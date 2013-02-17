@@ -1,0 +1,8 @@
+
+* Make sure all IBOutlet objects are correctly released.
+* Create list of servers, each with associated groups.  Also have an "all
+  servers" entry
+* Modify DownloadArticlesTask so that it works with an array of URLs.
+* Modify ArticleViewController so that it directly loads news: and nntp: URLs,
+  and uses a delegate (or data source) to load up previous and next articles.
+  (Will need to handle arrays of URLs for multi-part articles.)

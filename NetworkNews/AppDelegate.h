@@ -9,11 +9,24 @@
 #import <UIKit/UIKit.h>
 
 @class ViewController;
+@class NNServer;
+@class NNConnection;
+@class CoreDataStack;
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
 
-@property (strong, nonatomic) ViewController *viewController;
+//@property (strong, nonatomic) ViewController *viewController;
+@property (strong, nonatomic) UINavigationController *navigationController;
+
+@property(nonatomic, retain, readonly) NNServer *server;
+@property(nonatomic, retain, readonly) NNConnection *connection;
+@property(nonatomic, retain, readonly) NSString *cacheRootDir;
+@property(nonatomic, retain, readonly) NSMutableArray *savedLocation;
+@property(nonatomic, retain) CoreDataStack *activeCoreDataStack;
+@property(nonatomic, readonly, getter=isServerSetUp) BOOL serverSetUp;
+
+- (void)setUpConnectionWithServerInfo:(NSDictionary *)serverInfo;
 
 @end
