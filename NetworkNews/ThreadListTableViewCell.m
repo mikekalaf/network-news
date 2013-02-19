@@ -35,7 +35,7 @@
         
         // Add a label to display the thread count
         threadCountLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-        [threadCountLabel setTextAlignment:UITextAlignmentCenter];
+        [threadCountLabel setTextAlignment:NSTextAlignmentCenter];
         [threadCountLabel setFont:[UIFont boldSystemFontOfSize:12]];
         [[threadCountLabel layer] setCornerRadius:4];
         [[self contentView] addSubview:threadCountLabel];

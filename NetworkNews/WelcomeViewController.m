@@ -104,7 +104,7 @@
     {
         cell.textLabel.font = [UIFont boldSystemFontOfSize:24];
         cell.textLabel.text = @"Other";
-        cell.textLabel.textAlignment = UITextAlignmentCenter;
+        cell.textLabel.textAlignment = NSTextAlignmentCenter;
     }
     
     return cell;
@@ -202,7 +202,7 @@
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
         [navigationController setModalPresentationStyle:UIModalPresentationFormSheet];
 
-    [self presentModalViewController:navigationController animated:YES];
+    [self presentViewController:navigationController animated:YES completion:NULL];
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
         [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
@@ -239,13 +239,13 @@
     [array addObject:accountInfo];
     [userDefaults setObject:array forKey:@"Servers"];
 
-    [self dismissModalViewControllerAnimated:YES];
+    [self dismissViewControllerAnimated:YES completion:NULL];
     [[self navigationController] popViewControllerAnimated:NO];
 }
 
 - (void)newAccountViewControllerCancelled:(NewAccountViewController *)controller
 {
-    [self dismissModalViewControllerAnimated:YES];
+    [self dismissViewControllerAnimated:YES completion:NULL];
 }
 
 @end

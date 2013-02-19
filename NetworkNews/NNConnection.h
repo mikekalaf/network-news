@@ -25,7 +25,7 @@ extern NSString *NNConnectionBytesReceivedNotification;
     BOOL connected;
     BOOL executingCommand;
 
-    NSMutableData *responseData;
+    NSData *responseData;
     NSUInteger responseCode;
     const UInt8 *responseByteBuffer;
     NSUInteger responseLength;

@@ -9,7 +9,7 @@
 #import "ServersViewController.h"
 #import "WelcomeViewController.h"
 #import "FavouriteGroupsViewController.h"
-#import "NetworkNewsAppDelegate.h"
+#import "AppDelegate.h"
 
 #define SERVERS_KEY @"Servers"
 
@@ -150,7 +150,7 @@
 {
     NSDictionary *serverInfo = [servers objectAtIndex:[indexPath row]];
     
-    NetworkNewsAppDelegate *appDelegate = (NetworkNewsAppDelegate *)[[UIApplication sharedApplication] delegate];
+    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     [appDelegate setUpConnectionWithServerInfo:serverInfo];
 
     FavouriteGroupsViewController *viewController = [[FavouriteGroupsViewController alloc] initWithNibName:@"FavouriteGroupsView"

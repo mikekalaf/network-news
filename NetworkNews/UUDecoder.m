@@ -111,7 +111,7 @@ static NSUInteger scanForUuencodedData(const char *bytes,
             else
                 byteCount = bytes[i + 2] - 32;
             
-            if (byteCount < 0 || byteCount > 45)
+            if (byteCount > 45)
             {
                 linesOfValidData = 0;
                 continue;

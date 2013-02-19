@@ -10,7 +10,7 @@
 #import "NNArticleFormatter.h"
 #import "NNConnection.h"
 #import "PostArticleTask.h"
-#import "NetworkNewsAppDelegate.h"
+#import "AppDelegate.h"
 #import "NetworkNews.h"
 #import "NSString+NewsAdditions.h"
 
@@ -197,7 +197,7 @@
     articleText = [articleText stringByReplacingOccurrencesOfString:PARAGRAPH_SIGN_STR
                                                          withString:EMPTY_STR];
 
-    NetworkNewsAppDelegate *appDelegate = (NetworkNewsAppDelegate *)[[UIApplication sharedApplication] delegate];
+    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     NSString *path = [appDelegate.cacheRootDir stringByAppendingPathComponent:CACHE_FILE_NAME];
     [articleText writeToFile:path atomically:NO
                     encoding:NSUTF8StringEncoding
@@ -255,7 +255,7 @@
     restoredSelectedRange.location = [userDefaults integerForKey:@"MostRecentNewArticleSelectedRangeLocation"];
     restoredSelectedRange.length = 0;
 
-    NetworkNewsAppDelegate *appDelegate = (NetworkNewsAppDelegate *)[[UIApplication sharedApplication] delegate];
+    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     NSString *path = [appDelegate.cacheRootDir stringByAppendingPathComponent:CACHE_FILE_NAME];
     bodyText = [NSString stringWithContentsOfFile:path
                                          encoding:NSUTF8StringEncoding
@@ -479,7 +479,7 @@ shouldChangeTextInRange:(NSRange)range
 //    const char *bytes = articleData.bytes;
 //    NSUInteger length = articleData.length;
     
-    NetworkNewsAppDelegate *appDelegate = (NetworkNewsAppDelegate *)[[UIApplication sharedApplication] delegate];
+    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     currentTask = [[PostArticleTask alloc] initWithConnection:appDelegate.connection
                                                          data:articleData];
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];

@@ -11,7 +11,7 @@
 #import "Article.h"
 #import "ExtendedDateFormatter.h"
 #import "EmailAddressFormatter.h"
-#import "NetworkNewsAppDelegate.h"
+#import "AppDelegate.h"
 #import "ThreadTableViewCell.h"
 #import "ThreadSectionHeaderView.h"
 
@@ -267,7 +267,7 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NetworkNewsAppDelegate *appDelegate = (NetworkNewsAppDelegate *)[[UIApplication sharedApplication] delegate];
+    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
 
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
     {
@@ -284,13 +284,13 @@
     }
     else
     {
-        ArticleViewController *viewController = appDelegate.articleViewController;
-        
-        viewController.articleSource = self;
-        viewController.articleIndex = indexPath.row;
-        viewController.groupName = groupName;
-        
-        [viewController updateArticle];
+//        ArticleViewController *viewController = appDelegate.articleViewController;
+//        
+//        viewController.articleSource = self;
+//        viewController.articleIndex = indexPath.row;
+//        viewController.groupName = groupName;
+//        
+//        [viewController updateArticle];
     }
 }
 

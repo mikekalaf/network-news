@@ -7,9 +7,8 @@
 //
 
 #import "FavouriteGroupsViewController.h"
-#import "ArticleListViewController.h"
 #import "ThreadListViewController.h"
-#import "NetworkNewsAppDelegate.h"
+#import "AppDelegate.h"
 #import "SearchGroupsViewController.h"
 #import "NNServer.h"
 #import "NetworkNews.h"
@@ -36,7 +35,7 @@
 //    self.navigationItem.leftBarButtonItem = self.editButtonItem;
     
     // Load the subscribed groups
-    NetworkNewsAppDelegate *appDelegate = (NetworkNewsAppDelegate *)[[UIApplication sharedApplication] delegate];
+    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     NSString *path = [[appDelegate cacheRootDir] stringByAppendingPathComponent:@"groups.plist"];
     groups = [[NSMutableArray alloc] initWithContentsOfFile:path];
     if (!groups)
@@ -70,7 +69,7 @@
     // Save the group list if it has changed
     if (modified)
     {
-        NetworkNewsAppDelegate *appDelegate = (NetworkNewsAppDelegate *)[[UIApplication sharedApplication] delegate];
+        AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
         NSString *path = [[appDelegate cacheRootDir] stringByAppendingPathComponent:@"groups.plist"];
         [groups writeToFile:path atomically:YES];
         modified = NO;
@@ -157,7 +156,7 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
                                        reuseIdentifier:CellIdentifier];
         [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
-        [[cell textLabel] setLineBreakMode:UILineBreakModeMiddleTruncation];
+        [[cell textLabel] setLineBreakMode:NSLineBreakByTruncatingMiddle];
     }
 
     NSString *name = [groups objectAtIndex:[indexPath row]];
@@ -174,17 +173,6 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     NSString *name = [groups objectAtIndex:[indexPath row]];
 
-//    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-//    [userDefaults setObject:name forKey:MostRecentGroupName];
-
-	// Save this level's selection to our AppDelegate
-//	[appDelegate.savedLocation addObject:[NSNumber numberWithInteger:indexPath.row]];
-    
-    // TODO This will depend on whether we're using the threaded article view or not
-//    ArticleListViewController *viewController = [[ArticleListViewController alloc] initWithGroupName:name];
-//    [self.navigationController pushViewController:viewController animated:YES];
-//    [viewController release];
-    
     ThreadListViewController *viewController = [[ThreadListViewController alloc] initWithNibName:@"ThreadListView"
                                                                                           bundle:nil];
     [viewController setGroupName:name];
@@ -200,7 +188,7 @@ commitEditingStyle:(UITableViewCellEditingStyle)editingStyle
         // Delete the cache
         NSFileManager *fileManager = [NSFileManager defaultManager];
         NSString *name = [groups objectAtIndex:[indexPath row]];
-        NetworkNewsAppDelegate *appDelegate = (NetworkNewsAppDelegate *)[[UIApplication sharedApplication] delegate];
+        AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
         NSString *path = [[appDelegate cacheRootDir] stringByAppendingPathComponent:name];
         [fileManager removeItemAtPath:path error:NULL];
         
@@ -246,7 +234,7 @@ moveRowAtIndexPath:(NSIndexPath *)fromIndexPath
 - (IBAction)searchButtonPressed:(id)sender
 {
 	// Save this level's selection to our AppDelegate
-    NetworkNewsAppDelegate *appDelegate = (NetworkNewsAppDelegate *)[[UIApplication sharedApplication] delegate];
+    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
 	[appDelegate.savedLocation addObject:[NSNumber numberWithInteger:-2]];
 
     // Load the SearchGroupsViewController

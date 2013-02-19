@@ -8,7 +8,7 @@
 
 #import "SearchGroupsViewController.h"
 #import "GroupListSearchTask.h"
-#import "NetworkNewsAppDelegate.h"
+#import "AppDelegate.h"
 #import "NNConnection.h"
 #import "NetworkNews.h"
 
@@ -64,7 +64,7 @@
     // Save the group list if it has changed
     if (modified)
     {
-        NetworkNewsAppDelegate *appDelegate = (NetworkNewsAppDelegate *)[[UIApplication sharedApplication] delegate];
+        AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
         NSString *path = [[appDelegate cacheRootDir] stringByAppendingPathComponent:@"groups.plist"];
         [checkedGroups writeToFile:path atomically:YES];
         modified = NO;
@@ -95,7 +95,7 @@
 //    searchScope = [userDefaults integerForKey:MOST_RECENT_GROUP_SEARCH_SCOPE];
     if (searchText)
     {
-        NetworkNewsAppDelegate *appDelegate = (NetworkNewsAppDelegate *)[[UIApplication sharedApplication] delegate];
+        AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
         NSString *path = [appDelegate.cacheRootDir stringByAppendingPathComponent:@"search_results.archive"];
         foundGroupList = [NSKeyedUnarchiver unarchiveObjectWithFile:path];
     }
@@ -129,7 +129,7 @@
     {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle
                                        reuseIdentifier:CellIdentifier];
-        cell.textLabel.lineBreakMode = UILineBreakModeMiddleTruncation;
+        cell.textLabel.lineBreakMode = NSLineBreakByTruncatingMiddle;
     }
     
     GroupListInfo *listInfo = [foundGroupList objectAtIndex:indexPath.row];
@@ -252,7 +252,7 @@
 //    activityTextField.hidden = NO;
     
     // Issue a LIST ACTIVE <wildmat> command
-    NetworkNewsAppDelegate *appDelegate = (NetworkNewsAppDelegate *)[[UIApplication sharedApplication] delegate];
+    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     currentTask = [[GroupListSearchTask alloc] initWithConnection:appDelegate.connection
                                                           wildmat:wildmat];
     
@@ -321,7 +321,7 @@
                        sortedArrayUsingDescriptors:[NSArray arrayWithObject:sortDescriptor]];
 
     // Cache the results
-    NetworkNewsAppDelegate *appDelegate = (NetworkNewsAppDelegate *)[[UIApplication sharedApplication] delegate];
+    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     NSString *path = [appDelegate.cacheRootDir stringByAppendingPathComponent:@"search_results.archive"];
     [NSKeyedArchiver archiveRootObject:foundGroupList toFile:path];
     

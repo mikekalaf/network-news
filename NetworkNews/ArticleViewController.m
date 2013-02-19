@@ -8,7 +8,7 @@
 
 #import "ArticleViewController.h"
 #import "DownloadArticlesTask.h"
-#import "NetworkNewsAppDelegate.h"
+#import "AppDelegate.h"
 #import "Article.h"
 #import "ArticlePart.h"
 #import "NNConnection.h"
@@ -95,7 +95,7 @@
     progressView.hidden = YES;
 
     // Determine the cache directory, and make sure it exists
-    NetworkNewsAppDelegate *appDelegate = (NetworkNewsAppDelegate *)[[UIApplication sharedApplication] delegate];
+    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     cacheDir = [appDelegate.cacheRootDir stringByAppendingPathComponent:_groupName];
     
     NSFileManager *fileManager = [NSFileManager defaultManager];
@@ -117,7 +117,7 @@
         UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
         [viewController restoreLevel];
 
-        [self presentModalViewController:navigationController animated:NO];
+        [self presentViewController:navigationController animated:NO completion:NULL];
     }
 //    else if (restoreEmailView)
 //    {
@@ -222,7 +222,7 @@
 //    viewController.delegate = self;
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
 
-    [self.splitViewController presentModalViewController:navigationController animated:NO];
+    [self.splitViewController presentViewController:navigationController animated:NO completion:NULL];
     //[self presentModalViewController:navigationController animated:NO];
 }
 
@@ -232,9 +232,9 @@
 - (void)newArticleViewController:(NewArticleViewController *)controller
                          didSend:(BOOL)send
 {
-    [self dismissModalViewControllerAnimated:YES];
+    [self dismissViewControllerAnimated:YES completion:NULL];
 
-    NetworkNewsAppDelegate *appDelegate = (NetworkNewsAppDelegate *)[[UIApplication sharedApplication] delegate];
+    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
 	[appDelegate.savedLocation removeLastObject];
 }
 
@@ -245,8 +245,8 @@
 {
     NSLog(@"New user welcomed");
     
-    [self dismissModalViewControllerAnimated:YES];
-    
+    [self dismissViewControllerAnimated:YES completion:NULL];
+
     // Establish a connection to the newly specified server
     // TODO: Rework how this happens on the iPad
 //    NetworkNewsAppDelegate *appDelegate = (NetworkNewsAppDelegate *)[[UIApplication sharedApplication] delegate];
@@ -260,9 +260,9 @@
           didFinishWithResult:(MFMailComposeResult)result
                         error:(NSError*)error
 {
-    [self dismissModalViewControllerAnimated:YES];
+    [self dismissViewControllerAnimated:YES completion:NULL];
 
-    NetworkNewsAppDelegate *appDelegate = (NetworkNewsAppDelegate *)[[UIApplication sharedApplication] delegate];
+    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
 	[appDelegate.savedLocation removeLastObject];
 }
 
@@ -386,7 +386,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     
     // TODO This needs to be fixed-up to record the thread
     
-    NetworkNewsAppDelegate *appDelegate = (NetworkNewsAppDelegate *)[[UIApplication sharedApplication] delegate];
+    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     [appDelegate.savedLocation removeLastObject];
     [appDelegate.savedLocation addObject:[NSNumber numberWithInteger:_articleIndex]];
 }
@@ -416,7 +416,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 - (IBAction)composeButtonPressed:(id)sender
 {
 	// Save this level's selection to our AppDelegate
-    NetworkNewsAppDelegate *appDelegate = (NetworkNewsAppDelegate *)[[UIApplication sharedApplication] delegate];
+    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
 	[appDelegate.savedLocation addObject:[NSNumber numberWithInteger:-2]];
     
     NewArticleViewController *viewController = [[NewArticleViewController alloc] initWithGroupName:_groupName
@@ -427,7 +427,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
     navigationController.modalPresentationStyle = UIModalPresentationPageSheet;
-    [self presentModalViewController:navigationController animated:YES];
+    [self presentViewController:navigationController animated:YES completion:NULL];
 }
 
 #pragma mark -
@@ -485,7 +485,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
                                                extension:attachment.fileName.pathExtension];
             article.attachmentFileName = attachment.fileName;
 
-            NetworkNewsAppDelegate *appDelegate = (NetworkNewsAppDelegate *)[[UIApplication sharedApplication] delegate];
+            AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
             [appDelegate.activeCoreDataStack save];
         }
         
@@ -593,7 +593,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 
     // Mark it as read, since we're loading it to be viewed
     [article setRead:[NSNumber numberWithBool:YES]];
-    NetworkNewsAppDelegate *appDelegate = (NetworkNewsAppDelegate *)[[UIApplication sharedApplication] delegate];
+    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     [appDelegate.activeCoreDataStack save];
 }
 
@@ -671,7 +671,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 - (void)followUpToGroup
 {
 	// Save this level's selection to our AppDelegate
-    NetworkNewsAppDelegate *appDelegate = (NetworkNewsAppDelegate *)[[UIApplication sharedApplication] delegate];
+    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
 	[appDelegate.savedLocation addObject:[NSNumber numberWithInteger:-2]];
 
     // Collect the references, and add this messageId
@@ -696,7 +696,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
 
     navigationController.modalPresentationStyle = UIModalPresentationPageSheet;
-    [self presentModalViewController:navigationController animated:YES];
+    [self presentViewController:navigationController animated:YES completion:NULL];
 }
 
 - (void)replyViaEmail
@@ -707,7 +707,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     }
 
 	// Save this level's selection to our AppDelegate
-    NetworkNewsAppDelegate *appDelegate = (NetworkNewsAppDelegate *)[[UIApplication sharedApplication] delegate];
+    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
 	[appDelegate.savedLocation addObject:[NSNumber numberWithInteger:-3]];
     
     // Who do we reply to?
@@ -720,8 +720,9 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     [mailViewController setSubject:article.reSubject];
     [mailViewController setMessageBody:[self bodyTextForFollowUp] isHTML:NO];
     mailViewController.mailComposeDelegate = self;
-    [self presentModalViewController:mailViewController
-                            animated:YES];
+    [self presentViewController:mailViewController
+                       animated:YES
+                     completion:NULL];
 }
 
 - (NSData *)htmlEscapedData:(NSData *)unescapedData
@@ -861,7 +862,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 - (void)endQuoteLevel:(NSUInteger)level
 {
     for (NSUInteger i = 0; i <= level; ++i)
-        [htmlString appendFormat:@"</div>", i];
+        [htmlString appendString:@"</div>"];
 }
 
 - (void)beginSignature
@@ -1175,7 +1176,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 
         // Mark it as read
         [article setRead:[NSNumber numberWithBool:YES]];
-        NetworkNewsAppDelegate *appDelegate = (NetworkNewsAppDelegate *)[[UIApplication sharedApplication] delegate];
+        AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
         [appDelegate.activeCoreDataStack save];
 
         return;
@@ -1188,7 +1189,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     progressView.hidden = NO;
     
     // Download the article(s)
-    NetworkNewsAppDelegate *appDelegate = (NetworkNewsAppDelegate *)[[UIApplication sharedApplication] delegate];
+    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     currentTask = [[DownloadArticlesTask alloc] initWithConnection:appDelegate.connection
                                                       articleParts:sortedParts];
     
