@@ -10,10 +10,10 @@
 #import "LogoTableViewCell.h"
 
 #define NEW_ACCOUNT_GIGANEWS        0
-#define NEW_ACCOUNT_POWER_USENET    1
-#define NEW_ACCOUNT_SUPERNEWS       2
-#define NEW_ACCOUNT_USENET_DOT_NET  3
-#define NEW_ACCOUNT_OTHER           4
+//#define NEW_ACCOUNT_POWER_USENET    1
+//#define NEW_ACCOUNT_SUPERNEWS       2
+//#define NEW_ACCOUNT_USENET_DOT_NET  3
+#define NEW_ACCOUNT_OTHER           1
 
 @implementation WelcomeViewController
 
@@ -67,7 +67,7 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     // Return the number of rows in the section.
-    return 5;
+    return 2;
 }
 
 
@@ -88,18 +88,18 @@
     {
         cell.imageView.image = [UIImage imageNamed:@"gn.png"];
     }
-    else if (indexPath.row == NEW_ACCOUNT_POWER_USENET)
-    {
-        cell.imageView.image = [UIImage imageNamed:@"pu.png"];
-    }
-    else if (indexPath.row == NEW_ACCOUNT_SUPERNEWS)
-    {
-        cell.imageView.image = [UIImage imageNamed:@"sn.png"];
-    }
-    else if (indexPath.row == NEW_ACCOUNT_USENET_DOT_NET)
-    {
-        cell.imageView.image = [UIImage imageNamed:@"un.png"];
-    }
+//    else if (indexPath.row == NEW_ACCOUNT_POWER_USENET)
+//    {
+//        cell.imageView.image = [UIImage imageNamed:@"pu.png"];
+//    }
+//    else if (indexPath.row == NEW_ACCOUNT_SUPERNEWS)
+//    {
+//        cell.imageView.image = [UIImage imageNamed:@"sn.png"];
+//    }
+//    else if (indexPath.row == NEW_ACCOUNT_USENET_DOT_NET)
+//    {
+//        cell.imageView.image = [UIImage imageNamed:@"un.png"];
+//    }
     else if (indexPath.row == NEW_ACCOUNT_OTHER)
     {
         cell.textLabel.font = [UIFont boldSystemFontOfSize:24];
@@ -158,35 +158,35 @@
 {
     NSMutableDictionary *nai = [NSMutableDictionary dictionary];
 
-    if (indexPath.row == 0)
+    if (indexPath.row == NEW_ACCOUNT_GIGANEWS)
     {
         // Giganews
         [nai setObject:@"Giganews" forKey:@"Name"];
-        [nai setObject:@"http://www.giganews.com/?a=synchroma" forKey:@"SupportURL"];
+        [nai setObject:@"http://www.giganews.com/?c=gn1113881" forKey:@"SupportURL"];
         [nai setObject:@"news.giganews.com" forKey:@"HostName"];
     }
-    else if (indexPath.row == 1)
-    {
-        // Power Usenet
-        [nai setObject:@"Power Usenet" forKey:@"Name"];
-        [nai setObject:@"http://www.powerusenet.com/?a=synchroma" forKey:@"SupportURL"];
-        [nai setObject:@"news.powerusenet.com" forKey:@"HostName"];
-    }
-    else if (indexPath.row == 2)
-    {
-        // Supernews
-        [nai setObject:@"Supernews" forKey:@"Name"];
-        [nai setObject:@"http://www.supernews.com/?a=synchroma" forKey:@"SupportURL"];
-        [nai setObject:@"news.supernews.com" forKey:@"HostName"];
-    }
-    else if (indexPath.row == 3)
-    {
-        // Usenet.net
-        [nai setObject:@"Usenet.net" forKey:@"Name"];
-        [nai setObject:@"http://www.usenet.net/?a=synchroma" forKey:@"SupportURL"];
-        [nai setObject:@"news.usenet.net" forKey:@"HostName"];
-    }
-    else if (indexPath.row == 4)
+//    else if (indexPath.row == 1)
+//    {
+//        // Power Usenet
+//        [nai setObject:@"Power Usenet" forKey:@"Name"];
+//        [nai setObject:@"http://www.powerusenet.com/?a=synchroma" forKey:@"SupportURL"];
+//        [nai setObject:@"news.powerusenet.com" forKey:@"HostName"];
+//    }
+//    else if (indexPath.row == 2)
+//    {
+//        // Supernews
+//        [nai setObject:@"Supernews" forKey:@"Name"];
+//        [nai setObject:@"http://www.supernews.com/?a=synchroma" forKey:@"SupportURL"];
+//        [nai setObject:@"news.supernews.com" forKey:@"HostName"];
+//    }
+//    else if (indexPath.row == 3)
+//    {
+//        // Usenet.net
+//        [nai setObject:@"Usenet.net" forKey:@"Name"];
+//        [nai setObject:@"http://www.usenet.net/?a=synchroma" forKey:@"SupportURL"];
+//        [nai setObject:@"news.usenet.net" forKey:@"HostName"];
+//    }
+    else if (indexPath.row == NEW_ACCOUNT_OTHER)
     {
         // Other
         [nai setObject:@"Usenet Server" forKey:@"Name"];
