@@ -110,8 +110,8 @@
         EditableTableViewCell *cell = (EditableTableViewCell *)[tableView dequeueReusableCellWithIdentifier:cellIdentifier];
         if (cell == nil)
         {
-            cell = [[EditableTableViewCell alloc] initWithFrame:CGRectZero
-                                                 reuseIdentifier:cellIdentifier];
+            cell = [[EditableTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
+                                                reuseIdentifier:cellIdentifier];
             [cell.textField addTarget:self
                                action:@selector(textFieldValueChanged:)
                      forControlEvents:UIControlEventEditingChanged];

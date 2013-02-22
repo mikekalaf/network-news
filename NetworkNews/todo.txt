@@ -6,3 +6,5 @@
 * Modify ArticleViewController so that it directly loads news: and nntp: URLs,
   and uses a delegate (or data source) to load up previous and next articles.
   (Will need to handle arrays of URLs for multi-part articles.)
+* Investigate using NSOperation to handle the Tasks, including how GCD can be
+  used to make things work much more nicely.

@@ -163,7 +163,7 @@
 		634191E516D0D6590069B528 /* NetworkNewsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NetworkNewsTests.m; sourceTree = "<group>"; };
 		634191F316D0D87F0069B528 /* ArticleViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ArticleViewController.h; sourceTree = "<group>"; };
 		634191F416D0D87F0069B528 /* ArticleViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ArticleViewController.m; sourceTree = "<group>"; };
-		634191F916D0D87F0069B528 /* changes.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = changes.txt; sourceTree = "<group>"; };
+		634191F916D0D87F0069B528 /* changes.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = changes.txt; path = NetworkNews/changes.txt; sourceTree = "<group>"; };
 		634191FA16D0D87F0069B528 /* EditableTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditableTableViewCell.h; sourceTree = "<group>"; };
 		634191FB16D0D87F0069B528 /* EditableTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EditableTableViewCell.m; sourceTree = "<group>"; };
 		634191FF16D0D8800069B528 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/AllGroupsView.xib; sourceTree = "<group>"; };
@@ -236,7 +236,7 @@
 		6341925416D0D8800069B528 /* ThreadTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ThreadTableViewCell.m; sourceTree = "<group>"; };
 		6341925516D0D8800069B528 /* ThreadViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ThreadViewController.h; sourceTree = "<group>"; };
 		6341925616D0D8800069B528 /* ThreadViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ThreadViewController.m; sourceTree = "<group>"; };
-		6341925716D0D8800069B528 /* todo.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = todo.txt; sourceTree = "<group>"; };
+		6341925716D0D8800069B528 /* todo.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = todo.txt; path = NetworkNews/todo.txt; sourceTree = "<group>"; };
 		6341925816D0D8800069B528 /* un.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = un.png; sourceTree = "<group>"; };
 		6341925916D0D8800069B528 /* un@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "un@2x.png"; sourceTree = "<group>"; };
 		6341925A16D0D8800069B528 /* WelcomeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WelcomeViewController.h; sourceTree = "<group>"; };
@@ -364,6 +364,8 @@
 				634191DE16D0D6590069B528 /* NetworkNewsTests */,
 				634191B316D0D6590069B528 /* Frameworks */,
 				634191B216D0D6590069B528 /* Products */,
+				634191F916D0D87F0069B528 /* changes.txt */,
+				6341925716D0D8800069B528 /* todo.txt */,
 			);
 			sourceTree = "<group>";
 		};
@@ -396,150 +398,19 @@
 		634191BA16D0D6590069B528 /* NetworkNews */ = {
 			isa = PBXGroup;
 			children = (
-				6398525616D0FBEA009303E2 /* LineIterator.h */,
-				6398525716D0FBEA009303E2 /* LineIterator.m */,
-				6341931C16D0DDE30069B528 /* SizeFormatter.h */,
-				6341931D16D0DDE30069B528 /* SizeFormatter.m */,
-				6341931916D0DC0B0069B528 /* EmailAddressFormatter.h */,
-				6341931A16D0DC0B0069B528 /* EmailAddressFormatter.m */,
-				6341931616D0DB180069B528 /* GroupNode.h */,
-				6341931716D0DB180069B528 /* GroupNode.m */,
-				634192A716D0DAEC0069B528 /* Article.h */,
-				634192A816D0DAEC0069B528 /* Article.m */,
-				634192A916D0DAEC0069B528 /* Article.xcdatamodel */,
-				634192AA16D0DAEC0069B528 /* ArticleGroup.h */,
-				634192AB16D0DAEC0069B528 /* ArticleGroup.m */,
-				634192AC16D0DAEC0069B528 /* ArticlePart.h */,
-				634192AD16D0DAEC0069B528 /* ArticlePart.m */,
-				634192AE16D0DAEC0069B528 /* ArticlePartContent.h */,
-				634192AF16D0DAEC0069B528 /* ArticlePartContent.m */,
-				634192B216D0DAEC0069B528 /* Attachment.h */,
-				634192B316D0DAEC0069B528 /* Attachment.m */,
-				634192B416D0DAEC0069B528 /* ConnectionVerifier.h */,
-				634192B516D0DAEC0069B528 /* ConnectionVerifier.m */,
-				634192B616D0DAEC0069B528 /* ContentType.h */,
-				634192B716D0DAEC0069B528 /* ContentType.m */,
-				634192B816D0DAEC0069B528 /* CoreDataStack.h */,
-				634192B916D0DAED0069B528 /* CoreDataStack.m */,
-				634192BA16D0DAED0069B528 /* DownloadArticleOverviewsTask.h */,
-				634192BB16D0DAED0069B528 /* DownloadArticleOverviewsTask.m */,
-				634192BC16D0DAED0069B528 /* DownloadArticlesTask.h */,
-				634192BD16D0DAED0069B528 /* DownloadArticlesTask.m */,
-				634192BE16D0DAED0069B528 /* EncodedWordDecoder.h */,
-				634192BF16D0DAED0069B528 /* EncodedWordDecoder.m */,
-				634192C016D0DAED0069B528 /* Group.h */,
-				634192C116D0DAED0069B528 /* Group.m */,
-				634192C216D0DAED0069B528 /* GroupCoreDataStack.h */,
-				634192C316D0DAED0069B528 /* GroupCoreDataStack.m */,
-				634192C416D0DAED0069B528 /* GroupFavourite.h */,
-				634192C516D0DAED0069B528 /* GroupFavourite.m */,
-				634192C616D0DAED0069B528 /* GroupListSearchTask.h */,
-				634192C716D0DAED0069B528 /* GroupListSearchTask.m */,
-				634192C816D0DAED0069B528 /* GroupListTask.h */,
-				634192C916D0DAED0069B528 /* GroupListTask.m */,
-				634192CA16D0DAED0069B528 /* News.xcdatamodel */,
-				634192CB16D0DAED0069B528 /* NewsKit.h */,
-				634192CC16D0DAED0069B528 /* NNArticleFormatter.h */,
-				634192CD16D0DAED0069B528 /* NNArticleFormatter.m */,
-				634192CE16D0DAED0069B528 /* NNBase64Decoder.h */,
-				634192CF16D0DAED0069B528 /* NNBase64Decoder.m */,
-				634192D016D0DAED0069B528 /* NNConnection.h */,
-				634192D116D0DAED0069B528 /* NNConnection.m */,
-				634192D216D0DAED0069B528 /* NNHeaderEntry.h */,
-				634192D316D0DAED0069B528 /* NNHeaderEntry.m */,
-				634192D416D0DAED0069B528 /* NNHeaderParser.h */,
-				634192D516D0DAED0069B528 /* NNHeaderParser.m */,
-				634192D616D0DAED0069B528 /* NNQuoteLevel.h */,
-				634192D716D0DAED0069B528 /* NNQuoteLevel.m */,
-				634192D816D0DAED0069B528 /* NNQuoteLevelParser.h */,
-				634192D916D0DAED0069B528 /* NNQuoteLevelParser.m */,
-				634192DA16D0DAED0069B528 /* NNServer.h */,
-				634192DB16D0DAED0069B528 /* NNServer.m */,
-				634192DC16D0DAED0069B528 /* NNServerDelegate.h */,
-				634192DD16D0DAED0069B528 /* NSArray+NewsAdditions.h */,
-				634192DE16D0DAEE0069B528 /* NSArray+NewsAdditions.m */,
-				634192DF16D0DAEE0069B528 /* NSData+NewsAdditions.h */,
-				634192E016D0DAEE0069B528 /* NSData+NewsAdditions.m */,
-				634192E316D0DAEE0069B528 /* NSString+NewsAdditions.h */,
-				634192E416D0DAEE0069B528 /* NSString+NewsAdditions.m */,
-				634192E516D0DAEE0069B528 /* PostArticleTask.h */,
-				634192E616D0DAEE0069B528 /* PostArticleTask.m */,
-				634192E716D0DAEE0069B528 /* QuotedPrintableDecoder.h */,
-				634192E816D0DAEE0069B528 /* QuotedPrintableDecoder.m */,
-				634192E916D0DAEE0069B528 /* Task.h */,
-				634192EA16D0DAEE0069B528 /* Task.m */,
-				634192EB16D0DAEE0069B528 /* Thread.h */,
-				634192EC16D0DAEE0069B528 /* Thread.m */,
-				634192ED16D0DAEE0069B528 /* UUDecoder.h */,
-				634192EE16D0DAEE0069B528 /* UUDecoder.m */,
-				634192EF16D0DAEE0069B528 /* YEncDecoder.h */,
-				634192F016D0DAEE0069B528 /* YEncDecoder.m */,
+				638F78D616D42E640085B896 /* NewsKit */,
+				638F78D716D42EF90085B896 /* Tasks */,
+				638F78D816D42F940085B896 /* Model */,
+				638F78D916D430010085B896 /* UI */,
+				638F78DA16D431520085B896 /* Decoders */,
+				638F78DC16D433430085B896 /* Formatters */,
 				634192A616D0D8D90069B528 /* Images */,
-				634191F316D0D87F0069B528 /* ArticleViewController.h */,
-				634191F416D0D87F0069B528 /* ArticleViewController.m */,
-				634191F916D0D87F0069B528 /* changes.txt */,
-				634191FA16D0D87F0069B528 /* EditableTableViewCell.h */,
-				634191FB16D0D87F0069B528 /* EditableTableViewCell.m */,
-				634191FE16D0D8800069B528 /* AllGroupsView.xib */,
-				6341920016D0D8800069B528 /* ArticleListView.xib */,
-				6341920216D0D8800069B528 /* ArticleView.xib */,
-				6341920416D0D8800069B528 /* EditableTextTableViewCell.xib */,
-				6341920616D0D8800069B528 /* FavouriteGroupsView.xib */,
-				6341920816D0D8800069B528 /* GroupInfoView.xib */,
-				6341920A16D0D8800069B528 /* MainWindow.xib */,
-				6341920C16D0D8800069B528 /* NewAccountView.xib */,
-				6341920E16D0D8800069B528 /* NewArticleView.xib */,
-				6341921016D0D8800069B528 /* SearchGroupsView.xib */,
-				6341921216D0D8800069B528 /* ServersView.xib */,
-				6341921416D0D8800069B528 /* ThreadListView.xib */,
-				6341921616D0D8800069B528 /* ThreadView.xib */,
-				6341921816D0D8800069B528 /* WelcomeView.xib */,
-				6341921A16D0D8800069B528 /* ExtendedDateFormatter.h */,
-				6341921B16D0D8800069B528 /* ExtendedDateFormatter.m */,
-				6341921C16D0D8800069B528 /* ExtendedTextView.h */,
-				6341921D16D0D8800069B528 /* ExtendedTextView.m */,
-				6341921E16D0D8800069B528 /* FavouriteGroupsViewController.h */,
-				6341921F16D0D8800069B528 /* FavouriteGroupsViewController.m */,
-				6341922016D0D8800069B528 /* FieldView.h */,
-				6341922116D0D8800069B528 /* FieldView.m */,
-				6341922816D0D8800069B528 /* GroupInfoViewController.h */,
-				6341922916D0D8800069B528 /* GroupInfoViewController.m */,
-				6341922A16D0D8800069B528 /* GroupNavigationController.h */,
-				6341922B16D0D8800069B528 /* GroupNavigationController.m */,
-				6341923616D0D8800069B528 /* LogoTableViewCell.h */,
-				6341923716D0D8800069B528 /* LogoTableViewCell.m */,
-				6341923816D0D8800069B528 /* NetworkNews.h */,
-				6341923916D0D8800069B528 /* NewAccountViewController.h */,
-				6341923A16D0D8800069B528 /* NewAccountViewController.m */,
-				6341923B16D0D8800069B528 /* NewArticleViewController.h */,
-				6341923C16D0D8800069B528 /* NewArticleViewController.m */,
-				6341924016D0D8800069B528 /* ProgressView.h */,
-				6341924116D0D8800069B528 /* ProgressView.m */,
-				6341924416D0D8800069B528 /* SearchGroupsViewController.h */,
-				6341924516D0D8800069B528 /* SearchGroupsViewController.m */,
-				6341924616D0D8800069B528 /* ServersViewController.h */,
-				6341924716D0D8800069B528 /* ServersViewController.m */,
-				6341924816D0D8800069B528 /* Settings.bundle */,
-				6341924B16D0D8800069B528 /* ThreadIterator.h */,
-				6341924C16D0D8800069B528 /* ThreadIterator.m */,
-				6341924D16D0D8800069B528 /* ThreadListTableViewCell.h */,
-				6341924E16D0D8800069B528 /* ThreadListTableViewCell.m */,
-				6341924F16D0D8800069B528 /* ThreadListViewController.h */,
-				6341925016D0D8800069B528 /* ThreadListViewController.m */,
-				6341925116D0D8800069B528 /* ThreadSectionHeaderView.h */,
-				6341925216D0D8800069B528 /* ThreadSectionHeaderView.m */,
-				6341925316D0D8800069B528 /* ThreadTableViewCell.h */,
-				6341925416D0D8800069B528 /* ThreadTableViewCell.m */,
-				6341925516D0D8800069B528 /* ThreadViewController.h */,
-				6341925616D0D8800069B528 /* ThreadViewController.m */,
-				6341925716D0D8800069B528 /* todo.txt */,
-				6341925A16D0D8800069B528 /* WelcomeViewController.h */,
-				6341925B16D0D8800069B528 /* WelcomeViewController.m */,
 				634191C316D0D6590069B528 /* AppDelegate.h */,
 				634191C416D0D6590069B528 /* AppDelegate.m */,
 				634191CC16D0D6590069B528 /* ViewController.h */,
 				634191CD16D0D6590069B528 /* ViewController.m */,
 				634191CF16D0D6590069B528 /* ViewController.xib */,
+				638F78DB16D432A20085B896 /* Categories */,
 				634191BB16D0D6590069B528 /* Supporting Files */,
 			);
 			path = NetworkNews;
@@ -548,6 +419,8 @@
 		634191BB16D0D6590069B528 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				6341923816D0D8800069B528 /* NetworkNews.h */,
+				6341924816D0D8800069B528 /* Settings.bundle */,
 				634191BC16D0D6590069B528 /* NetworkNews-Info.plist */,
 				634191BD16D0D6590069B528 /* InfoPlist.strings */,
 				634191C016D0D6590069B528 /* main.m */,
@@ -603,6 +476,189 @@
 				6341922516D0D8800069B528 /* gn@2x.png */,
 			);
 			name = Images;
+			sourceTree = "<group>";
+		};
+		638F78D616D42E640085B896 /* NewsKit */ = {
+			isa = PBXGroup;
+			children = (
+				634192CB16D0DAED0069B528 /* NewsKit.h */,
+				634192CC16D0DAED0069B528 /* NNArticleFormatter.h */,
+				634192CD16D0DAED0069B528 /* NNArticleFormatter.m */,
+				634192CE16D0DAED0069B528 /* NNBase64Decoder.h */,
+				634192CF16D0DAED0069B528 /* NNBase64Decoder.m */,
+				634192D016D0DAED0069B528 /* NNConnection.h */,
+				634192D116D0DAED0069B528 /* NNConnection.m */,
+				634192D216D0DAED0069B528 /* NNHeaderEntry.h */,
+				634192D316D0DAED0069B528 /* NNHeaderEntry.m */,
+				634192D416D0DAED0069B528 /* NNHeaderParser.h */,
+				634192D516D0DAED0069B528 /* NNHeaderParser.m */,
+				634192D616D0DAED0069B528 /* NNQuoteLevel.h */,
+				634192D716D0DAED0069B528 /* NNQuoteLevel.m */,
+				634192D816D0DAED0069B528 /* NNQuoteLevelParser.h */,
+				634192D916D0DAED0069B528 /* NNQuoteLevelParser.m */,
+				634192DA16D0DAED0069B528 /* NNServer.h */,
+				634192DB16D0DAED0069B528 /* NNServer.m */,
+				634192DC16D0DAED0069B528 /* NNServerDelegate.h */,
+			);
+			name = NewsKit;
+			sourceTree = "<group>";
+		};
+		638F78D716D42EF90085B896 /* Tasks */ = {
+			isa = PBXGroup;
+			children = (
+				6398525616D0FBEA009303E2 /* LineIterator.h */,
+				6398525716D0FBEA009303E2 /* LineIterator.m */,
+				634192E916D0DAEE0069B528 /* Task.h */,
+				634192EA16D0DAEE0069B528 /* Task.m */,
+				634192BA16D0DAED0069B528 /* DownloadArticleOverviewsTask.h */,
+				634192BB16D0DAED0069B528 /* DownloadArticleOverviewsTask.m */,
+				634192BC16D0DAED0069B528 /* DownloadArticlesTask.h */,
+				634192BD16D0DAED0069B528 /* DownloadArticlesTask.m */,
+				634192C616D0DAED0069B528 /* GroupListSearchTask.h */,
+				634192C716D0DAED0069B528 /* GroupListSearchTask.m */,
+				634192C816D0DAED0069B528 /* GroupListTask.h */,
+				634192C916D0DAED0069B528 /* GroupListTask.m */,
+				634192E516D0DAEE0069B528 /* PostArticleTask.h */,
+				634192E616D0DAEE0069B528 /* PostArticleTask.m */,
+			);
+			name = Tasks;
+			sourceTree = "<group>";
+		};
+		638F78D816D42F940085B896 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				6341931616D0DB180069B528 /* GroupNode.h */,
+				6341931716D0DB180069B528 /* GroupNode.m */,
+				634192A716D0DAEC0069B528 /* Article.h */,
+				634192A816D0DAEC0069B528 /* Article.m */,
+				634192A916D0DAEC0069B528 /* Article.xcdatamodel */,
+				634192AA16D0DAEC0069B528 /* ArticleGroup.h */,
+				634192AB16D0DAEC0069B528 /* ArticleGroup.m */,
+				634192AC16D0DAEC0069B528 /* ArticlePart.h */,
+				634192AD16D0DAEC0069B528 /* ArticlePart.m */,
+				634192AE16D0DAEC0069B528 /* ArticlePartContent.h */,
+				634192AF16D0DAEC0069B528 /* ArticlePartContent.m */,
+				634192B216D0DAEC0069B528 /* Attachment.h */,
+				634192B316D0DAEC0069B528 /* Attachment.m */,
+				634192B816D0DAEC0069B528 /* CoreDataStack.h */,
+				634192B916D0DAED0069B528 /* CoreDataStack.m */,
+				634192C016D0DAED0069B528 /* Group.h */,
+				634192C116D0DAED0069B528 /* Group.m */,
+				634192C216D0DAED0069B528 /* GroupCoreDataStack.h */,
+				634192C316D0DAED0069B528 /* GroupCoreDataStack.m */,
+				634192C416D0DAED0069B528 /* GroupFavourite.h */,
+				634192C516D0DAED0069B528 /* GroupFavourite.m */,
+				634192CA16D0DAED0069B528 /* News.xcdatamodel */,
+			);
+			name = Model;
+			sourceTree = "<group>";
+		};
+		638F78D916D430010085B896 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				634192EB16D0DAEE0069B528 /* Thread.h */,
+				634192EC16D0DAEE0069B528 /* Thread.m */,
+				634192B616D0DAEC0069B528 /* ContentType.h */,
+				634192B716D0DAEC0069B528 /* ContentType.m */,
+				634192B416D0DAEC0069B528 /* ConnectionVerifier.h */,
+				634192B516D0DAEC0069B528 /* ConnectionVerifier.m */,
+				6341923916D0D8800069B528 /* NewAccountViewController.h */,
+				6341923A16D0D8800069B528 /* NewAccountViewController.m */,
+				6341923B16D0D8800069B528 /* NewArticleViewController.h */,
+				6341923C16D0D8800069B528 /* NewArticleViewController.m */,
+				6341924016D0D8800069B528 /* ProgressView.h */,
+				6341924116D0D8800069B528 /* ProgressView.m */,
+				6341924416D0D8800069B528 /* SearchGroupsViewController.h */,
+				6341924516D0D8800069B528 /* SearchGroupsViewController.m */,
+				6341924616D0D8800069B528 /* ServersViewController.h */,
+				6341924716D0D8800069B528 /* ServersViewController.m */,
+				6341924B16D0D8800069B528 /* ThreadIterator.h */,
+				6341924C16D0D8800069B528 /* ThreadIterator.m */,
+				6341924D16D0D8800069B528 /* ThreadListTableViewCell.h */,
+				6341924E16D0D8800069B528 /* ThreadListTableViewCell.m */,
+				6341924F16D0D8800069B528 /* ThreadListViewController.h */,
+				6341925016D0D8800069B528 /* ThreadListViewController.m */,
+				6341925116D0D8800069B528 /* ThreadSectionHeaderView.h */,
+				6341925216D0D8800069B528 /* ThreadSectionHeaderView.m */,
+				6341925316D0D8800069B528 /* ThreadTableViewCell.h */,
+				6341925416D0D8800069B528 /* ThreadTableViewCell.m */,
+				6341925516D0D8800069B528 /* ThreadViewController.h */,
+				6341925616D0D8800069B528 /* ThreadViewController.m */,
+				6341925A16D0D8800069B528 /* WelcomeViewController.h */,
+				6341925B16D0D8800069B528 /* WelcomeViewController.m */,
+				634191F316D0D87F0069B528 /* ArticleViewController.h */,
+				634191F416D0D87F0069B528 /* ArticleViewController.m */,
+				634191FA16D0D87F0069B528 /* EditableTableViewCell.h */,
+				634191FB16D0D87F0069B528 /* EditableTableViewCell.m */,
+				634191FE16D0D8800069B528 /* AllGroupsView.xib */,
+				6341920016D0D8800069B528 /* ArticleListView.xib */,
+				6341920216D0D8800069B528 /* ArticleView.xib */,
+				6341920416D0D8800069B528 /* EditableTextTableViewCell.xib */,
+				6341920616D0D8800069B528 /* FavouriteGroupsView.xib */,
+				6341920816D0D8800069B528 /* GroupInfoView.xib */,
+				6341920A16D0D8800069B528 /* MainWindow.xib */,
+				6341920C16D0D8800069B528 /* NewAccountView.xib */,
+				6341920E16D0D8800069B528 /* NewArticleView.xib */,
+				6341921016D0D8800069B528 /* SearchGroupsView.xib */,
+				6341921216D0D8800069B528 /* ServersView.xib */,
+				6341921416D0D8800069B528 /* ThreadListView.xib */,
+				6341921616D0D8800069B528 /* ThreadView.xib */,
+				6341921816D0D8800069B528 /* WelcomeView.xib */,
+				6341921A16D0D8800069B528 /* ExtendedDateFormatter.h */,
+				6341921B16D0D8800069B528 /* ExtendedDateFormatter.m */,
+				6341921C16D0D8800069B528 /* ExtendedTextView.h */,
+				6341921D16D0D8800069B528 /* ExtendedTextView.m */,
+				6341921E16D0D8800069B528 /* FavouriteGroupsViewController.h */,
+				6341921F16D0D8800069B528 /* FavouriteGroupsViewController.m */,
+				6341922016D0D8800069B528 /* FieldView.h */,
+				6341922116D0D8800069B528 /* FieldView.m */,
+				6341922816D0D8800069B528 /* GroupInfoViewController.h */,
+				6341922916D0D8800069B528 /* GroupInfoViewController.m */,
+				6341922A16D0D8800069B528 /* GroupNavigationController.h */,
+				6341922B16D0D8800069B528 /* GroupNavigationController.m */,
+				6341923616D0D8800069B528 /* LogoTableViewCell.h */,
+				6341923716D0D8800069B528 /* LogoTableViewCell.m */,
+			);
+			name = UI;
+			sourceTree = "<group>";
+		};
+		638F78DA16D431520085B896 /* Decoders */ = {
+			isa = PBXGroup;
+			children = (
+				634192BE16D0DAED0069B528 /* EncodedWordDecoder.h */,
+				634192BF16D0DAED0069B528 /* EncodedWordDecoder.m */,
+				634192E716D0DAEE0069B528 /* QuotedPrintableDecoder.h */,
+				634192E816D0DAEE0069B528 /* QuotedPrintableDecoder.m */,
+				634192ED16D0DAEE0069B528 /* UUDecoder.h */,
+				634192EE16D0DAEE0069B528 /* UUDecoder.m */,
+				634192EF16D0DAEE0069B528 /* YEncDecoder.h */,
+				634192F016D0DAEE0069B528 /* YEncDecoder.m */,
+			);
+			name = Decoders;
+			sourceTree = "<group>";
+		};
+		638F78DB16D432A20085B896 /* Categories */ = {
+			isa = PBXGroup;
+			children = (
+				634192DD16D0DAED0069B528 /* NSArray+NewsAdditions.h */,
+				634192DE16D0DAEE0069B528 /* NSArray+NewsAdditions.m */,
+				634192DF16D0DAEE0069B528 /* NSData+NewsAdditions.h */,
+				634192E016D0DAEE0069B528 /* NSData+NewsAdditions.m */,
+				634192E316D0DAEE0069B528 /* NSString+NewsAdditions.h */,
+				634192E416D0DAEE0069B528 /* NSString+NewsAdditions.m */,
+			);
+			name = Categories;
+			sourceTree = "<group>";
+		};
+		638F78DC16D433430085B896 /* Formatters */ = {
+			isa = PBXGroup;
+			children = (
+				6341931C16D0DDE30069B528 /* SizeFormatter.h */,
+				6341931D16D0DDE30069B528 /* SizeFormatter.m */,
+				6341931916D0DC0B0069B528 /* EmailAddressFormatter.h */,
+				6341931A16D0DC0B0069B528 /* EmailAddressFormatter.m */,
+			);
+			name = Formatters;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

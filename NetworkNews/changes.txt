@@ -2,6 +2,11 @@
 CHANGES
 =======
 
+Version 1.0 Build 6:
+--------------------
+* iPad support disabled (again) with a focus on publishing the iPhone version
+* Code revamp to modernise the codebase
+
 Version 1.0 Build 5:
 --------------------
 * Universal app with iPad support

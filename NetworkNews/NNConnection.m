@@ -94,6 +94,12 @@ static void ReadCallBack(CFReadStreamRef stream,
             CFReadStreamClose(stream);
             CFRelease(stream);
             break;
+
+        case kCFStreamEventNone:
+            break;
+
+        case kCFStreamEventCanAcceptBytes:
+            break;
     }
 }
 
@@ -140,6 +146,12 @@ static void WriteCallBack(CFWriteStreamRef stream,
                                                kCFRunLoopCommonModes);
             CFWriteStreamClose(stream);
             CFRelease(stream);
+            break;
+
+        case kCFStreamEventNone:
+            break;
+
+        case kCFStreamEventHasBytesAvailable:
             break;
     }
 }
@@ -230,7 +242,7 @@ static void WriteCallBack(CFWriteStreamRef stream,
     {
         CFStreamError myErr = CFReadStreamGetError(readStream);
         
-        NSLog(@"err: %d, %d", myErr.domain, myErr.error);
+        NSLog(@"err: %ld, %d", myErr.domain, (int)myErr.error);
         
         // An error has occurred.
         if (myErr.domain == kCFStreamErrorDomainPOSIX)
@@ -701,12 +713,12 @@ static void WriteCallBack(CFWriteStreamRef stream,
     {
         if (errorCode == kCFHostErrorUnknown)
         {
-            NSNumber *addrInfoFailure = (NSNumber *)CFBridgingRelease(CFReadStreamCopyProperty(readStream,
-                                                                             kCFGetAddrInfoFailureKey));
+//            NSNumber *addrInfoFailure = (NSNumber *)CFBridgingRelease(CFReadStreamCopyProperty(readStream,
+//                                                                             kCFGetAddrInfoFailureKey));
         }
     }
     
-    NSLog(@"reportReadError: (%@ %d)(%@)", errorDomain, errorCode, errorDesc);
+    NSLog(@"reportReadError: (%@ %ld)(%@)", errorDomain, errorCode, errorDesc);
     
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc postNotificationName:ServerReadErrorNotification object:self];
@@ -721,7 +733,7 @@ static void WriteCallBack(CFWriteStreamRef stream,
     NSString *errorDomain = (NSString *)CFErrorGetDomain(error);
     CFIndex errorCode = CFErrorGetCode(error);
     
-    NSLog(@"reportWriteError: (%@ %d)(%@)", errorDomain, errorCode, errorDesc);
+    NSLog(@"reportWriteError: (%@ %ld)(%@)", errorDomain, errorCode, errorDesc);
 
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc postNotificationName:ServerWriteErrorNotification object:self];

@@ -147,7 +147,7 @@
         UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
         [viewController restoreLevel];
 
-        [self presentModalViewController:navigationController animated:NO];
+        [self presentViewController:navigationController animated:NO completion:NULL];
     }   
     else if (threads == nil)
     {
@@ -635,7 +635,7 @@
 - (void)newArticleViewController:(NewArticleViewController *)controller
                          didSend:(BOOL)send
 {
-    [self dismissModalViewControllerAnimated:YES];
+    [self dismissViewControllerAnimated:YES completion:NULL];
     restoreArticleComposer = NO;
 
     AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
@@ -647,7 +647,7 @@
 
 - (void)closedGroupInfoController:(GroupInfoViewController *)controller
 {
-    [self dismissModalViewControllerAnimated:YES];
+    [self dismissViewControllerAnimated:YES completion:NULL];
 }
 
 #pragma mark -
@@ -683,7 +683,7 @@
     viewController.delegate = self;
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
 
-    [self presentModalViewController:navigationController animated:YES];
+    [self presentViewController:navigationController animated:YES completion:NULL];
 }
 
 - (void)composeButtonPressed:(id)sender
@@ -699,7 +699,7 @@
     viewController.delegate = self;
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
 
-    [self presentModalViewController:navigationController animated:YES];
+    [self presentViewController:navigationController animated:YES completion:NULL];
 }
 
 #pragma mark -
@@ -1124,7 +1124,7 @@
                                                   target:self
                                                   action:@selector(composeButtonPressed:)];
     self.toolbarItems = [NSArray arrayWithObjects:
-//                         refreshButtonItem,
+                         refreshButtonItem,
                          actionButtonItem,
                          flexibleSpaceButtonItem,
 //                         infoButtonItem,
