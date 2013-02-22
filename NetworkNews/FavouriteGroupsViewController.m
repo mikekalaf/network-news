@@ -233,10 +233,6 @@ moveRowAtIndexPath:(NSIndexPath *)fromIndexPath
 
 - (IBAction)searchButtonPressed:(id)sender
 {
-	// Save this level's selection to our AppDelegate
-    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-	[appDelegate.savedLocation addObject:[NSNumber numberWithInteger:-2]];
-
     // Load the SearchGroupsViewController
     SearchGroupsViewController *viewController = [[SearchGroupsViewController alloc] initWithNibName:@"SearchGroupsView"
                                                                                               bundle:nil];

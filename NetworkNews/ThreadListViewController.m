@@ -30,45 +30,37 @@
 #define TWO_WEEKS_IN_SECONDS    14 * ONE_DAY_IN_SECONDS
 #define FOUR_WEEKS_IN_SECONDS   28 * ONE_DAY_IN_SECONDS
 
-#define REFRESH_ACTION_SHEET    0
-#define ACTION_ACTION_SHEET     1
-
 #define DISPLAY_ALL_THREADS     0
 #define DISPLAY_FILE_THREADS    1
 #define DISPLAY_MESSAGE_THREADS 2
 
 #define THREAD_DISPLAY_KEY      @"ThreadDisplay"
 
-@interface NSString (ReplacingNumbers)
 
-- (NSString *)stringByReplacingOccurrencesOfNumbersWithString:(NSString *)replacement;
-
-@end
-
-@implementation NSString (ReplacingNumbers)
-
-- (NSString *)stringByReplacingOccurrencesOfNumbersWithString:(NSString *)replacement
+@interface ThreadListViewController ()
 {
-    NSMutableString *newString = [self mutableCopy];
-    NSRange searchRange = NSMakeRange(0, [self length]);
-    while (searchRange.length)
-    {
-        NSRange range = [self rangeOfCharacterFromSet:[NSCharacterSet decimalDigitCharacterSet]
-                                              options:0
-                                                range:searchRange];
-        if (range.location == NSNotFound)
-            break;
+    NSFetchedResultsController *searchFetchedResultsController;
+    ProgressView *progressView;
+    NSArray *threads;
+    NSArray *fileThreads;
+    NSArray *messageThreads;
+    ThreadIterator *threadIterator;
+    GroupCoreDataStack *stack;
+    Task *currentTask;
+    BOOL silentlyFailConnection;
+    BOOL restoreArticleComposer;
+    NSString *searchText;
+    NSUInteger searchScope;
+    NSUInteger threadTypeDisplay;
 
-        [newString replaceCharactersInRange:range withString:replacement];
-        searchRange.location = NSMaxRange(range);
-        searchRange.length = [self length] - searchRange.location;
-    }
-    return newString;
+    NSDateFormatter *dateFormatter;
+    NSFormatter *emailAddressFormatter;
+    UIImage *incompleteIconImage;
+    UIImage *unreadIconImage;
+    UIImage *partReadIconImage;
+    UIImage *readIconImage;
+    NSArray *fileExtensions;
 }
-
-@end
-
-@interface ThreadListViewController (Private)
 
 - (NSArray *)activeThreads;
 
@@ -83,25 +75,18 @@
 
 @implementation ThreadListViewController
 
-@synthesize tableView;
-
-- (NSString *)groupName
-{
-    return groupName;
-}
-
 - (void)setGroupName:(NSString *)aGroupName
 {
-    groupName = [aGroupName copy];
+    _groupName = [aGroupName copy];
     
     AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
 
-    stack = [[GroupCoreDataStack alloc] initWithGroupName:groupName
+    stack = [[GroupCoreDataStack alloc] initWithGroupName:_groupName
                                               inDirectory:[[appDelegate server] hostName]];
 
     [appDelegate setActiveCoreDataStack:stack];
     
-    [self setTitle:[groupName shortGroupName]];
+    [self setTitle:[_groupName shortGroupName]];
 }
 
 #pragma mark -
@@ -110,6 +95,18 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+
+    // Pull to refresh control
+    UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
+    [refreshControl addTarget:self
+                       action:@selector(refresh:)
+             forControlEvents:UIControlEventValueChanged];
+    [self setRefreshControl:refreshControl];
+
+    // At the moment we have the default white background, whereas iOS Mail
+    // app has a nicer light grey background
+//    [refreshControl setBackgroundColor:[UIColor greenColor]];
+//    [[self view] setBackgroundColor:[UIColor redColor]];
 
     dateFormatter = [[ExtendedDateFormatter alloc] init];
     emailAddressFormatter = [[EmailAddressFormatter alloc] init];
@@ -133,13 +130,13 @@
     [self buildThreadListToolbar];
     
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    NSDictionary *dict = [userDefaults dictionaryForKey:groupName];
+    NSDictionary *dict = [userDefaults dictionaryForKey:_groupName];
     threadTypeDisplay = [[dict objectForKey:THREAD_DISPLAY_KEY] integerValue];
     
     if (restoreArticleComposer)
     {
         // Compose article
-        NewArticleViewController *viewController = [[NewArticleViewController alloc] initWithGroupName:groupName
+        NewArticleViewController *viewController = [[NewArticleViewController alloc] initWithGroupName:_groupName
                                                                                                subject:nil
                                                                                             references:nil
                                                                                               bodyText:nil];
@@ -153,6 +150,7 @@
     {
         // Download the latest articles (this will also do a fetch request)
         silentlyFailConnection = YES;
+        [[self refreshControl] beginRefreshing];
         [self downloadWithMode:DownloadArticleOverviewsTaskLatest];
         [self toolbarEnabled:NO];
     }
@@ -187,11 +185,6 @@
     }
 }
 
-//- (void)viewDidAppear:(BOOL)animated
-//{
-//    [super viewDidAppear:animated];
-//}
-
 - (void)viewWillDisappear:(BOOL)animated
 {
 	[super viewWillDisappear:animated];
@@ -203,12 +196,6 @@
         currentTask = nil;
     }
 }
-
-/*
-- (void)viewDidDisappear:(BOOL)animated {
-    [super viewDidDisappear:animated];
-}
-*/
 
 - (void)dealloc
 {
@@ -224,8 +211,9 @@
     return YES;
 }
 
-#pragma mark -
-#pragma mark Public Methods
+#pragma mark - Public Methods
+
+// DO WE EVEN NEED THE FOLLOWING ANYMORE?
 
 - (void)restoreLevelWithSelectionArray:(NSArray *)aSelectionArray
 {
@@ -272,7 +260,7 @@
             viewController = [[ThreadViewController alloc] initWithArticles:[threads objectAtIndex:index]
                                                                 threadTitle:@""
                                                                  threadDate:nil
-                                                                 groupName:groupName];
+                                                                 groupName:_groupName];
             [self.navigationController pushViewController:viewController animated:NO];
 
             NSArray *newSelectionArray = [aSelectionArray subarrayWithRange:NSMakeRange(1, aSelectionArray.count - 1)];
@@ -371,7 +359,7 @@
     if (cell == nil)
     {
         cell = [[ThreadListTableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle
-                                               reuseIdentifier:CellIdentifier];
+                                              reuseIdentifier:CellIdentifier];
         [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
     }
     
@@ -426,15 +414,10 @@
     return cell;
 }
 
-#pragma mark -
-#pragma mark Table view delegate
+#pragma mark - UITableViewDelegate Methods
 
 - (void)tableView:(UITableView *)aTableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-	// Save this level's selection to our AppDelegate
-    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-	[[appDelegate savedLocation] addObject:[NSNumber numberWithInteger:[indexPath row]]];
-    
     UIViewController *viewController;
 
     if (aTableView == [[self searchDisplayController] searchResultsTableView])
@@ -451,14 +434,17 @@
     {
         // Was "Load More" selected?
         if ([indexPath row] >= [[self activeThreads] count])
+        {
+            [self downloadWithMode:DownloadArticleOverviewsTaskMore];
             return;
+        }
 
         Thread *thread = [[self activeThreads] objectAtIndex:[indexPath row]];
         if ([[thread articles] count] > 1)
             viewController = [[ThreadViewController alloc] initWithArticles:[thread sortedArticles]
                                                                 threadTitle:[thread subject]
                                                                  threadDate:[thread latestDate]
-                                                                  groupName:groupName];
+                                                                  groupName:_groupName];
         else
         {
 
@@ -466,7 +452,7 @@
                                                                                                    bundle:nil];
             [articleViewController setArticleSource:threadIterator];
             [articleViewController setArticleIndex:[threadIterator articleIndexOfThreadIndex:[indexPath row]]];
-            [articleViewController setGroupName:groupName];
+            [articleViewController setGroupName:_groupName];
 
             viewController = articleViewController;
         }
@@ -591,18 +577,7 @@
     {
         // NOP
     }
-    else if ([actionSheet tag] == REFRESH_ACTION_SHEET)
-    {
-        DownloadArticleOverviewsTaskMode mode = 0;
-        if (buttonIndex == 0)
-            mode = DownloadArticleOverviewsTaskLatest;
-        else if (buttonIndex == 1)
-            mode = DownloadArticleOverviewsTaskMore;
-        [self downloadWithMode:mode];
-        
-        [self toolbarEnabled:NO];
-    }
-    else if ([actionSheet tag] == ACTION_ACTION_SHEET)
+    else
     {
         if (buttonIndex == 0)
         {
@@ -617,15 +592,15 @@
             threadTypeDisplay = DISPLAY_MESSAGE_THREADS;
         }
         threadIterator = [[ThreadIterator alloc] initWithThreads:[self activeThreads]];
-        [tableView reloadData];
+        [[self tableView] reloadData];
         
         NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-        NSMutableDictionary *dict = [[userDefaults dictionaryForKey:groupName] mutableCopy];
+        NSMutableDictionary *dict = [[userDefaults dictionaryForKey:_groupName] mutableCopy];
         if (!dict)
             dict = [[NSMutableDictionary alloc] initWithCapacity:1];
         [dict setObject:[NSNumber numberWithInteger:threadTypeDisplay]
                  forKey:THREAD_DISPLAY_KEY];
-        [userDefaults setObject:dict forKey:groupName];
+        [userDefaults setObject:dict forKey:_groupName];
     }
 }
 
@@ -637,9 +612,6 @@
 {
     [self dismissViewControllerAnimated:YES completion:NULL];
     restoreArticleComposer = NO;
-
-    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-	[appDelegate.savedLocation removeLastObject];
 }
 
 #pragma mark -
@@ -653,16 +625,10 @@
 #pragma mark -
 #pragma mark Actions
 
-- (void)refreshButtonPressed:(id)sender
+- (void)refresh:(id)sender
 {
-    // Show an action sheet with our various refresh options
-    UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:nil
-                                                             delegate:self
-                                                    cancelButtonTitle:@"Cancel"
-                                               destructiveButtonTitle:nil
-                                                    otherButtonTitles:@"Load Latest", @"Load More", nil];
-    [actionSheet setTag:REFRESH_ACTION_SHEET];
-    [actionSheet showFromToolbar:self.navigationController.toolbar];
+    [self downloadWithMode:DownloadArticleOverviewsTaskLatest];
+    [self toolbarEnabled:NO];
 }
 
 - (void)actionButtonPressed:(id)sender
@@ -673,7 +639,6 @@
                                                     cancelButtonTitle:@"Cancel"
                                                destructiveButtonTitle:nil
                                                     otherButtonTitles:@"Show All", @"Show Files", @"Show Messages", nil];
-    [actionSheet setTag:ACTION_ACTION_SHEET];
     [actionSheet showFromToolbar:self.navigationController.toolbar];
 }
 
@@ -688,11 +653,7 @@
 
 - (void)composeButtonPressed:(id)sender
 {
-	// Save this level's selection to our AppDelegate
-    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-	[appDelegate.savedLocation addObject:[NSNumber numberWithInteger:-2]];
-    
-    NewArticleViewController *viewController = [[NewArticleViewController alloc] initWithGroupName:groupName
+    NewArticleViewController *viewController = [[NewArticleViewController alloc] initWithGroupName:_groupName
                                                                                            subject:nil
                                                                                         references:nil
                                                                                           bodyText:nil];
@@ -756,6 +717,8 @@
     progressView.status = ProgressViewStatusUpdated;
     silentlyFailConnection = NO;
     [self toolbarEnabled:YES];
+
+    [[self refreshControl] endRefreshing];
 }
 
 - (void)noSuchGroup:(NSNotification *)notification
@@ -998,7 +961,7 @@
 {
     NSFileManager *fileManager = [NSFileManager defaultManager];
     AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    NSString *groupCachePath = [appDelegate.cacheRootDir stringByAppendingPathComponent:groupName];
+    NSString *groupCachePath = [appDelegate.cacheRootDir stringByAppendingPathComponent:_groupName];
 
     // Delete article parts, and articles, from the database
     NSManagedObjectContext *context = stack.managedObjectContext;
@@ -1097,10 +1060,6 @@
 - (void)buildThreadListToolbar
 {
     // Set up toolbar
-    UIBarButtonItem *refreshButtonItem =
-    [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
-                                                  target:self
-                                                  action:@selector(refreshButtonPressed:)];
     UIBarButtonItem *actionButtonItem =
     [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction
                                                   target:self
@@ -1124,7 +1083,6 @@
                                                   target:self
                                                   action:@selector(composeButtonPressed:)];
     self.toolbarItems = [NSArray arrayWithObjects:
-                         refreshButtonItem,
                          actionButtonItem,
                          flexibleSpaceButtonItem,
 //                         infoButtonItem,

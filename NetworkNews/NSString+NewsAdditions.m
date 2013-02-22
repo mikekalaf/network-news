@@ -148,4 +148,23 @@
     return str;
 }
 
+- (NSString *)stringByReplacingOccurrencesOfNumbersWithString:(NSString *)replacement
+{
+    NSMutableString *newString = [self mutableCopy];
+    NSRange searchRange = NSMakeRange(0, [self length]);
+    while (searchRange.length)
+    {
+        NSRange range = [self rangeOfCharacterFromSet:[NSCharacterSet decimalDigitCharacterSet]
+                                              options:0
+                                                range:searchRange];
+        if (range.location == NSNotFound)
+            break;
+
+        [newString replaceCharactersInRange:range withString:replacement];
+        searchRange.location = NSMaxRange(range);
+        searchRange.length = [self length] - searchRange.location;
+    }
+    return newString;
+}
+
 @end

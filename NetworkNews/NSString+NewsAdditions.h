@@ -17,4 +17,6 @@
 
 - (NSString *)messageIDFileName;
 
+- (NSString *)stringByReplacingOccurrencesOfNumbersWithString:(NSString *)replacement;
+
 @end

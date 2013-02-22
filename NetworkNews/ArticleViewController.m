@@ -233,9 +233,6 @@
                          didSend:(BOOL)send
 {
     [self dismissViewControllerAnimated:YES completion:NULL];
-
-    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-	[appDelegate.savedLocation removeLastObject];
 }
 
 #pragma mark -
@@ -261,9 +258,6 @@
                         error:(NSError*)error
 {
     [self dismissViewControllerAnimated:YES completion:NULL];
-
-    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-	[appDelegate.savedLocation removeLastObject];
 }
 
 #pragma mark -
@@ -383,12 +377,6 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     }
 
     [self updateTitle];
-    
-    // TODO This needs to be fixed-up to record the thread
-    
-    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    [appDelegate.savedLocation removeLastObject];
-    [appDelegate.savedLocation addObject:[NSNumber numberWithInteger:_articleIndex]];
 }
 
 - (IBAction)replyButtonPressed:(id)sender
@@ -415,10 +403,6 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 
 - (IBAction)composeButtonPressed:(id)sender
 {
-	// Save this level's selection to our AppDelegate
-    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-	[appDelegate.savedLocation addObject:[NSNumber numberWithInteger:-2]];
-    
     NewArticleViewController *viewController = [[NewArticleViewController alloc] initWithGroupName:_groupName
                                                                                            subject:nil
                                                                                         references:nil
@@ -670,10 +654,6 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 
 - (void)followUpToGroup
 {
-	// Save this level's selection to our AppDelegate
-    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-	[appDelegate.savedLocation addObject:[NSNumber numberWithInteger:-2]];
-
     // Collect the references, and add this messageId
     NSMutableString *references = [NSMutableString stringWithCapacity:1];
     if (article.references)
@@ -706,10 +686,6 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
         return;
     }
 
-	// Save this level's selection to our AppDelegate
-    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-	[appDelegate.savedLocation addObject:[NSNumber numberWithInteger:-3]];
-    
     // Who do we reply to?
     NSString *replyTo = [self headerValueWithName:@"Reply-To"];
     if (!replyTo)

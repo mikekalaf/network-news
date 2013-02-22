@@ -27,9 +27,13 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+
     // Override point for customization after application launch.
     UIViewController *viewController = [[ServersViewController alloc] initWithNibName:@"ServersView" bundle:nil];
-    self.navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
+    [self setNavigationController:[[UINavigationController alloc] initWithRootViewController:viewController]];
+
+    [[self navigationController] setToolbarHidden:NO];
+    
     self.window.rootViewController = self.navigationController;
     [self.window makeKeyAndVisible];
     return YES;

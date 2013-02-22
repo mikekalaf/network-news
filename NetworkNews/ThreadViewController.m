@@ -267,13 +267,8 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
     {
-        // Save this level's selection to our AppDelegate
-        [appDelegate.savedLocation addObject:[NSNumber numberWithInteger:indexPath.row]];
-
         ArticleViewController *viewController = [[ArticleViewController alloc] initWithNibName:@"ArticleView"
                                                                                         bundle:nil];
         viewController.articleSource = self;
@@ -323,11 +318,6 @@
     [super didReceiveMemoryWarning];
     
     // Relinquish ownership any cached data, images, etc that aren't in use.
-}
-
-- (void)viewDidUnload {
-    // Relinquish ownership of anything that can be recreated in viewDidLoad or on demand.
-    // For example: self.myOutlet = nil;
 }
 
 @end
