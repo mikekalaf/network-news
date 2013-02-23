@@ -143,27 +143,6 @@
 #pragma mark -
 #pragma mark Public Methods
 
-- (void)restoreLevelWithSelectionArray:(NSArray *)aSelectionArray
-{
-    NSLog(@"ThreadViewController restoreLevelWithSelectionArray: %@", aSelectionArray);
-    
-    if (aSelectionArray.count == 0)
-        return;
-
-    NSInteger index = [[aSelectionArray objectAtIndex:0] integerValue];
-    ArticleViewController *viewController = [[ArticleViewController alloc] initWithNibName:@"ArticleView"
-                                                                                    bundle:nil];
-//    viewController.threads = threads;
-//    viewController.threadIndex = threadIndex;
-    viewController.articleIndex = index;
-    viewController.groupName = groupName;
-
-    [self.navigationController pushViewController:viewController animated:NO];
-
-    NSArray *newSelectionArray = [aSelectionArray subarrayWithRange:NSMakeRange(1, aSelectionArray.count - 1)];
-    [viewController restoreLevelWithSelectionArray:newSelectionArray];
-}
-
 - (void)returningFromArticleIndex:(NSUInteger)fromArticleIndex
 {
     NSIndexPath *selectedIndexPath = [[self tableView] indexPathForSelectedRow];

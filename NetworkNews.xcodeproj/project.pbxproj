@@ -484,8 +484,6 @@
 				634192CB16D0DAED0069B528 /* NewsKit.h */,
 				634192CC16D0DAED0069B528 /* NNArticleFormatter.h */,
 				634192CD16D0DAED0069B528 /* NNArticleFormatter.m */,
-				634192CE16D0DAED0069B528 /* NNBase64Decoder.h */,
-				634192CF16D0DAED0069B528 /* NNBase64Decoder.m */,
 				634192D016D0DAED0069B528 /* NNConnection.h */,
 				634192D116D0DAED0069B528 /* NNConnection.m */,
 				634192D216D0DAED0069B528 /* NNHeaderEntry.h */,
@@ -527,6 +525,8 @@
 		638F78D816D42F940085B896 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				634192B616D0DAEC0069B528 /* ContentType.h */,
+				634192B716D0DAEC0069B528 /* ContentType.m */,
 				6341931616D0DB180069B528 /* GroupNode.h */,
 				6341931716D0DB180069B528 /* GroupNode.m */,
 				634192A716D0DAEC0069B528 /* Article.h */,
@@ -558,8 +558,6 @@
 			children = (
 				634192EB16D0DAEE0069B528 /* Thread.h */,
 				634192EC16D0DAEE0069B528 /* Thread.m */,
-				634192B616D0DAEC0069B528 /* ContentType.h */,
-				634192B716D0DAEC0069B528 /* ContentType.m */,
 				634192B416D0DAEC0069B528 /* ConnectionVerifier.h */,
 				634192B516D0DAEC0069B528 /* ConnectionVerifier.m */,
 				6341923916D0D8800069B528 /* NewAccountViewController.h */,
@@ -633,6 +631,8 @@
 				634192EE16D0DAEE0069B528 /* UUDecoder.m */,
 				634192EF16D0DAEE0069B528 /* YEncDecoder.h */,
 				634192F016D0DAEE0069B528 /* YEncDecoder.m */,
+				634192CE16D0DAED0069B528 /* NNBase64Decoder.h */,
+				634192CF16D0DAED0069B528 /* NNBase64Decoder.m */,
 			);
 			name = Decoders;
 			sourceTree = "<group>";

@@ -27,8 +27,6 @@
             threadDate:(NSDate *)aThreadDate
              groupName:(NSString *)aGroupName;
 
-- (void)restoreLevelWithSelectionArray:(NSArray *)aSelectionArray;
-
 - (void)returningFromArticleIndex:(NSUInteger)fromArticleIndex;
 
 @end

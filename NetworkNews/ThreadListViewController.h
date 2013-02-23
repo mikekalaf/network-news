@@ -53,8 +53,6 @@
 @property(nonatomic, retain) IBOutlet UITableView *tableView;
 @property(nonatomic, copy) NSString *groupName;
 
-- (void)restoreLevelWithSelectionArray:(NSArray *)aSelectionArray;
-
 - (void)returningFromArticleIndex:(NSUInteger)articleIndex;
 
 @end

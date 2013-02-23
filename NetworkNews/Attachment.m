@@ -8,41 +8,53 @@
 
 #import "Attachment.h"
 #import "ArticlePartContent.h"
+#import "ContentType.h"
 #import "YEncDecoder.h"
 #import "UUDecoder.h"
+#import "NNBase64Decoder.h"
 #import "NSData+NewsAdditions.h"
 
 @implementation Attachment
 
-@synthesize fileName;
-@synthesize data;
-@synthesize rangeInArticleData;
-
-- (id)initWithContent:(ArticlePartContent *)content
+-   (id)initWithContent:(ArticlePartContent *)content
+            contentType:(ContentType *)contentType
+contentTransferEncoding:(NSString *)contentTransferEncoding
 {
     self = [super init];
     if (self)
     {
-        NSData *bodyData = content.bodyData;
+        NSData *bodyData = [content bodyData];
 
-        if ([YEncDecoder containsYEncData:bodyData])
+        if ([[contentType mediaType] hasPrefix:@"image"])
+        {
+            if ([contentTransferEncoding caseInsensitiveCompare:@"base64"] == NSOrderedSame)
+            {
+                NNBase64Decoder *decoder = [[NNBase64Decoder alloc] initWithData:bodyData];
+                _data = [decoder decode];
+                _fileName = [contentType name];
+                _rangeInArticleData = NSMakeRange(0, [bodyData length]);
+
+                NSLog(@"base64 Filename: %@", _fileName);
+            }
+        }
+        else if ([YEncDecoder containsYEncData:bodyData])
         {
             YEncDecoder *decoder = [[YEncDecoder alloc] initWithData:bodyData];
-            data = [decoder decode];
-            if (data)
+            _data = [decoder decode];
+            if (_data)
             {
-                fileName = [decoder.fileName copy];
-                rangeInArticleData = decoder.encodedRange;
+                _fileName = [[decoder fileName] copy];
+                _rangeInArticleData = [decoder encodedRange];
 
-                NSLog(@"yEnc Filename: %@", fileName);
+                NSLog(@"yEnc Filename: %@", _fileName);
 
                 // Check the checksum
                 if (decoder.CRC32)
                 {
-                    NSUInteger dataCRC32 = data.CRC32;
-                    if (decoder.CRC32 != dataCRC32)
+                    NSUInteger dataCRC32 = [_data CRC32];
+                    if ([decoder CRC32] != dataCRC32)
                         NSLog(@"Reported CRC32: %x, Calculated CRC32: %x",
-                              decoder.CRC32,
+                              [decoder CRC32],
                               dataCRC32);
                 }
             }
@@ -50,18 +62,18 @@
         else if ([UUDecoder containsUUEncodedData:bodyData])
         {
             UUDecoder *decoder = [[UUDecoder alloc] initWithData:bodyData];
-            data = [decoder decode];
-            if (data)
+            _data = [decoder decode];
+            if (_data)
             {
-                fileName = [decoder.fileName copy];
-                rangeInArticleData = decoder.encodedRange;
+                _fileName = [[decoder fileName] copy];
+                _rangeInArticleData = [decoder encodedRange];
                 
-                NSLog(@"uuencode Filename: %@", decoder.fileName);
+                NSLog(@"uuencode Filename: %@", [decoder fileName]);
             }
         }
     }
 
-    if (data == nil)
+    if (_data == nil)
     {
         return nil;
     }
