@@ -10,9 +10,10 @@
 
 
 @interface NNBase64Decoder : NSObject
-{
 
-}
+- (id)initWithData:(NSData *)encodedData;
+
+- (NSData *)decode;
 
 - (NSString *)decodeString:(NSString *)string
           toStringEncoding:(CFStringEncoding)encoding;

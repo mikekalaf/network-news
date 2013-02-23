@@ -29,8 +29,32 @@
 #import "CoreDataStack.h"
 #import "NSString+NewsAdditions.h"
 #import "EncodedWordDecoder.h"
+#import "WelcomeViewController.h"
 
-@interface ArticleViewController (Private)
+@interface ArticleViewController ()
+{
+    UIPopoverController *_popoverController;
+
+    UISegmentedControl *_navigationSegmentedControl;
+    UIProgressView *_progressView;
+
+    Article *_article;
+    NSMutableString *htmlString;
+    Task *currentTask;
+    NSString *cacheDir;
+    NSUInteger partCount;
+    NSString *attachmentPath;
+    NSArray *_headEntries;
+    NSData *bodyTextDataTop;
+    NSData *bodyTextDataBottom;
+    NSUInteger bytesCached;
+    BOOL toolbarSetForPortrait;
+}
+
+@property(nonatomic, weak) IBOutlet UIToolbar *toolbar;
+@property(nonatomic, weak) IBOutlet UIWebView *webView;
+@property(nonatomic, weak) IBOutlet UIBarButtonItem *replyButtonItem;
+@property(nonatomic, weak) IBOutlet UIBarButtonItem *composeButtonItem;
 
 - (NSString *)cachePathForMessageId:(NSString *)messageId
                           extension:(NSString *)extension;
@@ -49,6 +73,9 @@
 - (void)disableNavigationControls;
 - (void)showProgressToolbar;
 - (void)showArticleToolbar;
+
+- (IBAction)replyButtonPressed:(id)sender;
+- (IBAction)composeButtonPressed:(id)sender;
 
 @end
 
@@ -73,16 +100,16 @@
                               [UIImage imageNamed:@"icon-triangle-up.png"],
                               [UIImage imageNamed:@"icon-triangle-down.png"],
                               nil];
-        navigationSegmentedControl = [[UISegmentedControl alloc] initWithItems:itemArray];
-        [navigationSegmentedControl setMomentary:YES];
-        navigationSegmentedControl.segmentedControlStyle = UISegmentedControlStyleBar;
-        [navigationSegmentedControl setWidth:44 forSegmentAtIndex:0];
-        [navigationSegmentedControl setWidth:44 forSegmentAtIndex:1];
-        [navigationSegmentedControl addTarget:self
+        _navigationSegmentedControl = [[UISegmentedControl alloc] initWithItems:itemArray];
+        [_navigationSegmentedControl setMomentary:YES];
+        _navigationSegmentedControl.segmentedControlStyle = UISegmentedControlStyleBar;
+        [_navigationSegmentedControl setWidth:44 forSegmentAtIndex:0];
+        [_navigationSegmentedControl setWidth:44 forSegmentAtIndex:1];
+        [_navigationSegmentedControl addTarget:self
                                        action:@selector(articleNavigation:)
                              forControlEvents:UIControlEventValueChanged];
         
-        UIBarButtonItem *segmentBarItem = [[UIBarButtonItem alloc] initWithCustomView:navigationSegmentedControl];
+        UIBarButtonItem *segmentBarItem = [[UIBarButtonItem alloc] initWithCustomView:_navigationSegmentedControl];
         self.navigationItem.rightBarButtonItem = segmentBarItem;
     }
     
@@ -91,8 +118,8 @@
     [self disableNavigationControls];
 
     // Create a progress view to use with the toolbar
-    progressView = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleBar];
-    progressView.hidden = YES;
+    _progressView = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleBar];
+    _progressView.hidden = YES;
 
     // Determine the cache directory, and make sure it exists
     AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
@@ -105,39 +132,6 @@
                                  error:NULL];
 
     [self updateArticle];
-    
-    if (restoreArticleComposer)
-    {
-        // Compose article
-        NewArticleViewController *viewController = [[NewArticleViewController alloc] initWithGroupName:_groupName
-                                                                                               subject:nil
-                                                                                            references:nil
-                                                                                              bodyText:nil];
-        viewController.delegate = self;
-        UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
-        [viewController restoreLevel];
-
-        [self presentViewController:navigationController animated:NO completion:NULL];
-    }
-//    else if (restoreEmailView)
-//    {
-//        // Compose email
-//        MFMailComposeViewController *mailViewController = [[MFMailComposeViewController alloc] init];
-////        [mailViewController setToRecipients:[NSArray arrayWithObject:replyTo]];
-////        [mailViewController setSubject:article.reSubject];
-////        [mailViewController setMessageBody:[self bodyTextForFollowUp] isHTML:NO];
-//        mailViewController.mailComposeDelegate = self;
-//        [self presentModalViewController:mailViewController
-//                                animated:NO];
-//        [mailViewController release];
-//    }
-}
-
-- (void)viewDidUnload
-{
-    [super viewDidUnload];
-
-    NSLog(@"viewDidUnload");
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -185,30 +179,10 @@
 #pragma mark -
 #pragma mark Public Methods
 
-- (void)restoreLevelWithSelectionArray:(NSArray *)aSelectionArray
-{
-    NSLog(@"ThreadViewController restoreLevelWithSelectionArray: %@", aSelectionArray);
-    
-    if (aSelectionArray.count == 0)
-        return;
-
-    NSInteger index = [[aSelectionArray objectAtIndex:0] integerValue];
-    if (index == -2)
-    {
-        // Follow-up
-        restoreArticleComposer = YES;
-    }
-    else if (index == -3)
-    {
-        // Email
-        restoreEmailView = YES;
-    }
-}
-
 - (void)updateArticle
 {
-    if (popoverController)
-        [popoverController dismissPopoverAnimated:YES];
+    if (_popoverController)
+        [_popoverController dismissPopoverAnimated:YES];
     
 //    if (articles)
         [self downloadArticle];
@@ -269,8 +243,13 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 {
     if (navigationType == UIWebViewNavigationTypeLinkClicked)
     {
-        [[UIApplication sharedApplication] openURL:[request URL]];
-        return NO;
+        // If this is to the open internet, then open in an external browser
+        if ([[[request URL] scheme] isEqualToString:@"http"] |
+            [[[request URL] scheme] isEqualToString:@"https"])
+        {
+            [[UIApplication sharedApplication] openURL:[request URL]];
+            return NO;
+        }
     }
     return YES;
 }
@@ -302,7 +281,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 {
     barButtonItem.title = @"Articles";
 
-    popoverController = pc;
+    _popoverController = pc;
 
     if (toolbarSetForPortrait)
         return;
@@ -312,17 +291,17 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
                           [UIImage imageNamed:@"icon-triangle-up.png"],
                           [UIImage imageNamed:@"icon-triangle-down.png"],
                           nil];
-    navigationSegmentedControl = [[UISegmentedControl alloc] initWithItems:itemArray];
-    navigationSegmentedControl.tintColor = [UIColor colorWithWhite:0.66 alpha:1.0];
-    [navigationSegmentedControl setMomentary:YES];
-    navigationSegmentedControl.segmentedControlStyle = UISegmentedControlStyleBar;
-    [navigationSegmentedControl setWidth:44 forSegmentAtIndex:0];
-    [navigationSegmentedControl setWidth:44 forSegmentAtIndex:1];
-    [navigationSegmentedControl addTarget:self
+    _navigationSegmentedControl = [[UISegmentedControl alloc] initWithItems:itemArray];
+    _navigationSegmentedControl.tintColor = [UIColor colorWithWhite:0.66 alpha:1.0];
+    [_navigationSegmentedControl setMomentary:YES];
+    _navigationSegmentedControl.segmentedControlStyle = UISegmentedControlStyleBar;
+    [_navigationSegmentedControl setWidth:44 forSegmentAtIndex:0];
+    [_navigationSegmentedControl setWidth:44 forSegmentAtIndex:1];
+    [_navigationSegmentedControl addTarget:self
                                    action:@selector(articleNavigation:)
                          forControlEvents:UIControlEventValueChanged];
     
-    UIBarButtonItem *segmentBarItem = [[UIBarButtonItem alloc] initWithCustomView:navigationSegmentedControl];
+    UIBarButtonItem *segmentBarItem = [[UIBarButtonItem alloc] initWithCustomView:_navigationSegmentedControl];
     self.navigationItem.rightBarButtonItem = segmentBarItem;
 
     // Insert the split view controller's bar button item, and the navigation
@@ -346,7 +325,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     [items removeObjectAtIndex:0];
     [_toolbar setItems:items animated:YES];
     
-    popoverController = nil;
+    _popoverController = nil;
 
     toolbarSetForPortrait = NO;
 }
@@ -356,7 +335,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 
 - (void)articleNavigation:(id)sender
 {
-    NSUInteger index = navigationSegmentedControl.selectedSegmentIndex;
+    NSUInteger index = _navigationSegmentedControl.selectedSegmentIndex;
     if (index == 0)
     {
         // Up Article
@@ -414,27 +393,36 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     [self presentViewController:navigationController animated:YES completion:NULL];
 }
 
-#pragma mark -
-#pragma mark Notifications
+#pragma mark - Notifications
 
 - (void)bytesLoaded:(NSNotification *)notification
 {
     DownloadArticlesTask *task = notification.object;
     NSUInteger loadedBytes = task.articlePartContent.data.length;
-    NSInteger totalBytes = article.totalByteCount.integerValue;
-    progressView.progress = (float)(bytesCached + loadedBytes) / totalBytes;
+    NSInteger totalBytes = [[_article totalByteCount] integerValue];
+    _progressView.progress = (float)(bytesCached + loadedBytes) / totalBytes;
 }
 
 - (void)partLoaded:(NSNotification *)notification
 {
     ++partCount;
     
-    NSUInteger completePartCount = article.completePartCount.integerValue;
+    NSUInteger completePartCount = [[_article completePartCount] integerValue];
     
     DownloadArticlesTask *task = notification.object;
     NSUInteger partNumber = task.articlePart.partNumber.integerValue;
-    
-    Attachment *attachment = [[Attachment alloc] initWithContent:task.articlePartContent];
+
+    if (partNumber == 1)
+    {
+        // This is the first part, so grab those headers
+        _headEntries = [[task articlePartContent] headEntries];
+    }
+
+    NSString *contentTransferEncoding = [self headerValueWithName:@"Content-Transfer-Encoding"];
+
+    Attachment *attachment = [[Attachment alloc] initWithContent:[task articlePartContent]
+                                                     contentType:[self contentType]
+                                         contentTransferEncoding:contentTransferEncoding];
     if (attachment)
     {
         if (partNumber != partCount)
@@ -448,8 +436,6 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
             // Grab the initial text in the first part
             // Calculate the range of the header text and the body text up to
             // the attachment
-            headEntries = task.articlePartContent.headEntries;
-
             NSRange range = NSMakeRange(0, attachment.rangeInArticleData.location);
             bodyTextDataTop = [task.articlePartContent.bodyData subdataWithRange:range];
 
@@ -467,7 +453,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
             // Note the attachment filename
             attachmentPath = [self cachePathForMessageId:task.articlePart.messageId
                                                extension:attachment.fileName.pathExtension];
-            article.attachmentFileName = attachment.fileName;
+            [_article setAttachmentFileName:[attachment fileName]];
 
             AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
             [appDelegate.activeCoreDataStack save];
@@ -517,9 +503,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
         // This is text only
         if (partNumber == 1)
         {
-            headEntries = task.articlePartContent.headEntries;
-
-            BOOL quotedPrintable = [QuotedPrintableDecoder isQuotedPrintable:headEntries];
+            BOOL quotedPrintable = [QuotedPrintableDecoder isQuotedPrintable:_headEntries];
 
             bodyTextDataTop = task.articlePartContent.bodyData;
             
@@ -548,7 +532,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 - (void)articleLoaded:(NSNotification *)notification
 {
     // Do we have all parts?
-    NSUInteger completePartCount = article.completePartCount.integerValue;
+    NSUInteger completePartCount = [[_article completePartCount] integerValue];
 //    if (completePartCount == 1 && attachmentFileName == nil)
     if (completePartCount == 1 && attachmentPath == nil)
     {
@@ -576,7 +560,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     [nc removeObserver:self];
 
     // Mark it as read, since we're loading it to be viewed
-    [article setRead:[NSNumber numberWithBool:YES]];
+    [_article setRead:[NSNumber numberWithBool:YES]];
     AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     [appDelegate.activeCoreDataStack save];
 }
@@ -628,7 +612,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 
     NSMutableString *mutableString = [NSMutableString stringWithCapacity:bodyTextDataTop.length];
     
-    [mutableString appendFormat:@"%@ wrote:\n", article.from];
+    [mutableString appendFormat:@"%@ wrote:\n", [_article from]];
     
     for (NNQuoteLevel *quoteLevel in quoteLevels)
     {
@@ -656,12 +640,12 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 {
     // Collect the references, and add this messageId
     NSMutableString *references = [NSMutableString stringWithCapacity:1];
-    if (article.references)
+    if ([_article references])
     {
-        [references appendString:article.references];
+        [references appendString:[_article references]];
         [references appendString:@" "];
     }
-    [references appendString:article.firstMessageId];
+    [references appendString:[_article firstMessageId]];
     
     // Make sure we follow-up to the requested group
     NSString *followupTo = [self headerValueWithName:@"Followup-To"];
@@ -669,7 +653,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
         followupTo = _groupName;
     
     NewArticleViewController *viewController = [[NewArticleViewController alloc] initWithGroupName:followupTo
-                                                                                           subject:article.reSubject
+                                                                                           subject:[_article reSubject]
                                                                                         references:references
                                                                                           bodyText:[self bodyTextForFollowUp]];
     viewController.delegate = self;
@@ -689,11 +673,11 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     // Who do we reply to?
     NSString *replyTo = [self headerValueWithName:@"Reply-To"];
     if (!replyTo)
-        replyTo = article.from;
+        replyTo = [_article from];
     
     MFMailComposeViewController *mailViewController = [[MFMailComposeViewController alloc] init];
     [mailViewController setToRecipients:[NSArray arrayWithObject:replyTo]];
-    [mailViewController setSubject:article.reSubject];
+    [mailViewController setSubject:[_article reSubject]];
     [mailViewController setMessageBody:[self bodyTextForFollowUp] isHTML:NO];
     mailViewController.mailComposeDelegate = self;
     [self presentViewController:mailViewController
@@ -759,25 +743,32 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 
 - (NSString *)headerValueWithName:(NSString *)name
 {
-    for (NNHeaderEntry *entry in headEntries)
+    for (NNHeaderEntry *entry in _headEntries)
         if ([entry.name caseInsensitiveCompare:name] == NSOrderedSame)
             return entry.value;
     return nil;
 }
 
+- (ContentType *)contentType
+{
+    ContentType *contentType = nil;
+    NSString *contentTypeValue = [self headerValueWithName:@"Content-Type"];
+    if (contentTypeValue)
+        contentType = [[ContentType alloc] initWithString:contentTypeValue];
+    return contentType;
+}
+
 - (BOOL)isFlowed
 {
     BOOL flowed = NO;
-    NSString *contentTypeValue = [self headerValueWithName:@"Content-Type"];
-    if (contentTypeValue)
+    ContentType *contentType = [self contentType];
+    if (contentType)
     {
-        ContentType *contentType = [[ContentType alloc] initWithString:contentTypeValue];
-
-        NSLog(@"Media Type: '%@'", contentType.mediaType);
-        NSLog(@"Charset   : '%@'", contentType.charset);
-        NSLog(@"Format    : '%@'", contentType.format);
+        NSLog(@"Media Type: '%@'", [contentType mediaType]);
+        NSLog(@"Charset   : '%@'", [contentType charset]);
+        NSLog(@"Format    : '%@'", [contentType format]);
         
-        flowed = contentType.formatFlowed;
+        flowed = [contentType isFormatFlowed];
     }
     return flowed;
 }
@@ -785,12 +776,9 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 - (NSString *)charsetName
 {
     NSString *charsetName = nil;
-    NSString *contentTypeValue = [self headerValueWithName:@"Content-Type"];
-    if (contentTypeValue)
-    {
-        ContentType *contentType = [[ContentType alloc] initWithString:contentTypeValue];
-        charsetName = contentType.charset;
-    }
+    ContentType *contentType = [self contentType];
+    if (contentType)
+        charsetName = [contentType charset];
     return charsetName;
 }
 
@@ -818,9 +806,9 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
      @"<p class=\"field subject\">%@</p>"
      @"<p class=\"field date\">%@</p>"
      @"</div>",
-     [self htmlEscapedString:[emailFormatter stringForObjectValue:article.from]],
-     [self htmlEscapedString:article.subject],
-     [dateFormatter stringFromDate:article.date]];
+     [self htmlEscapedString:[emailFormatter stringForObjectValue:[_article from]]],
+     [self htmlEscapedString:[_article subject]],
+     [dateFormatter stringFromDate:[_article date]]];
 }
 
 - (void)beginQuoteLevel:(NSUInteger)level
@@ -978,7 +966,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 
 - (void)beginHTML
 {
-    NSRange range = NSMakeRange(0, htmlString.length);
+    NSRange range = NSMakeRange(0, [htmlString length]);
     [htmlString deleteCharactersInRange:range];
     
     [htmlString appendString:@"<html>"
@@ -1056,20 +1044,20 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     
     [self endHTML];
     
-    progressView.hidden = YES;
+    _progressView.hidden = YES;
 }
 
 - (void)downloadArticle
 {
     partCount = 0;
     attachmentPath = nil;
-    headEntries = nil;
+    _headEntries = nil;
     bodyTextDataTop = nil;
     bodyTextDataBottom = nil;
     bytesCached = 0;
 
     // Reference the current article
-    article = [_articleSource articleAtIndex:_articleIndex];
+    _article = [_articleSource articleAtIndex:_articleIndex];
     
 //    // Mark it as read, since we're loading it to be viewed
 //    // TODO: Mark the article as read AFTER it is loaded, not before
@@ -1083,9 +1071,9 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     [self appendHeadFromArticle];
     
     SizeFormatter *formatter = [[SizeFormatter alloc] init];
-    NSString *sizeString = [formatter stringForObjectValue:article.totalByteCount];
+    NSString *sizeString = [formatter stringForObjectValue:[_article totalByteCount]];
 
-    if (article.hasAllParts == NO)
+    if ([_article hasAllParts] == NO)
     {
         [htmlString appendString:@"<p class=\"status\">Incomplete parts</p>"];
     }
@@ -1096,7 +1084,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     [_webView loadHTMLString:htmlString baseURL:nil];
 
     // Bail out if the article has incomplete parts
-    if (article.hasAllParts == NO)
+    if ([_article hasAllParts] == NO)
     {
         [self updateNavigationControls];
         return;
@@ -1107,7 +1095,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     // part will have the required filename.
     NSSortDescriptor *descriptor = [[NSSortDescriptor alloc] initWithKey:@"partNumber"
                                                                ascending:YES];
-    NSArray *sortedParts = [article.parts.allObjects sortedArrayUsingDescriptors:
+    NSArray *sortedParts = [[[_article parts] allObjects] sortedArrayUsingDescriptors:
                             [NSArray arrayWithObject:descriptor]];
 
     // First, check if we have a cached copy?
@@ -1127,11 +1115,11 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
         if (headData)
         {
             NNHeaderParser *hp = [[NNHeaderParser alloc] initWithData:headData];
-            headEntries = hp.entries;
+            _headEntries = [hp entries];
         }
         
         // Is there an attachment to load?
-        NSString *attachmentFileName = article.attachmentFileName;
+        NSString *attachmentFileName = [_article attachmentFileName];
         if (attachmentFileName)
         {
             // Retrieve the cached attachment
@@ -1151,7 +1139,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
         [self showArticleToolbar];
 
         // Mark it as read
-        [article setRead:[NSNumber numberWithBool:YES]];
+        [_article setRead:[NSNumber numberWithBool:YES]];
         AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
         [appDelegate.activeCoreDataStack save];
 
@@ -1161,8 +1149,8 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     // Proceed with the download
     [self disableNavigationControls];
     [self showProgressToolbar];
-    progressView.progress = 0;
-    progressView.hidden = NO;
+    _progressView.progress = 0;
+    _progressView.hidden = NO;
     
     // Download the article(s)
     AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
@@ -1206,17 +1194,17 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 - (void)updateNavigationControls
 {
     // Enable/disable the navigation controls
-    [navigationSegmentedControl setEnabled:(_articleIndex > 0)
+    [_navigationSegmentedControl setEnabled:(_articleIndex > 0)
                          forSegmentAtIndex:0];
-    [navigationSegmentedControl setEnabled:(_articleIndex < [_articleSource articleCount] - 1)
+    [_navigationSegmentedControl setEnabled:(_articleIndex < [_articleSource articleCount] - 1)
                          forSegmentAtIndex:1];
 }
 
 - (void)disableNavigationControls
 {
     // Enable/disable the navigation controls
-    [navigationSegmentedControl setEnabled:NO forSegmentAtIndex:0];
-    [navigationSegmentedControl setEnabled:NO forSegmentAtIndex:1];
+    [_navigationSegmentedControl setEnabled:NO forSegmentAtIndex:0];
+    [_navigationSegmentedControl setEnabled:NO forSegmentAtIndex:1];
 }
 
 - (void)showProgressToolbar
@@ -1230,7 +1218,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
                                                   target:nil
                                                   action:nil];
     
-    UIBarButtonItem *progressItem = [[UIBarButtonItem alloc] initWithCustomView:progressView];
+    UIBarButtonItem *progressItem = [[UIBarButtonItem alloc] initWithCustomView:_progressView];
     
     self.toolbarItems = [NSArray arrayWithObjects:
                          flexibleSpaceButtonItem,

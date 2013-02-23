@@ -8,12 +8,7 @@
 
 #import "ContentType.h"
 
-
 @implementation ContentType
-
-@synthesize mediaType;
-@synthesize charset;
-@synthesize format;
 
 - (id)initWithString:(NSString *)string
 {
@@ -21,28 +16,27 @@
     if (self)
     {
         NSArray *components = [string componentsSeparatedByString:@";"];
-        self.mediaType = [components objectAtIndex:0];
+        [self setMediaType:components[0]];
         
         if (components.count > 1)
         {
             NSCharacterSet *set = [NSCharacterSet characterSetWithCharactersInString:@" \""];
             
             // Parse any parameters
-            for (NSUInteger i = 1; i < components.count; ++i)
+            for (NSUInteger i = 1; i < [components count]; ++i)
             {
-                NSArray *paramComponents = [[components objectAtIndex:i] componentsSeparatedByString:@"="];
-                if (paramComponents.count == 2)
+                NSArray *paramComponents = [components[i] componentsSeparatedByString:@"="];
+                if ([paramComponents count] == 2)
                 {
-                    NSString *name = [paramComponents objectAtIndex:0];
-                    NSString *value = [paramComponents objectAtIndex:1];
-                    
-                    name = [name stringByTrimmingCharactersInSet:set];
-                    value = [value stringByTrimmingCharactersInSet:set];
+                    NSString *name = [paramComponents[0] stringByTrimmingCharactersInSet:set];
+                    NSString *value = [paramComponents[1] stringByTrimmingCharactersInSet:set];
                     
                     if ([name caseInsensitiveCompare:@"charset"] == NSOrderedSame)
-                        self.charset = value.lowercaseString;
+                        [self setCharset:[value lowercaseString]];
                     else if ([name caseInsensitiveCompare:@"format"] == NSOrderedSame)
-                        self.format = value.lowercaseString;
+                        [self setFormat:[value lowercaseString]];
+                    else if ([name caseInsensitiveCompare:@"name"] == NSOrderedSame)
+                        [self setName:value];
                 }
             }
         }
@@ -52,7 +46,7 @@
 
 - (BOOL)isFormatFlowed
 {
-    return [format isEqualToString:@"flowed"];
+    return [_format isEqualToString:@"flowed"];
 }
 
 @end

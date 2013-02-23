@@ -29,15 +29,70 @@ static char base64LUT[256] = {
 };
 //  x0  x1  x2  x3  x4  x5  x6  x7  x8  x9  xA  xB  xC  xD  xE  xF
 
+@interface NNBase64Decoder ()
+{
+    NSData *_data;
+}
+
+@end
+
 @implementation NNBase64Decoder
 
-- (id)init
+- (id)initWithData:(NSData *)encodedData
 {
     self = [super init];
     if (self)
     {
+        _data = encodedData;
     }
     return self;
+}
+
+- (NSData *)decode
+{
+    NSMutableData *decodedData = nil;
+    char inputGroup[4];
+    char outputGroup[3];
+    for (NSUInteger i = 0; i < [_data length]; i += 4)
+    {
+        NSRange range = NSMakeRange(i, 4);
+        [_data getBytes:inputGroup range:range];
+
+        if (inputGroup[0] == 13 || inputGroup[0] == 10)
+        {
+            // We've reached the end of a line, so rewind three characters
+            // and try again (this will probably happen twice: CR + LF
+            i -= 3;
+            continue;
+        }
+
+        char in0 = base64LUT[inputGroup[0]];
+        char in1 = base64LUT[inputGroup[1]];
+        char in2 = base64LUT[inputGroup[2]];
+        char in3 = base64LUT[inputGroup[3]];
+
+        // Are all the encoding inputs legal?
+        if (in0 == -1 || in1 == -1 || in2 == -1 || in3 == -1)
+            return nil;
+
+        outputGroup[0] = ((in0 << 2) & 0xfc) | ((in1 >> 4) & 0x03);
+        outputGroup[1] = ((in1 << 4) & 0xf0) | ((in2 >> 2) & 0x0f);
+        outputGroup[2] = ((in2 << 6) & 0xc0) | (in3 & 0x3f);
+
+        if (decodedData == nil)
+            decodedData = [[NSMutableData alloc] initWithCapacity:[_data length] / 4 * 3];
+
+        [decodedData appendBytes:outputGroup length:3];
+
+        // It it only a CRLF that remains?
+        if (i + 6 >= [_data length] - 2)
+        {
+            char b[2];
+            [_data getBytes:b range:NSMakeRange(i + 4, 1)];
+            break;
+        }
+    }
+    return decodedData;
 }
 
 - (NSString *)decodeString:(NSString *)string

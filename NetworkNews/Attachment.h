@@ -9,20 +9,16 @@
 #import <Foundation/Foundation.h>
 
 @class ArticlePartContent;
+@class ContentType;
 
 @interface Attachment : NSObject
-{
-    NSString *fileName;
-    NSData *data;
-    NSRange rangeInArticleData;
-}
 
 @property(nonatomic, copy, readonly) NSString *fileName;
-
-@property(nonatomic, retain, readonly) NSData *data;
-
+@property(nonatomic, readonly) NSData *data;
 @property(nonatomic, readonly) NSRange rangeInArticleData;
 
-- (id)initWithContent:(ArticlePartContent *)content;
+-   (id)initWithContent:(ArticlePartContent *)content
+            contentType:(ContentType *)contentType
+contentTransferEncoding:(NSString *)contentTransferEncoding;
 
 @end
