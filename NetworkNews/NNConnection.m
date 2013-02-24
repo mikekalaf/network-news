@@ -34,7 +34,20 @@
 
 NSString *NNConnectionBytesReceivedNotification = @"NNConnectionBytesReceivedNotification";
 
-@interface NNConnection (Private)
+@interface NNConnection () <NSStreamDelegate>
+{
+    NSInputStream *_inputStream;
+    NSOutputStream *_outputStream;
+
+    NSString *_deferredCommandString;
+    BOOL _connected;
+    BOOL _executingCommand;
+
+    const UInt8 *_responseByteBuffer;
+    NSUInteger _responseLength;
+    BOOL _lastHandledBytesEndedWithCRLF;
+    BOOL _issuedModeReaderCommand;
+}
 
 - (void)connectAndSendCommandString:(NSString *)commandString
                 withParameterString:(NSString *)paramString;
@@ -49,125 +62,15 @@ NSString *NNConnectionBytesReceivedNotification = @"NNConnectionBytesReceivedNot
 
 @end
 
-static void ReadCallBack(CFReadStreamRef stream,
-                         CFStreamEventType event,
-                         void *info)
-{
-    UInt8 buf[BUFSIZE];
-    
-    switch (event)
-    {
-        case kCFStreamEventOpenCompleted:
-        {
-            NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-            [nc postNotificationName:ServerReadOpenCompletedNotification object:(__bridge id)(info)];
-            break;
-        }
-            
-        case kCFStreamEventHasBytesAvailable:
-        {
-            CFIndex bytesRead = CFReadStreamRead(stream, buf, BUFSIZE);
-            if (bytesRead > 0)
-                [(__bridge NNConnection *)info handleBytes:buf length:bytesRead];
-            break;
-        }
-            
-        case kCFStreamEventErrorOccurred:
-        {
-            CFErrorRef error = CFReadStreamCopyError(stream);
-            [(__bridge NNConnection *)info reportReadError:error];
-            CFRelease(error);
-
-            CFReadStreamUnscheduleFromRunLoop(stream,
-                                              CFRunLoopGetCurrent(),
-                                              kCFRunLoopCommonModes);
-            CFReadStreamClose(stream);
-            CFRelease(stream);
-            break;
-        }
-            
-        case kCFStreamEventEndEncountered:
-            [(__bridge NNConnection *)info reportCompletion];
-            CFReadStreamUnscheduleFromRunLoop(stream,
-                                              CFRunLoopGetCurrent(),
-                                              kCFRunLoopCommonModes);
-            CFReadStreamClose(stream);
-            CFRelease(stream);
-            break;
-
-        case kCFStreamEventNone:
-            break;
-
-        case kCFStreamEventCanAcceptBytes:
-            break;
-    }
-}
-
-static void WriteCallBack(CFWriteStreamRef stream,
-                          CFStreamEventType event,
-                          void *info)
-{
-    switch (event)
-    {
-        case kCFStreamEventOpenCompleted:
-        {
-            NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-            [nc postNotificationName:ServerWriteOpenCompletedNotification object:(__bridge id)(info)];
-            break;
-        }
-            
-        case kCFStreamEventCanAcceptBytes:
-        {
-            //            CFIndex bytesRead = CFReadStreamRead(stream, buf, BUFSIZE);
-            //            if (bytesRead > 0)
-            //                [(NNServer *)info handleBytes:buf length:bytesRead];
-//            NSLog(@"kCFStreamEventCanAcceptBytes");
-            break;
-        }
-            
-        case kCFStreamEventErrorOccurred:
-        {
-            CFErrorRef error = CFWriteStreamCopyError(stream);
-            [(__bridge NNConnection *)info reportWriteError:error];
-            CFRelease(error);
-
-            CFWriteStreamUnscheduleFromRunLoop(stream,
-                                               CFRunLoopGetCurrent(),
-                                               kCFRunLoopCommonModes);
-            CFWriteStreamClose(stream);
-            CFRelease(stream);
-            break;
-        }
-            
-        case kCFStreamEventEndEncountered:
-            [(__bridge NNConnection *)info reportCompletion];
-            CFWriteStreamUnscheduleFromRunLoop(stream,
-                                               CFRunLoopGetCurrent(),
-                                               kCFRunLoopCommonModes);
-            CFWriteStreamClose(stream);
-            CFRelease(stream);
-            break;
-
-        case kCFStreamEventNone:
-            break;
-
-        case kCFStreamEventHasBytesAvailable:
-            break;
-    }
-}
 
 @implementation NNConnection
-
-@synthesize server;
-@synthesize responseCode;
-@synthesize responseData;
 
 - (id)initWithServer:(NNServer *)aServer
 {
     self = [super init];
     if (self)
     {
-        server = aServer;
+        _server = aServer;
         
         // Notifications we're interested in
         NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
@@ -189,90 +92,37 @@ static void WriteCallBack(CFWriteStreamRef stream,
     
     [self disconnect];
 
-    CFHostUnscheduleFromRunLoop(server.host,
+    CFHostUnscheduleFromRunLoop(_server.host,
                                 CFRunLoopGetCurrent(),
                                 kCFRunLoopCommonModes);
-    CFHostSetClient(server.host, NULL, NULL);
+    CFHostSetClient(_server.host, NULL, NULL);
 }
 
 - (NSString *)hostName
 {
-    return server.hostName;
+    return _server.hostName;
 }
 
 - (void)connect
 {
-    responseCode = 0;
+    _responseCode = 0;
 
+    CFReadStreamRef readStream;
+    CFWriteStreamRef writeStream;
     CFStreamCreatePairWithSocketToCFHost(kCFAllocatorDefault,
-                                         server.host,
-                                         server.port,
+                                         [_server host],
+                                         [_server port],
                                          &readStream,
                                          &writeStream);
     
-    CFStreamClientContext context = {0, (__bridge void *)(self), NULL, NULL, NULL};
-    
-    if (CFReadStreamSetClient(readStream,
-                              kCFStreamEventOpenCompleted
-                              | kCFStreamEventHasBytesAvailable
-                              | kCFStreamEventErrorOccurred
-                              | kCFStreamEventEndEncountered,
-                              ReadCallBack,
-                              &context))
-    {
-        CFReadStreamScheduleWithRunLoop(readStream,
-                                        CFRunLoopGetCurrent(),
-                                        kCFRunLoopCommonModes);
-    }
-    
-    if (CFWriteStreamSetClient(writeStream,
-                               kCFStreamEventOpenCompleted
-                               | kCFStreamEventCanAcceptBytes
-                               | kCFStreamEventErrorOccurred
-                               | kCFStreamEventEndEncountered,
-                               WriteCallBack,
-                               &context))
-    {
-        CFWriteStreamScheduleWithRunLoop(writeStream,
-                                         CFRunLoopGetCurrent(),
-                                         kCFRunLoopCommonModes);
-    }
-    
-    if (!CFReadStreamOpen(readStream))
-    {
-        CFStreamError myErr = CFReadStreamGetError(readStream);
-        
-        NSLog(@"err: %ld, %d", myErr.domain, (int)myErr.error);
-        
-        // An error has occurred.
-        if (myErr.domain == kCFStreamErrorDomainPOSIX)
-        {
-            // Interpret myErr.error as a UNIX errno.
-        }
-        else if (myErr.domain == kCFStreamErrorDomainMacOSStatus)
-        {
-            // Interpret myErr.error as a MacOS error code.
-            //OSStatus macError = (OSStatus)myErr.error;
-            // Check other error domains.
-        }
-    }
-    
-    if (!CFWriteStreamOpen(writeStream))
-    {
-        CFStreamError myErr = CFWriteStreamGetError(writeStream);
-        
-        // An error has occurred.
-        if (myErr.domain == kCFStreamErrorDomainPOSIX)
-        {
-            // Interpret myErr.error as a UNIX errno.
-        }
-        else if (myErr.domain == kCFStreamErrorDomainMacOSStatus)
-        {
-            // Interpret myErr.error as a MacOS error code.
-            //OSStatus macError = (OSStatus)myErr.error;
-            // Check other error domains.
-        }
-    }
+    _inputStream = (__bridge_transfer NSInputStream *)readStream;
+    _outputStream = (__bridge_transfer NSOutputStream *)writeStream;
+    [_inputStream setDelegate:self];
+    [_outputStream setDelegate:self];
+    [_inputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+    [_outputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+    [_inputStream open];
+    [_outputStream open];
 }
 
 - (void)disconnect
@@ -280,46 +130,40 @@ static void WriteCallBack(CFWriteStreamRef stream,
     // Don't try to disconnect if we're not connected.  Presently, when an
     // error is encountered, then streams are automatically removed from the
     // run loop and closed.  If we try to do it again here, then it crashes.
-    if (connected == NO)
+    if (_connected == NO)
         return;
 
-    if (readStream)
+    if (_inputStream)
     {
-        CFReadStreamUnscheduleFromRunLoop(readStream,
-                                          CFRunLoopGetCurrent(),
-                                          kCFRunLoopCommonModes);
-        CFReadStreamClose(readStream);
-        CFRelease(readStream);
-        readStream = 0;
-    }
-    
-    if (writeStream)
-    {
-        CFWriteStreamUnscheduleFromRunLoop(writeStream,
-                                           CFRunLoopGetCurrent(),
-                                           kCFRunLoopCommonModes);
-        CFWriteStreamClose(writeStream);
-        CFRelease(writeStream);
-        writeStream = 0;
+        [_inputStream close];
+        _inputStream = nil;
     }
 
-    connected = NO;
-    issuedModeReaderCommand = NO;
-    deferredCommandString = nil;
-    executingCommand = NO;
+    if (_outputStream)
+    {
+        [_outputStream close];
+        _outputStream = nil;
+    }
 
-    [server.delegate endNetworkAccessForServer:server];
+    _connected = NO;
+    _issuedModeReaderCommand = NO;
+    _deferredCommandString = nil;
+    _executingCommand = NO;
+
+    [_server.delegate endNetworkAccessForServer:_server];
 }
 
 - (void)writeData:(NSData *)data
 {
-    responseCode = 0;
+    _responseCode = 0;
+
+    // TODO: Don't do the actual writing here - instead, see how we do it via
+    // the event handling delegate
 
     // TODO We need to scan through the buffer and escape any lines that
     // contain a single period ('.') as the only line
-    CFIndex bytesWritten = CFWriteStreamWrite(writeStream,
-                                              data.bytes,
-                                              data.length);
+    NSInteger bytesWritten = [_outputStream write:[data bytes] maxLength:[data length]];
+
     if (bytesWritten < 0)
     {
         //        CFStreamError error = CFWriteStreamGetError(writeStream);
@@ -338,11 +182,119 @@ static void WriteCallBack(CFWriteStreamRef stream,
     }
 
     // Terminate the stream
-    bytesWritten = CFWriteStreamWrite(writeStream, (const UInt8 *)"\r\n.\r\n", 5);
+    bytesWritten = [_outputStream write:(const UInt8 *)"\r\n.\r\n" maxLength:5];
 }
 
-#pragma mark -
-#pragma mark NNTP Commands
+- (void)handleInputStreamEvent:(NSStreamEvent)streamEvent
+{
+    switch (streamEvent)
+    {
+        case NSStreamEventOpenCompleted:
+        {
+            NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+            [nc postNotificationName:ServerReadOpenCompletedNotification object:self];
+            break;
+        }
+
+        case NSStreamEventHasBytesAvailable:
+        {
+            // TODO: shift this buffer to the heap
+            UInt8 buf[BUFSIZE];
+            unsigned int bytesRead = [_inputStream read:buf maxLength:BUFSIZE];
+            if (bytesRead > 0)
+                [self handleBytes:buf length:bytesRead];
+            break;
+        }
+
+        case NSStreamEventErrorOccurred:
+        {
+            //            CFErrorRef error = CFReadStreamCopyError(stream);
+            //            [self reportReadError:error];
+            [self reportReadError:nil];
+            [_inputStream close];
+            [_inputStream removeFromRunLoop:[NSRunLoop currentRunLoop]
+                                    forMode:NSDefaultRunLoopMode];
+            _inputStream = nil;
+            break;
+        }
+
+        case NSStreamEventEndEncountered:
+        {
+            // TODO: This is potentially called twice - once each for read and write
+            [self reportCompletion];
+
+            [_inputStream close];
+            [_inputStream removeFromRunLoop:[NSRunLoop currentRunLoop]
+                                    forMode:NSDefaultRunLoopMode];
+            _inputStream = nil;
+            break;
+        }
+
+        case NSStreamEventNone:
+            break;
+            
+        case NSStreamEventHasSpaceAvailable:
+            break;
+    }
+}
+
+- (void)handleOutputStreamEvent:(NSStreamEvent)streamEvent
+{
+    switch (streamEvent)
+    {
+        case NSStreamEventOpenCompleted:
+        {
+            NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+            [nc postNotificationName:ServerWriteOpenCompletedNotification object:self];
+            break;
+        }
+
+        case NSStreamEventHasSpaceAvailable:
+            break;
+
+        case NSStreamEventHasBytesAvailable:
+            break;
+
+        case NSStreamEventErrorOccurred:
+        {
+            //            CFErrorRef error = CFReadStreamCopyError(stream);
+            //            [self reportReadError:error];
+            [self reportWriteError:nil];
+            [_outputStream close];
+            [_outputStream removeFromRunLoop:[NSRunLoop currentRunLoop]
+                                     forMode:NSDefaultRunLoopMode];
+            _outputStream = nil;
+            break;
+        }
+
+        case NSStreamEventEndEncountered:
+        {
+            // TODO: This is potentially called twice - once each for read and write
+            [self reportCompletion];
+
+            [_outputStream close];
+            [_outputStream removeFromRunLoop:[NSRunLoop currentRunLoop]
+                                     forMode:NSDefaultRunLoopMode];
+            _outputStream = nil;
+            break;
+        }
+
+        case NSStreamEventNone:
+            break;
+    }
+}
+
+#pragma mark - NSStreamDelegate Methods
+
+- (void)stream:(NSStream *)stream handleEvent:(NSStreamEvent)streamEvent
+{
+    if (stream == _inputStream)
+        [self handleInputStreamEvent:streamEvent];
+    else if (stream == _outputStream)
+        [self handleOutputStreamEvent:streamEvent];
+}
+
+#pragma mark - NNTP Commands
 
 - (void)articleWithMessageId:(NSString *)messageId
 {
@@ -397,7 +349,7 @@ static void WriteCallBack(CFWriteStreamRef stream,
 - (void)serverConnected:(NSNotification *)notification
 {
     // Do we have authentication info?  If so, then authenticate now.
-    NSString *userName = [server.delegate userNameForServer:server];
+    NSString *userName = [_server.delegate userNameForServer:_server];
     if (userName && [userName isEqualToString:@""] == NO)
     {
         [self sendCommandString:AUTHINFO_USER_COMMAND
@@ -407,20 +359,19 @@ static void WriteCallBack(CFWriteStreamRef stream,
     
     // Check if we have a deferred command that is waiting for this
     // connection to be established
-    if (deferredCommandString)
-        [self sendCommandString:deferredCommandString];
+    if (_deferredCommandString)
+        [self sendCommandString:_deferredCommandString];
 }
 
 - (void)serverAuthenticated:(NSNotification *)notification
 {
     // Check if we have a deferred command that is waiting for this
     // connection to be authenticated
-    if (deferredCommandString)
-        [self sendCommandString:deferredCommandString];
+    if (_deferredCommandString)
+        [self sendCommandString:_deferredCommandString];
 }
 
-#pragma mark -
-#pragma mark Private Methods
+#pragma mark - Private Methods
 
 - (void)connectAndSendCommandString:(NSString *)commandString
                 withParameterString:(NSString *)paramString
@@ -433,9 +384,9 @@ static void WriteCallBack(CFWriteStreamRef stream,
 {
     // If the connection is yet to be connected, start doing so, and defer
     // the command until the ServerConnectedNotification is generated
-    if (!connected)
+    if (!_connected)
     {
-        deferredCommandString = [commandString copy];
+        _deferredCommandString = [commandString copy];
         [self connect];
     }
     else
@@ -451,9 +402,9 @@ static void WriteCallBack(CFWriteStreamRef stream,
 
 - (void)sendCommandString:(NSString *)commandString
 {
-    responseCode = 0;
+    _responseCode = 0;
 
-    if (executingCommand || !connected)
+    if (_executingCommand || !_connected)
         return;
     
     NSLog(@"Command: %@", commandString);
@@ -474,9 +425,9 @@ static void WriteCallBack(CFWriteStreamRef stream,
     buf[count + 1] = 10;
     count += 2;
 
-    [server.delegate beginNetworkAccessForServer:server];
+    [_server.delegate beginNetworkAccessForServer:_server];
     
-    CFIndex bytesWritten = CFWriteStreamWrite(writeStream, buf, count);
+    NSInteger bytesWritten = [_outputStream write:buf maxLength:count];
     if (bytesWritten < 0)
     {
         //        CFStreamError error = CFWriteStreamGetError(writeStream);
@@ -494,12 +445,12 @@ static void WriteCallBack(CFWriteStreamRef stream,
         
     }
     
-    executingCommand = YES;
+    _executingCommand = YES;
 }
 
 - (BOOL)isMultilineResponse
 {
-    switch (responseCode)
+    switch (_responseCode)
     {
         case 100:   // Help text follows
         case 215:   // List information follows
@@ -514,7 +465,7 @@ static void WriteCallBack(CFWriteStreamRef stream,
 
 - (BOOL)isResponseTerminated
 {
-    if (responseCode == 0)
+    if (_responseCode == 0)
     {
 //        NSLog(@"NOT Terminated (responseCode == 0)");
         return NO;
@@ -522,22 +473,22 @@ static void WriteCallBack(CFWriteStreamRef stream,
     
     if ([self isMultilineResponse])
     {
-        const unsigned char *bytes = responseByteBuffer;
-        if (responseLength >= 5
-            && bytes[responseLength - 5] == 13
-            && bytes[responseLength - 4] == 10
-            && bytes[responseLength - 3] == '.'
-            && bytes[responseLength - 2] == 13
-            && bytes[responseLength - 1] == 10)
+        const unsigned char *bytes = _responseByteBuffer;
+        if (_responseLength >= 5
+            && bytes[_responseLength - 5] == 13
+            && bytes[_responseLength - 4] == 10
+            && bytes[_responseLength - 3] == '.'
+            && bytes[_responseLength - 2] == 13
+            && bytes[_responseLength - 1] == 10)
         {
 //            NSLog(@"TERMINATED");
             return YES;
         }
-        else if (lastHandledBytesEndedWithCRLF
-                 && responseLength >= 3
-                 && bytes[responseLength - 3] == '.'
-                 && bytes[responseLength - 2] == 13
-                 && bytes[responseLength - 1] == 10)
+        else if (_lastHandledBytesEndedWithCRLF
+                 && _responseLength >= 3
+                 && bytes[_responseLength - 3] == '.'
+                 && bytes[_responseLength - 2] == 13
+                 && bytes[_responseLength - 1] == 10)
         {
 //            NSLog(@"TERMINATED (previous CRLF)");
             return YES;
@@ -545,8 +496,8 @@ static void WriteCallBack(CFWriteStreamRef stream,
     }
     else
     {
-        const unsigned char *bytes = responseByteBuffer;
-        NSUInteger i = responseLength - 2;
+        const unsigned char *bytes = _responseByteBuffer;
+        NSUInteger i = _responseLength - 2;
         if (bytes[i] == 13 && bytes[i + 1] == 10)
         {
 //            NSLog(@"TERMINATED");
@@ -562,11 +513,11 @@ static void WriteCallBack(CFWriteStreamRef stream,
 - (void)reportAuthenticationFailed
 {
     // We are unable to work with any deferred commands
-    deferredCommandString = nil;
+    _deferredCommandString = nil;
     
     // Authentication failed
-    NSString *message = [[NSString alloc] initWithBytes:responseByteBuffer
-                                                 length:responseLength - 2
+    NSString *message = [[NSString alloc] initWithBytes:_responseByteBuffer
+                                                 length:_responseLength - 2
                                                encoding:NSASCIIStringEncoding];
     NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
                               message, @"Message",
@@ -584,20 +535,20 @@ static void WriteCallBack(CFWriteStreamRef stream,
 - (void)responseCompleted
 {
     // Data is terminated, so no further data is expected
-    executingCommand = NO;
-    [server.delegate endNetworkAccessForServer:server];
+    _executingCommand = NO;
+    [_server.delegate endNetworkAccessForServer:_server];
     
-    NSLog(@"Response: %d", responseCode);
+    NSLog(@"Response: %d", _responseCode);
 
-    if (responseCode == 200 && issuedModeReaderCommand == NO)
+    if (_responseCode == 200 && _issuedModeReaderCommand == NO)
     {
         // Initial connection response -- we are now connected.
         // Set to MODE READER.
-        connected = YES;
-        issuedModeReaderCommand = YES;
+        _connected = YES;
+        _issuedModeReaderCommand = YES;
         [self sendCommandString:MODE_READER_COMMAND];
     }
-    else if (responseCode == 200 || responseCode == 201)
+    else if (_responseCode == 200 || _responseCode == 201)
     {
         // We are now connected and MODE READER
         NSNotification *notification =
@@ -607,27 +558,27 @@ static void WriteCallBack(CFWriteStreamRef stream,
         [nq enqueueNotification:notification
                    postingStyle:NSPostWhenIdle];
     }
-    else if (responseCode == 480)
+    else if (_responseCode == 480)
     {
         // Authentication required -- send user name
-        NSString *userName = [server.delegate userNameForServer:server];
+        NSString *userName = [_server.delegate userNameForServer:_server];
         if (userName == nil || [userName isEqualToString:@""])
             [self reportAuthenticationFailed];
         else
             [self sendCommandString:AUTHINFO_USER_COMMAND
                 withParameterString:userName];
     }
-    else if (responseCode == 381)
+    else if (_responseCode == 381)
     {
         // More authentication required -- send password
-        NSString *password = [server.delegate passwordForServer:server];
+        NSString *password = [_server.delegate passwordForServer:_server];
         if (password == nil || [password isEqualToString:@""])
             [self reportAuthenticationFailed];
         else
             [self sendCommandString:AUTHINFO_PASS_COMMAND
                 withParameterString:password];
     }
-    else if (responseCode == 281)
+    else if (_responseCode == 281)
     {
         // Authentication completed
         NSNotification *notification =
@@ -637,16 +588,16 @@ static void WriteCallBack(CFWriteStreamRef stream,
         [nq enqueueNotification:notification
                    postingStyle:NSPostWhenIdle];
     }
-    else if (responseCode == 481)
+    else if (_responseCode == 481)
     {
         // Authentication failed
         [self reportAuthenticationFailed];
     }
-    else if (responseCode == 501)
+    else if (_responseCode == 501)
     {
         // Syntax error in the command
     }
-    else if (responseCode == 503)
+    else if (_responseCode == 503)
     {
         // Disconnection notification -- we are no longer connected
         // [NNConnection reportCompletion] will be called
@@ -654,7 +605,7 @@ static void WriteCallBack(CFWriteStreamRef stream,
     else
     {
         // We are finished with any deferred commands
-        deferredCommandString = nil;
+        _deferredCommandString = nil;
 
         // A command has completed
         NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
@@ -665,25 +616,25 @@ static void WriteCallBack(CFWriteStreamRef stream,
 
 - (void)handleBytes:(UInt8 *)buffer length:(NSUInteger)length
 {
-    if (responseCode == 0)
+    if (_responseCode == 0)
     {
         if (isdigit(buffer[0]) && isdigit(buffer[1]) && isdigit(buffer[2]))
-            responseCode = 100 * (buffer[0] - '0') + 10 * (buffer[1] - '0') + (buffer[2] - '0');
+            _responseCode = 100 * (buffer[0] - '0') + 10 * (buffer[1] - '0') + (buffer[2] - '0');
     }
 
 //    NSString *str = [NSString stringWithCString:buffer length:length];
 //    NSLog(@"handleBytes: %@", str);
     
     // Notify interested parties of the received data
-    responseData = [[NSData alloc] initWithBytesNoCopy:buffer
-                                                length:length
+    _responseData = [[NSData alloc] initWithBytesNoCopy:buffer
+                                                 length:length
                                           freeWhenDone:NO];
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc postNotificationName:NNConnectionBytesReceivedNotification object:self];
 
     // TODO This is still a bit hacky -- clean it up
-    responseByteBuffer = buffer;
-    responseLength = length;
+    _responseByteBuffer = buffer;
+    _responseLength = length;
     
     if ([self isResponseTerminated])
     {
@@ -693,17 +644,17 @@ static void WriteCallBack(CFWriteStreamRef stream,
     // To help us work out when the response is terminated, we'll note if the
     // end of this buffer contains a CRLF pair
     if (buffer[length - 2] == 13 && buffer[length - 1] == 10)
-        lastHandledBytesEndedWithCRLF = YES;
+        _lastHandledBytesEndedWithCRLF = YES;
     else
-        lastHandledBytesEndedWithCRLF = NO;
+        _lastHandledBytesEndedWithCRLF = NO;
 
-    responseData = nil;
+    _responseData = nil;
 }
 
 - (void)reportReadError:(CFErrorRef)error
 {
-    connected = NO;
-    issuedModeReaderCommand = NO;
+    _connected = NO;
+    _issuedModeReaderCommand = NO;
     
     NSString *errorDesc = (NSString *)CFBridgingRelease(CFErrorCopyDescription(error));
     NSString *errorDomain = (NSString *)CFErrorGetDomain(error);
@@ -726,8 +677,8 @@ static void WriteCallBack(CFWriteStreamRef stream,
 
 - (void)reportWriteError:(CFErrorRef)error
 {
-    connected = NO;
-    issuedModeReaderCommand = NO;
+    _connected = NO;
+    _issuedModeReaderCommand = NO;
 
     NSString *errorDesc = (NSString *)CFBridgingRelease(CFErrorCopyDescription(error));
     NSString *errorDomain = (NSString *)CFErrorGetDomain(error);
@@ -741,11 +692,11 @@ static void WriteCallBack(CFWriteStreamRef stream,
 
 - (void)reportCompletion
 {
-    connected = NO;
-    issuedModeReaderCommand = NO;
+    _connected = NO;
+    _issuedModeReaderCommand = NO;
     NSLog(@"reportCompletion");
 
-    [server.delegate endNetworkAccessForServer:server];
+    [_server.delegate endNetworkAccessForServer:_server];
     
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc postNotificationName:ServerDisconnectedNotification object:self];

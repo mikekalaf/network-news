@@ -43,6 +43,8 @@ static int hexvalue(char c)
         return kCFStringEncodingBig5;
     else if ([encodingName caseInsensitiveCompare:@"KOI8-R"] == NSOrderedSame)
         return kCFStringEncodingKOI8_R;
+    else if ([encodingName caseInsensitiveCompare:@"GB2312"] == NSOrderedSame)
+        return kCFStringEncodingGB_2312_80;
     else
         return kCFStringEncodingInvalidId;
 }
@@ -181,6 +183,9 @@ static int hexvalue(char c)
         NSRange range = NSUnionRange(range1, range2);
         NSString *encodedString = [string substringWithRange:range];
         NSString *decodedString = [self decodeEncodedWordString:encodedString];
+
+        if (decodedString == nil)
+            break;
 
         // Recompose the string, substituting the encoded range with
         // the decoded string

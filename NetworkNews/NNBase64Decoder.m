@@ -136,6 +136,9 @@ static char base64LUT[256] = {
                                                  decodedData.length,
                                                  encoding,
                                                  false);
+    if (strRef == NULL)
+        return nil;
+
     NSLog(@"BASE64 decoded string: %@", (__bridge NSString *)strRef);
 
     return (NSString *)CFBridgingRelease(strRef);

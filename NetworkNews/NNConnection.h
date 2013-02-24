@@ -16,22 +16,6 @@ extern NSString *NNConnectionBytesReceivedNotification;
 @class NNServer;
 
 @interface NNConnection : NSObject
-{
-    NNServer *server;
-    CFReadStreamRef readStream;
-    CFWriteStreamRef writeStream;
-
-    NSString *deferredCommandString;
-    BOOL connected;
-    BOOL executingCommand;
-
-    NSData *responseData;
-    NSUInteger responseCode;
-    const UInt8 *responseByteBuffer;
-    NSUInteger responseLength;
-    BOOL lastHandledBytesEndedWithCRLF;
-    BOOL issuedModeReaderCommand;
-}
 
 @property(nonatomic, readonly) NNServer *server;
 
