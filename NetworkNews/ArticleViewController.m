@@ -533,12 +533,10 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 {
     // Do we have all parts?
     NSUInteger completePartCount = [[_article completePartCount] integerValue];
-//    if (completePartCount == 1 && attachmentFileName == nil)
     if (completePartCount == 1 && attachmentPath == nil)
     {
         // NOP
     }
-//    else if (completePartCount == partCount && attachmentFileName != nil)
     else if (completePartCount == partCount && attachmentPath != nil)
     {
         // NOP
@@ -558,6 +556,12 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc removeObserver:self];
+
+    // TODO: This notification is also being called by articleError: so we
+    // can't assume that the article has in fact been read. The above code, and
+    // all other code that updates and displays article HTML should be factored-out
+    // and called by these notifications, rather than having one notification
+    // calling another.
 
     // Mark it as read, since we're loading it to be viewed
     [_article setRead:[NSNumber numberWithBool:YES]];
@@ -1138,10 +1142,10 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
         [self updateNavigationControls];
         [self showArticleToolbar];
 
-        // Mark it as read
-        [_article setRead:[NSNumber numberWithBool:YES]];
-        AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-        [appDelegate.activeCoreDataStack save];
+//        // Mark it as read
+//        [_article setRead:[NSNumber numberWithBool:YES]];
+//        AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+//        [appDelegate.activeCoreDataStack save];
 
         return;
     }

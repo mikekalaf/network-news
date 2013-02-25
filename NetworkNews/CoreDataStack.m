@@ -71,7 +71,7 @@
     if (!mom)
     {
         NSAssert(NO, @"Managed object model is nil");
-        NSLog(@"%@:%s No model to generate a store from", [self class], _cmd);
+        //NSLog(@"%@:%s No model to generate a store from", [self class], _cmd);
         return nil;
     }
     

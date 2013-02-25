@@ -9,11 +9,15 @@
 #import "ServersViewController.h"
 #import "WelcomeViewController.h"
 #import "FavouriteGroupsViewController.h"
+#import "AccountSettingsViewController.h"
 #import "AppDelegate.h"
 
 #define SERVERS_KEY @"Servers"
 
-@interface ServersViewController (Private)
+@interface ServersViewController ()
+{
+    NSArray *_accounts;
+}
 
 - (void)addButtonPressed:(id)sender;
 
@@ -22,8 +26,7 @@
 
 @implementation ServersViewController
 
-#pragma mark -
-#pragma mark View lifecycle
+#pragma mark - View lifecycle
 
 - (void)viewDidLoad
 {
@@ -43,8 +46,8 @@
     [super viewWillAppear:animated];
 
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    servers = [userDefaults objectForKey:SERVERS_KEY];
-    if (!servers || [servers count] == 0)
+    _accounts = [userDefaults objectForKey:SERVERS_KEY];
+    if (!_accounts || [_accounts count] == 0)
         [self addButtonPressed:nil];
     else
         [[self tableView] reloadData];
@@ -74,18 +77,17 @@
 */
 
 
-#pragma mark -
-#pragma mark Table view data source
+#pragma mark - UITableViewDataSource Methods
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return [servers count];
+    return [_accounts count];
 }
 
 
 // Customize the appearance of table view cells.
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
     static NSString *CellIdentifier = @"Cell";
     
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
@@ -96,7 +98,7 @@
         [cell setAccessoryType:UITableViewCellAccessoryDetailDisclosureButton];
     }
 
-    NSDictionary *serverInfo = [servers objectAtIndex:[indexPath row]];
+    NSDictionary *serverInfo = [_accounts objectAtIndex:[indexPath row]];
     [[cell textLabel] setText:[serverInfo objectForKey:@"Host"]];
     
     return cell;
@@ -143,39 +145,42 @@
 */
 
 
-#pragma mark -
-#pragma mark Table view delegate
+#pragma mark - UITableViewDelegate Methods
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSDictionary *serverInfo = [servers objectAtIndex:[indexPath row]];
+    NSDictionary *accountInfo = [_accounts objectAtIndex:[indexPath row]];
     
     AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    [appDelegate setUpConnectionWithServerInfo:serverInfo];
+    [appDelegate setUpConnectionWithServerInfo:accountInfo];
 
     FavouriteGroupsViewController *viewController = [[FavouriteGroupsViewController alloc] initWithNibName:@"FavouriteGroupsView"
                                                                                                     bundle:nil];
     [[self navigationController] pushViewController:viewController animated:YES];
 }
 
+- (void)tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath
+{
+    NSDictionary *accountInfo = [_accounts objectAtIndex:[indexPath row]];
 
-#pragma mark -
-#pragma mark Memory management
+    AccountSettingsViewController *viewController = [[AccountSettingsViewController alloc] initWithNibName:@"AccountSettingsView"
+                                                                                                    bundle:nil];
+//    [viewController setTitle:title];
+//    [[viewController navigationItem] setHidesBackButton:hideBackButton];
+    [viewController setAccountInfo:accountInfo];
 
-- (void)didReceiveMemoryWarning {
+    [[self navigationController] pushViewController:viewController animated:YES];
+}
+
+- (void)didReceiveMemoryWarning
+{
     // Releases the view if it doesn't have a superview.
     [super didReceiveMemoryWarning];
     
     // Relinquish ownership any cached data, images, etc. that aren't in use.
 }
 
-- (void)viewDidUnload {
-    // Relinquish ownership of anything that can be recreated in viewDidLoad or on demand.
-    // For example: self.myOutlet = nil;
-}
-
-#pragma mark -
-#pragma mark Actions
+#pragma mark - Actions
 
 - (void)addButtonPressed:(id)sender
 {

@@ -81,14 +81,21 @@
     _userName = [[serverInfo objectForKey:USERNAME_KEY] copy];
     _password = [[serverInfo objectForKey:PASSWORD_KEY] copy];
     NSString *hostName = [serverInfo objectForKey:HOST_KEY];
+    BOOL secure = [[serverInfo objectForKey:SECURE_KEY] boolValue];
     NSUInteger port = [[serverInfo objectForKey:PORT_KEY] integerValue];
     if (port == 0)
         port = 119;
 
+//    // TESTING
+//    port = 563;
+//    secure = YES;
+//    // END TESTING
+
     if (hostName)
     {
         _server = [[NNServer alloc] initWithHostName:hostName port:port];
-        _server.delegate = self;
+        [_server setSecure:secure];
+        [_server setDelegate:self];
 
         _connection = [[NNConnection alloc] initWithServer:_server];
     }
@@ -146,8 +153,7 @@
 //    [userDefaults setObject:myGroups forKey:FAVOURITES_KEY];
 //}
 
-#pragma mark -
-#pragma mark Private Methods
+#pragma mark - Private Methods
 
 - (void)configureCacheForHostName:(NSString *)hostName
 {
@@ -172,8 +178,7 @@
                                  error:NULL];
 }
 
-#pragma mark -
-#pragma mark NNServerDelegate Methods
+#pragma mark - NNServerDelegate Methods
 
 - (NSString *)userNameForServer:(NNServer *)aServer
 {

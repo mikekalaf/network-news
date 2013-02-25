@@ -110,60 +110,18 @@
     return cell;
 }
 
-
-/*
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
-}
-*/
-
-
-/*
-// Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source
-        [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:YES];
-    }   
-    else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-    }   
-}
-*/
-
-
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
-}
-*/
-
-
-/*
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
-}
-*/
-
-
-#pragma mark -
-#pragma mark Table view delegate
+#pragma mark - Table view delegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSMutableDictionary *nai = [NSMutableDictionary dictionary];
+    NSMutableDictionary *accountInfo = [NSMutableDictionary dictionary];
 
     if (indexPath.row == NEW_ACCOUNT_GIGANEWS)
     {
         // Giganews
-        [nai setObject:@"Giganews" forKey:@"Name"];
-        [nai setObject:@"http://www.giganews.com/?c=gn1113881" forKey:@"SupportURL"];
-        [nai setObject:@"news.giganews.com" forKey:@"HostName"];
+        accountInfo[@"Name"] = @"Giganews";
+        accountInfo[@"SupportURL"] = @"http://www.giganews.com/?c=gn1113881";
+        accountInfo[@"HostName"] = @"news.giganews.com";
     }
 //    else if (indexPath.row == 1)
 //    {
@@ -189,12 +147,12 @@
     else if (indexPath.row == NEW_ACCOUNT_OTHER)
     {
         // Other
-        [nai setObject:@"Usenet Server" forKey:@"Name"];
+        accountInfo[@"Name"] = @"Usenet Server";
     }
     
-    NewAccountViewController *viewController = [[NewAccountViewController alloc] initWithNibName:@"NewAccountView"
-                                                                                          bundle:nil];
-    [viewController setFreshAccountInfo:nai];
+    AccountSettingsViewController *viewController = [[AccountSettingsViewController alloc] initWithNibName:@"AccountSettingsView"
+                                                                                                    bundle:nil];
+    [viewController setAccountInfo:accountInfo];
     [viewController setDelegate:self];
 
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
@@ -208,26 +166,17 @@
         [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
-
-#pragma mark -
-#pragma mark Memory management
-
-- (void)didReceiveMemoryWarning {
+- (void)didReceiveMemoryWarning
+{
     // Releases the view if it doesn't have a superview.
     [super didReceiveMemoryWarning];
     
     // Relinquish ownership any cached data, images, etc that aren't in use.
 }
 
-- (void)viewDidUnload {
-    // Relinquish ownership of anything that can be recreated in viewDidLoad or on demand.
-    // For example: self.myOutlet = nil;
-}
+#pragma mark - NewAccountDelegate Methods
 
-#pragma mark -
-#pragma mark NewAccountDelegate Methods
-
-- (void)newAccountViewController:(NewAccountViewController *)controller
+- (void)newAccountViewController:(AccountSettingsViewController *)controller
                   createdAccount:(NSDictionary *)accountInfo
 {
     NSLog(@"New Account: %@", accountInfo);
@@ -243,7 +192,7 @@
     [[self navigationController] popViewControllerAnimated:NO];
 }
 
-- (void)newAccountViewControllerCancelled:(NewAccountViewController *)controller
+- (void)newAccountViewControllerCancelled:(AccountSettingsViewController *)controller
 {
     [self dismissViewControllerAnimated:YES completion:NULL];
 }

@@ -7,9 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "NewAccountViewController.h"
+#import "AccountSettingsViewController.h"
 
-@interface WelcomeViewController : UITableViewController <NewAccountDelegate>
+@interface WelcomeViewController : UITableViewController <AccountSettingsDelegate>
 {
 }
 

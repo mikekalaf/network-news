@@ -56,8 +56,8 @@ NSString *NNConnectionBytesReceivedNotification = @"NNConnectionBytesReceivedNot
       withParameterString:(NSString *)paramString;
 - (void)sendCommandString:(NSString *)commandString;
 - (void)handleBytes:(UInt8 *)buffer length:(NSUInteger)length;
-- (void)reportReadError:(CFErrorRef)error;
-- (void)reportWriteError:(CFErrorRef)error;
+- (void)reportReadError:(NSError *)error;
+- (void)reportWriteError:(NSError *)error;
 - (void)reportCompletion;
 
 @end
@@ -121,6 +121,16 @@ NSString *NNConnectionBytesReceivedNotification = @"NNConnectionBytesReceivedNot
     [_outputStream setDelegate:self];
     [_inputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
     [_outputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+
+    // Sort out any required SSL
+    if ([_server isSecure])
+    {
+        [_inputStream setProperty:NSStreamSocketSecurityLevelSSLv2
+                           forKey:NSStreamSocketSecurityLevelKey];
+        [_outputStream setProperty:NSStreamSocketSecurityLevelSSLv2
+                            forKey:NSStreamSocketSecurityLevelKey];
+    }
+
     [_inputStream open];
     [_outputStream open];
 }
@@ -208,9 +218,7 @@ NSString *NNConnectionBytesReceivedNotification = @"NNConnectionBytesReceivedNot
 
         case NSStreamEventErrorOccurred:
         {
-            //            CFErrorRef error = CFReadStreamCopyError(stream);
-            //            [self reportReadError:error];
-            [self reportReadError:nil];
+            [self reportReadError:[_inputStream streamError]];
             [_inputStream close];
             [_inputStream removeFromRunLoop:[NSRunLoop currentRunLoop]
                                     forMode:NSDefaultRunLoopMode];
@@ -257,9 +265,7 @@ NSString *NNConnectionBytesReceivedNotification = @"NNConnectionBytesReceivedNot
 
         case NSStreamEventErrorOccurred:
         {
-            //            CFErrorRef error = CFReadStreamCopyError(stream);
-            //            [self reportReadError:error];
-            [self reportWriteError:nil];
+            [self reportWriteError:[_outputStream streamError]];
             [_outputStream close];
             [_outputStream removeFromRunLoop:[NSRunLoop currentRunLoop]
                                      forMode:NSDefaultRunLoopMode];
@@ -624,6 +630,9 @@ NSString *NNConnectionBytesReceivedNotification = @"NNConnectionBytesReceivedNot
 
 //    NSString *str = [NSString stringWithCString:buffer length:length];
 //    NSLog(@"handleBytes: %@", str);
+
+    // TODO: Investigate why crash logs are showing problems here - basically
+    // this whole thing looks like a dog's dinner, and so needs to be fixed up
     
     // Notify interested parties of the received data
     _responseData = [[NSData alloc] initWithBytesNoCopy:buffer
@@ -651,40 +660,23 @@ NSString *NNConnectionBytesReceivedNotification = @"NNConnectionBytesReceivedNot
     _responseData = nil;
 }
 
-- (void)reportReadError:(CFErrorRef)error
+- (void)reportReadError:(NSError *)error
 {
     _connected = NO;
     _issuedModeReaderCommand = NO;
     
-    NSString *errorDesc = (NSString *)CFBridgingRelease(CFErrorCopyDescription(error));
-    NSString *errorDomain = (NSString *)CFErrorGetDomain(error);
-    CFIndex errorCode = CFErrorGetCode(error);
-
-    if ([errorDomain isEqualToString:(NSString *)kCFErrorDomainCFNetwork])
-    {
-        if (errorCode == kCFHostErrorUnknown)
-        {
-//            NSNumber *addrInfoFailure = (NSNumber *)CFBridgingRelease(CFReadStreamCopyProperty(readStream,
-//                                                                             kCFGetAddrInfoFailureKey));
-        }
-    }
-    
-    NSLog(@"reportReadError: (%@ %ld)(%@)", errorDomain, errorCode, errorDesc);
+    NSLog(@"reportReadError: (%@ %d)(%@)", [error domain], [error code], [error description]);
     
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc postNotificationName:ServerReadErrorNotification object:self];
 }
 
-- (void)reportWriteError:(CFErrorRef)error
+- (void)reportWriteError:(NSError *)error
 {
     _connected = NO;
     _issuedModeReaderCommand = NO;
 
-    NSString *errorDesc = (NSString *)CFBridgingRelease(CFErrorCopyDescription(error));
-    NSString *errorDomain = (NSString *)CFErrorGetDomain(error);
-    CFIndex errorCode = CFErrorGetCode(error);
-    
-    NSLog(@"reportWriteError: (%@ %ld)(%@)", errorDomain, errorCode, errorDesc);
+    NSLog(@"reportWriteError: (%@ %d)(%@)", [error domain], [error code], [error description]);
 
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc postNotificationName:ServerWriteErrorNotification object:self];

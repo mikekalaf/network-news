@@ -41,6 +41,7 @@
 {
     NSFetchedResultsController *searchFetchedResultsController;
     ProgressView *progressView;
+    UILabel *_statusLabel;
     NSArray *threads;
     NSArray *fileThreads;
     NSArray *messageThreads;
@@ -115,18 +116,17 @@
     readIconImage = [UIImage imageNamed:@"icon-blank.png"];
     incompleteIconImage = [UIImage imageNamed:@"icon-dot-incomplete.png"];
 
-    fileExtensions = [[NSArray alloc] initWithObjects:
-                      @".jpg",
-                      @".png",
-                      @".gif",
-                      @".mp3",
-                      @".mp2",
-                      @".wav",
-                      @".aif",
-                      @".zip",
-                      @".rar",
-                      nil];
-    
+    fileExtensions = @[@".jpg",
+                       @".png",
+                       @".gif",
+                       @".mp3",
+                       @".mp2",
+                       @".mov",
+                       @".wav",
+                       @".aif",
+                       @".zip",
+                       @".rar"];
+
     [self buildThreadListToolbar];
     
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
@@ -406,23 +406,17 @@
 }
 
 
-#pragma mark -
-#pragma mark Memory management
+#pragma mark - Memory management
 
-- (void)didReceiveMemoryWarning {
+- (void)didReceiveMemoryWarning
+{
     // Releases the view if it doesn't have a superview.
     [super didReceiveMemoryWarning];
     
     // Relinquish ownership any cached data, images, etc that aren't in use.
 }
 
-- (void)viewDidUnload {
-    // Relinquish ownership of anything that can be recreated in viewDidLoad or on demand.
-    // For example: self.myOutlet = nil;
-}
-
-#pragma mark -
-#pragma mark UISearchBarDelegate Methods
+#pragma mark - UISearchBarDelegate Methods
 
 - (void)searchBar:(UISearchBar *)searchBar selectedScopeButtonIndexDidChange:(NSInteger)selectedScope
 {
@@ -512,8 +506,7 @@
 //    [fileManager removeItemAtPath:path error:NULL];
 }
 
-#pragma mark -
-#pragma mark UIActionSheetDelegate Methods
+#pragma mark - UIActionSheetDelegate Methods
 
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
@@ -548,8 +541,7 @@
     }
 }
 
-#pragma mark -
-#pragma mark NewArticleDelegate Methods
+#pragma mark - NewArticleDelegate Methods
 
 - (void)newArticleViewController:(NewArticleViewController *)controller
                          didSend:(BOOL)send
@@ -558,16 +550,14 @@
     restoreArticleComposer = NO;
 }
 
-#pragma mark -
-#pragma mark GroupInfoDelegate Methods
+#pragma mark - GroupInfoDelegate Methods
 
 - (void)closedGroupInfoController:(GroupInfoViewController *)controller
 {
     [self dismissViewControllerAnimated:YES completion:NULL];
 }
 
-#pragma mark -
-#pragma mark Actions
+#pragma mark - Actions
 
 - (void)refresh:(id)sender
 {
@@ -607,8 +597,7 @@
     [self presentViewController:navigationController animated:YES completion:NULL];
 }
 
-#pragma mark -
-#pragma mark Notifications
+#pragma mark - Notifications
 
 - (void)articleOverviewsLoaded:(NSNotification *)notification
 {
@@ -704,8 +693,7 @@
     [self articleOverviewsLoaded:notification];
 }
 
-#pragma mark -
-#pragma mark Private Methods
+#pragma mark - Private Methods
 
 - (NSArray *)activeThreads
 {
@@ -973,33 +961,11 @@
 
 - (void)toolbarEnabled:(BOOL)enabled
 {
-    for (UIBarButtonItem *item in self.toolbarItems)
-        item.enabled = enabled;
+    // Set the enabled state of all items except UILabels
+    for (UIBarButtonItem *item in [self toolbarItems])
+        if ([[item customView] isKindOfClass:[UILabel class]] == NO)
+            [item setEnabled:enabled];
 }
-
-//- (void)showProgressToolbar
-//{
-//    // Set up toolbar
-//    UIBarButtonItem *flexibleSpaceButtonItem =
-//    [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
-//                                                  target:nil
-//                                                  action:nil];
-//    
-//    progressView = [[ProgressView alloc] init];
-//    [progressView.activityIndicatorView startAnimating];
-//    progressView.label.text = @"Downloading...";
-//    UIBarButtonItem *progressItem = [[UIBarButtonItem alloc] initWithCustomView:progressView];
-//    [progressView release];
-//    
-//    self.toolbarItems = [NSArray arrayWithObjects:
-//                         flexibleSpaceButtonItem,
-//                         progressItem,
-//                         flexibleSpaceButtonItem,
-//                         nil];
-//    
-//    [flexibleSpaceButtonItem release];
-//    [progressItem release];
-//}
 
 - (void)buildThreadListToolbar
 {
@@ -1017,11 +983,33 @@
 //                                     style:UIBarButtonItemStylePlain
 //                                    target:self
 //                                    action:@selector(infoButtonPressed:)];
-    progressView = [[ProgressView alloc] init];
-    progressView.updatedDate = stack.group.lastUpdate;
-    progressView.status = ProgressViewStatusUpdated;
-    UIBarButtonItem *progressItem = [[UIBarButtonItem alloc] initWithCustomView:progressView];
-    
+
+//    progressView = [[ProgressView alloc] init];
+//    progressView.updatedDate = stack.group.lastUpdate;
+//    progressView.status = ProgressViewStatusUpdated;
+//    UIBarButtonItem *progressItem = [[UIBarButtonItem alloc] initWithCustomView:progressView];
+
+    NSMutableAttributedString *text = [[NSMutableAttributedString alloc] init];
+    UIFont *boldFont = [UIFont boldSystemFontOfSize:12.0];
+    UIFont *regularFont = [UIFont systemFontOfSize:12.0];
+    [text appendAttributedString:[[NSMutableAttributedString alloc] initWithString:@"Updated  "
+                                                                        attributes:@{NSFontAttributeName: boldFont}]];
+    [text appendAttributedString:[[NSMutableAttributedString alloc] initWithString:@"01/01/13  "
+                                                                        attributes:@{NSFontAttributeName: regularFont}]];
+    [text appendAttributedString:[[NSMutableAttributedString alloc] initWithString:@"12:00 "
+                                                                        attributes:@{NSFontAttributeName: boldFont}]];
+    [text appendAttributedString:[[NSMutableAttributedString alloc] initWithString:@"PM"
+                                                                        attributes:@{NSFontAttributeName: regularFont}]];
+
+    _statusLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+    [_statusLabel setOpaque:NO];
+    [_statusLabel setBackgroundColor:[UIColor clearColor]];
+    [_statusLabel setShadowColor:[UIColor darkGrayColor]];
+    [_statusLabel setTextColor:[UIColor whiteColor]];
+    [_statusLabel setAttributedText:text];
+    [_statusLabel sizeToFit];
+    UIBarButtonItem *statusItem = [[UIBarButtonItem alloc] initWithCustomView:_statusLabel];
+
     UIBarButtonItem *composeButtonItem =
     [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCompose
                                                   target:self
@@ -1030,7 +1018,8 @@
                          actionButtonItem,
                          flexibleSpaceButtonItem,
 //                         infoButtonItem,
-                         progressItem,
+//                         progressItem,
+                         statusItem,
                          flexibleSpaceButtonItem,
                          composeButtonItem,
                          nil];

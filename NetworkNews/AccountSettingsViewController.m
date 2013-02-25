@@ -1,12 +1,12 @@
 //
-//  NewAccountViewController.m
+//  AccountSettingsViewController.m
 //  Network News
 //
 //  Created by David Schweinsberg on 10/04/10.
 //  Copyright 2010 David Schweinsberg. All rights reserved.
 //
 
-#import "NewAccountViewController.h"
+#import "AccountSettingsViewController.h"
 #import "NetworkNews.h"
 #import "EditableTableViewCell.h"
 
@@ -15,40 +15,61 @@
 #define PASSWORD_TAG    3
 #define DESCRIPTION_TAG 4
 
-@interface NewAccountViewController (Private)
+@interface AccountSettingsViewController ()
+{
+    NSUInteger accountType;
+    UIBarButtonItem *cancelButtonItem;
+    UIBarButtonItem *saveButtonItem;
+
+    NSString *serverName;
+    NSString *name;
+    NSString *password;
+    NSString *description;
+    ConnectionVerifier *connectionVerifier;
+    BOOL isVerified;
+    BOOL isModified;
+}
+
+@property(nonatomic, weak) IBOutlet UIButton *linkButton;
+
+- (IBAction)textFieldValueChanged:(id)sender;
+- (IBAction)linkTouchUp:(id)sender;
 
 - (UIView *)createVerifyView;
-- (NSDictionary *)accountInfo;
+//- (NSDictionary *)createdAccountInfo;
 - (BOOL)selectNextField;
 
 @end
 
-@implementation NewAccountViewController
+@implementation AccountSettingsViewController
 
-#pragma mark -
-#pragma mark View lifecycle
+#pragma mark - View lifecycle
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 
-    [self setTitle:[_freshAccountInfo objectForKey:@"Name"]];
-    if ([_freshAccountInfo objectForKey:@"SupportURL"])
+    [self setTitle:[_accountInfo objectForKey:@"Name"]];
+    if ([_accountInfo objectForKey:@"SupportURL"])
         [self.linkButton setTitle:[NSString stringWithFormat:
                                    @"Learn More about %@",
-                                   [_freshAccountInfo objectForKey:@"Name"]]
+                                   [_accountInfo objectForKey:@"Name"]]
                          forState:UIControlStateNormal];
     else
         [[self linkButton] setHidden:YES];
     
-    description = [[_freshAccountInfo objectForKey:@"Name"] copy];
-    
+    description = [[_accountInfo objectForKey:@"Name"] copy];
+
     // Cancel and Save buttons
-    cancelButtonItem =
-    [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
-                                                  target:self
-                                                  action:@selector(cancelButtonPressed:)];
-    [[self navigationItem] setLeftBarButtonItem:cancelButtonItem];
+    // We only want to display a cancel button if we're the root view controller
+    if ([[self navigationController] viewControllers][0] == self)
+    {
+        cancelButtonItem =
+        [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
+                                                      target:self
+                                                      action:@selector(cancelButtonPressed:)];
+        [[self navigationItem] setLeftBarButtonItem:cancelButtonItem];
+    }
 
     saveButtonItem =
     [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave
@@ -75,8 +96,7 @@
     return YES;
 }
 
-#pragma mark -
-#pragma mark Table view data source
+#pragma mark - UITableViewDataSource Methods
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
@@ -91,7 +111,7 @@
     // Return the number of rows in the section.
     if (section == 0)
     {
-        if ([_freshAccountInfo objectForKey:@"HostName"])
+        if ([_accountInfo objectForKey:@"HostName"])
             return 2;
         else
             return 3;
@@ -121,7 +141,7 @@
             cell.textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
         }
         
-        if (![_freshAccountInfo objectForKey:@"HostName"])
+        if (![_accountInfo objectForKey:@"HostName"])
         {
             if (indexPath.row == 0)
             {
@@ -282,6 +302,8 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 
 - (IBAction)saveButtonPressed:(id)sender
 {
+    [self updateAccountInfo];
+
     if (!isModified)
     {
         NSString *alertMessage = @"This account may not be able to send or receive news articles. Are you sure you want to save?";
@@ -313,8 +335,8 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
         self.navigationItem.titleView = [self createVerifyView];
         [self tableViewEnable:NO];
         
-        if ([_freshAccountInfo objectForKey:@"HostName"])
-            serverName = [_freshAccountInfo objectForKey:@"HostName"];
+        if ([_accountInfo objectForKey:@"HostName"])
+            serverName = [_accountInfo objectForKey:@"HostName"];
         
         connectionVerifier = [[ConnectionVerifier alloc] initWithHostName:serverName
                                                                      port:119
@@ -350,7 +372,7 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
         description = [textField.text copy];
     }
     
-    if ([_freshAccountInfo objectForKey:@"HostName"])
+    if ([_accountInfo objectForKey:@"HostName"])
     {
         // If both the username and password fields have entries, then we can
         // enable the save button, otherwise it should be disabled
@@ -372,7 +394,7 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 
 - (IBAction)linkTouchUp:(id)sender
 {
-    NSURL *url = [NSURL URLWithString:[_freshAccountInfo objectForKey:@"SupportURL"]];
+    NSURL *url = [NSURL URLWithString:[_accountInfo objectForKey:@"SupportURL"]];
     if (url)
         [[UIApplication sharedApplication] openURL:url];
 }
@@ -402,32 +424,29 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
     return YES;
 }
 
-#pragma mark -
-#pragma mark UIActionSheetDelegate Methods
+#pragma mark - UIActionSheetDelegate Methods
 
 - (void)actionSheet:(UIActionSheet *)actionSheet
 didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
     if (buttonIndex == 0)
     {
-        [_delegate newAccountViewController:self createdAccount:[self accountInfo]];
+        [_delegate newAccountViewController:self createdAccount:_accountInfo];
     }
 }
 
-#pragma mark -
-#pragma mark UIAlertViewDelegate Methods
+#pragma mark - UIAlertViewDelegate Methods
 
 - (void)alertView:(UIAlertView *)alertView
 didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
     if (buttonIndex == 0)
     {
-        [_delegate newAccountViewController:self createdAccount:[self accountInfo]];
+        [_delegate newAccountViewController:self createdAccount:_accountInfo];
     }
 }
 
-#pragma mark -
-#pragma mark ConnectionVerifierDelegate Methods
+#pragma mark - ConnectionVerifierDelegate Methods
 
 - (void)connectionVerifier:(ConnectionVerifier *)verifier
                   verified:(BOOL)verified
@@ -443,7 +462,7 @@ didDismissWithButtonIndex:(NSInteger)buttonIndex
 //        passwordCell.accessoryType = UITableViewCellAccessoryCheckmark;
 
         // Report our success
-        [_delegate newAccountViewController:self createdAccount:[self accountInfo]];
+        [_delegate newAccountViewController:self createdAccount:_accountInfo];
     }
     else
     {
@@ -469,14 +488,14 @@ didDismissWithButtonIndex:(NSInteger)buttonIndex
         [alertView show];
         
         // Restore UI elements for verification
-        self.navigationItem.leftBarButtonItem = cancelButtonItem;
+        if (cancelButtonItem)
+            self.navigationItem.leftBarButtonItem = cancelButtonItem;
         self.navigationItem.rightBarButtonItem = saveButtonItem;
         [self tableViewEnable:YES];
     }
 }
 
-#pragma mark -
-#pragma mark Private Methods
+#pragma mark - Private Methods
 
 - (UIView *)createVerifyView
 {
@@ -518,17 +537,30 @@ didDismissWithButtonIndex:(NSInteger)buttonIndex
     return verifyView;
 }
 
-- (NSDictionary *)accountInfo
+//- (NSDictionary *)createdAccountInfo
+//{
+//    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+//    [dict setObject:serverName forKey:HOST_KEY];
+//    if (name)
+//        [dict setObject:name forKey:USERNAME_KEY];
+//    if (password)
+//        [dict setObject:password forKey:PASSWORD_KEY];
+//    if (description)
+//        [dict setObject:description forKey:DESCRIPTION_KEY];
+//    return [dict copy];
+//}
+
+- (void)updateAccountInfo
 {
-    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-    [dict setObject:serverName forKey:HOST_KEY];
+    NSMutableDictionary *dict = [_accountInfo mutableCopy];
+//    [dict setObject:serverName forKey:HOST_KEY];
     if (name)
         [dict setObject:name forKey:USERNAME_KEY];
     if (password)
         [dict setObject:password forKey:PASSWORD_KEY];
     if (description)
         [dict setObject:description forKey:DESCRIPTION_KEY];
-    return [dict copy];
+    _accountInfo = [dict copy];
 }
 
 - (BOOL)selectNextField

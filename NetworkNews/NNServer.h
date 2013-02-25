@@ -23,16 +23,12 @@ extern NSString *ServerWriteErrorNotification;
 extern NSString *ServerCommandRespondedNotification;
 
 @interface NNServer : NSObject
-{
-}
 
 @property(nonatomic, copy, readonly) NSString *hostName;
-
 @property(nonatomic, readonly) NSUInteger port;
-
 @property(nonatomic, readonly) CFHostRef host;
-
-@property(nonatomic, assign) id <NNServerDelegate> delegate;
+@property(nonatomic, getter = isSecure) BOOL secure;
+@property(nonatomic, weak) id <NNServerDelegate> delegate;
 
 - (id)initWithHostName:(NSString *)aHostName port:(NSUInteger)aPort;
 

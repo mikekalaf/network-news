@@ -9,6 +9,7 @@
 
 #define HOST_KEY                            @"Host"
 #define PORT_KEY                            @"Port"
+#define SECURE_KEY                          @"Secure"
 #define USERNAME_KEY                        @"UserName"
 #define PASSWORD_KEY                        @"Password"
 #define DESCRIPTION_KEY                     @"Description"
