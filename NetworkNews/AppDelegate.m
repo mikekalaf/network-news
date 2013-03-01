@@ -80,7 +80,7 @@
 {
     _userName = [[serverInfo objectForKey:USERNAME_KEY] copy];
     _password = [[serverInfo objectForKey:PASSWORD_KEY] copy];
-    NSString *hostName = [serverInfo objectForKey:HOST_KEY];
+    NSString *hostName = [serverInfo objectForKey:HOSTNAME_KEY];
     BOOL secure = [[serverInfo objectForKey:SECURE_KEY] boolValue];
     NSUInteger port = [[serverInfo objectForKey:PORT_KEY] integerValue];
     if (port == 0)

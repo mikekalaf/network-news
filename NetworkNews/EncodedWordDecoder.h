@@ -13,8 +13,6 @@
 {
 }
 
-+ (CFStringEncoding)charsetEncodingFromName:(NSString *)encodingName;
-
 //- (NSString *)decodeData:(NSData *)data;
 
 - (NSString *)decodeString:(NSString *)string;

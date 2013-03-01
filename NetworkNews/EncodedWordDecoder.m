@@ -23,38 +23,12 @@ static int hexvalue(char c)
 
 @implementation EncodedWordDecoder
 
-+ (CFStringEncoding)charsetEncodingFromName:(NSString *)encodingName
-{
-    if ([encodingName caseInsensitiveCompare:@"UTF-8"] == NSOrderedSame)
-        return kCFStringEncodingUTF8;
-    else if ([encodingName caseInsensitiveCompare:@"ISO-8859-1"] == NSOrderedSame)
-        return kCFStringEncodingISOLatin1;
-    else if ([encodingName caseInsensitiveCompare:@"ISO-8859-2"] == NSOrderedSame)
-        return kCFStringEncodingISOLatin2;
-    else if ([encodingName caseInsensitiveCompare:@"ISO-8859-15"] == NSOrderedSame)
-        return kCFStringEncodingISOLatin9;
-    else if ([encodingName caseInsensitiveCompare:@"windows-1252"] == NSOrderedSame)
-        return kCFStringEncodingWindowsLatin1;
-    else if ([encodingName caseInsensitiveCompare:@"windows-1256"] == NSOrderedSame)
-        return kCFStringEncodingWindowsArabic;
-    else if ([encodingName caseInsensitiveCompare:@"ISO-2022-JP"] == NSOrderedSame)
-        return kCFStringEncodingISO_2022_JP;
-    else if ([encodingName caseInsensitiveCompare:@"Big5"] == NSOrderedSame)
-        return kCFStringEncodingBig5;
-    else if ([encodingName caseInsensitiveCompare:@"KOI8-R"] == NSOrderedSame)
-        return kCFStringEncodingKOI8_R;
-    else if ([encodingName caseInsensitiveCompare:@"GB2312"] == NSOrderedSame)
-        return kCFStringEncodingGB_2312_80;
-    else
-        return kCFStringEncodingInvalidId;
-}
-
 //- (NSString *)decodeData:(NSData *)data
 //{
 //}
 
 - (NSString *)decodeQString:(NSString *)string
-                   encoding:(CFStringEncoding)encoding
+                   encoding:(NSStringEncoding)encoding
 {
     NSMutableString *decodedString = [NSMutableString stringWithCapacity:string.length];
     NSMutableData *dataToDecode = nil;
@@ -82,13 +56,8 @@ static int hexvalue(char c)
                 if (i + 3 >= string.length
                     || [string characterAtIndex:i + 3] != '=')
                 {
-                    CFStringRef strRef = CFStringCreateWithBytes(kCFAllocatorDefault,
-                                                                 dataToDecode.bytes,
-                                                                 dataToDecode.length,
-                                                                 encoding,
-                                                                 false);
-                    [decodedString appendString:(__bridge NSString *)strRef];
-                    CFRelease(strRef);
+                    NSString *str = [[NSString alloc] initWithData:dataToDecode encoding:encoding];
+                    [decodedString appendString:str];
                     dataToDecode = nil;
                 }
                 i += 2;
@@ -108,7 +77,7 @@ static int hexvalue(char c)
 }
 
 - (NSString *)decodeBString:(NSString *)string
-                   encoding:(CFStringEncoding)encoding
+                   encoding:(NSStringEncoding)encoding
 {
     NNBase64Decoder *base64Decoder = [[NNBase64Decoder alloc] init];
     NSString *decodedString = [base64Decoder decodeString:string
@@ -125,20 +94,19 @@ static int hexvalue(char c)
     if (components.count == 5)
     {
         NSString *encodingName = [components objectAtIndex:1];
-        CFStringEncoding targetEncoding = [EncodedWordDecoder charsetEncodingFromName:encodingName];
-        if (targetEncoding != kCFStringEncodingInvalidId)
+
+        CFStringEncoding targetCFStringEncoding = CFStringConvertIANACharSetNameToEncoding((__bridge CFStringRef)(encodingName));
+        NSStringEncoding targetEncoding = CFStringConvertEncodingToNSStringEncoding(targetCFStringEncoding);
+        NSString *encoding = [components objectAtIndex:2];
+        if ([encoding caseInsensitiveCompare:@"Q"] == NSOrderedSame)
         {
-            NSString *encoding = [components objectAtIndex:2];
-            if ([encoding caseInsensitiveCompare:@"Q"] == NSOrderedSame)
-            {
-                return [self decodeQString:[components objectAtIndex:3]
-                                  encoding:targetEncoding];
-            }
-            else if ([encoding caseInsensitiveCompare:@"B"] == NSOrderedSame)
-            {
-                return [self decodeBString:[components objectAtIndex:3]
-                                  encoding:targetEncoding];
-            }
+            return [self decodeQString:[components objectAtIndex:3]
+                              encoding:targetEncoding];
+        }
+        else if ([encoding caseInsensitiveCompare:@"B"] == NSOrderedSame)
+        {
+            return [self decodeBString:[components objectAtIndex:3]
+                              encoding:targetEncoding];
         }
     }
     

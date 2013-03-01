@@ -8,6 +8,7 @@
 
 #import "WelcomeViewController.h"
 #import "LogoTableViewCell.h"
+#import "NetworkNews.h"
 
 #define NEW_ACCOUNT_GIGANEWS        0
 //#define NEW_ACCOUNT_POWER_USENET    1
@@ -119,9 +120,11 @@
     if (indexPath.row == NEW_ACCOUNT_GIGANEWS)
     {
         // Giganews
-        accountInfo[@"Name"] = @"Giganews";
-        accountInfo[@"SupportURL"] = @"http://www.giganews.com/?c=gn1113881";
-        accountInfo[@"HostName"] = @"news.giganews.com";
+        accountInfo[SERVICE_NAME_KEY] = @"Giganews";
+        accountInfo[SUPPORT_URL_KEY] = @"http://www.giganews.com/?c=gn1113881";
+        accountInfo[HOSTNAME_KEY] = @"news.giganews.com";
+        accountInfo[SECURE_KEY] = [NSNumber numberWithBool:YES];
+        accountInfo[PORT_KEY] = [NSNumber numberWithInteger:563];
     }
 //    else if (indexPath.row == 1)
 //    {
@@ -147,7 +150,9 @@
     else if (indexPath.row == NEW_ACCOUNT_OTHER)
     {
         // Other
-        accountInfo[@"Name"] = @"Usenet Server";
+        accountInfo[SERVICE_NAME_KEY] = @"Usenet Server";
+        accountInfo[SECURE_KEY] = [NSNumber numberWithBool:NO];
+        accountInfo[PORT_KEY] = [NSNumber numberWithInteger:119];
     }
     
     AccountSettingsViewController *viewController = [[AccountSettingsViewController alloc] initWithNibName:@"AccountSettingsView"
@@ -182,11 +187,11 @@
     NSLog(@"New Account: %@", accountInfo);
 
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    NSMutableArray *array = [[userDefaults arrayForKey:@"Servers"] mutableCopy];
+    NSMutableArray *array = [[userDefaults arrayForKey:ACCOUNTS_NAME_KEY] mutableCopy];
     if (!array)
         array = [[NSMutableArray alloc] initWithCapacity:1];
     [array addObject:accountInfo];
-    [userDefaults setObject:array forKey:@"Servers"];
+    [userDefaults setObject:array forKey:ACCOUNTS_NAME_KEY];
 
     [self dismissViewControllerAnimated:YES completion:NULL];
     [[self navigationController] popViewControllerAnimated:NO];

@@ -786,12 +786,17 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     return charsetName;
 }
 
-- (CFStringEncoding)charsetEncoding
+- (NSStringEncoding)charsetEncoding
 {
-    CFStringEncoding encoding = [EncodedWordDecoder charsetEncodingFromName:[self charsetName]];
-    if (encoding == kCFStringEncodingInvalidId)
-        encoding = kCFStringEncodingASCII;
-    return encoding;
+    CFStringEncoding encoding = kCFStringEncodingASCII;
+    NSString *encodingName = [self charsetName];
+    if (encodingName)
+    {
+        encoding = CFStringConvertIANACharSetNameToEncoding((__bridge CFStringRef)(encodingName));
+        if (encoding == kCFStringEncodingInvalidId)
+            encoding = kCFStringEncodingASCII;
+    }
+    return CFStringConvertEncodingToNSStringEncoding(encoding);
 }
 
 - (void)appendHeadFromArticle
@@ -843,7 +848,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     [htmlString appendString:@"</div>"];
 }
 
-- (void)appendBodyLineData:(NSData *)lineData encoding:(CFStringEncoding)encoding
+- (void)appendBodyLineData:(NSData *)lineData encoding:(NSStringEncoding)encoding
 {
     if (lineData.length == 2)
     {
@@ -862,47 +867,21 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 
     // Decode used the specified encoding.  If this fails, try our two
     // fall-back encodings: UTF8 and ISOLatin1.
-    CFStringRef strRef = CFStringCreateWithBytes(kCFAllocatorDefault,
-                                                 lineData.bytes,
-                                                 lineData.length,
-                                                 encoding,
-                                                 false);
-    if (strRef == NULL)
-    {
-        strRef = CFStringCreateWithBytes(kCFAllocatorDefault,
-                                         lineData.bytes,
-                                         lineData.length,
-                                         kCFStringEncodingUTF8,
-                                         false);
-    }
+    NSString *articleString = [[NSString alloc] initWithData:lineData
+                                                    encoding:encoding];
 
-    if (strRef == NULL)
-    {
-        strRef = CFStringCreateWithBytes(kCFAllocatorDefault,
-                                         lineData.bytes,
-                                         lineData.length,
-                                         kCFStringEncodingISOLatin1,
-                                         false);
-    }
-    
-    if (strRef)
-    {
-        [htmlString appendString:(__bridge NSString *)strRef];
-        CFRelease(strRef);
-    }
-    
-//    NSString *articleString = [[NSString alloc] initWithData:lineData
-//                                                    encoding:NSUTF8StringEncoding];
-//    if (!articleString)
-//        articleString = [[NSString alloc] initWithData:lineData
-//                                              encoding:NSISOLatin1StringEncoding];
-//
-//    [htmlString appendString:articleString];
-//    [articleString release];
+    if (!articleString)
+        articleString = [[NSString alloc] initWithData:lineData
+                                              encoding:NSUTF8StringEncoding];
+    if (!articleString)
+        articleString = [[NSString alloc] initWithData:lineData
+                                              encoding:NSISOLatin1StringEncoding];
+
+    [htmlString appendString:articleString];
 }
 
 - (void)appendBodyData:(NSData *)bodyData
-              encoding:(CFStringEncoding)encoding
+              encoding:(NSStringEncoding)encoding
                 flowed:(BOOL)flowed
 {
     // TODO: The "quote level parser" needs to be renamed since its role has
@@ -1019,7 +998,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     // Is the content format=flowed?
     BOOL flowed = [self isFlowed];
     
-    CFStringEncoding encoding = [self charsetEncoding];
+    NSStringEncoding encoding = [self charsetEncoding];
 
     // Append the visible headers
     [self appendHeadFromArticle];

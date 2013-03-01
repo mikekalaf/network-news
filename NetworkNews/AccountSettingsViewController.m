@@ -111,7 +111,7 @@
     // Return the number of rows in the section.
     if (section == 0)
     {
-        if ([_accountInfo objectForKey:@"HostName"])
+        if ([_accountInfo objectForKey:HOSTNAME_KEY])
             return 2;
         else
             return 3;
@@ -141,7 +141,7 @@
             cell.textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
         }
         
-        if (![_accountInfo objectForKey:@"HostName"])
+        if (![_accountInfo objectForKey:HOSTNAME_KEY])
         {
             if (indexPath.row == 0)
             {
@@ -334,12 +334,19 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
         self.navigationItem.rightBarButtonItem = nil;
         self.navigationItem.titleView = [self createVerifyView];
         [self tableViewEnable:NO];
-        
-        if ([_accountInfo objectForKey:@"HostName"])
-            serverName = [_accountInfo objectForKey:@"HostName"];
-        
+
+        NSInteger port = 119;
+        BOOL secure = NO;
+        if ([_accountInfo objectForKey:HOSTNAME_KEY])
+            serverName = [_accountInfo objectForKey:HOSTNAME_KEY];
+        if ([_accountInfo objectForKey:PORT_KEY])
+            port = [[_accountInfo objectForKey:PORT_KEY] integerValue];
+        if ([_accountInfo objectForKey:SECURE_KEY])
+            secure = [[_accountInfo objectForKey:SECURE_KEY] boolValue];
+
         connectionVerifier = [[ConnectionVerifier alloc] initWithHostName:serverName
-                                                                     port:119
+                                                                     port:port
+                                                                   secure:secure
                                                                  userName:name
                                                                  password:password
                                                                  delegate:self];
@@ -372,7 +379,7 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
         description = [textField.text copy];
     }
     
-    if ([_accountInfo objectForKey:@"HostName"])
+    if ([_accountInfo objectForKey:HOSTNAME_KEY])
     {
         // If both the username and password fields have entries, then we can
         // enable the save button, otherwise it should be disabled
@@ -553,13 +560,14 @@ didDismissWithButtonIndex:(NSInteger)buttonIndex
 - (void)updateAccountInfo
 {
     NSMutableDictionary *dict = [_accountInfo mutableCopy];
-//    [dict setObject:serverName forKey:HOST_KEY];
+    if (serverName)
+        [dict setObject:serverName forKey:HOSTNAME_KEY];
     if (name)
         [dict setObject:name forKey:USERNAME_KEY];
     if (password)
         [dict setObject:password forKey:PASSWORD_KEY];
-    if (description)
-        [dict setObject:description forKey:DESCRIPTION_KEY];
+//    if (description)
+//        [dict setObject:description forKey:DESCRIPTION_KEY];
     _accountInfo = [dict copy];
 }
 

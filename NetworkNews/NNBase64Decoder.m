@@ -96,7 +96,7 @@ static char base64LUT[256] = {
 }
 
 - (NSString *)decodeString:(NSString *)string
-          toStringEncoding:(CFStringEncoding)encoding
+          toStringEncoding:(NSStringEncoding)encoding
 {
     // The string length must be a multiple of 4
     if (string.length % 4 != 0)
@@ -131,17 +131,11 @@ static char base64LUT[256] = {
         [decodedData appendBytes:outputGroup length:3];
     }
 
-    CFStringRef strRef = CFStringCreateWithBytes(kCFAllocatorDefault,
-                                                 decodedData.bytes,
-                                                 decodedData.length,
-                                                 encoding,
-                                                 false);
-    if (strRef == NULL)
-        return nil;
+    NSString *str = [[NSString alloc] initWithData:decodedData encoding:encoding];
 
-    NSLog(@"BASE64 decoded string: %@", (__bridge NSString *)strRef);
+    NSLog(@"BASE64 decoded string: %@", str);
 
-    return (NSString *)CFBridgingRelease(strRef);
+    return str;
 }
 
 @end

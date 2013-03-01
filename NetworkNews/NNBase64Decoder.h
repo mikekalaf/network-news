@@ -16,6 +16,6 @@
 - (NSData *)decode;
 
 - (NSString *)decodeString:(NSString *)string
-          toStringEncoding:(CFStringEncoding)encoding;
+          toStringEncoding:(NSStringEncoding)encoding;
 
 @end

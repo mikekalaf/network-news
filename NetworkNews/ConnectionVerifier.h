@@ -21,21 +21,13 @@
 
 
 @interface ConnectionVerifier : NSObject <NNServerDelegate>
-{
-    NNServer *server;
-    NNConnection *connection;
-    NSString *userName;
-    NSString *password;
-    id <ConnectionVerifierDelegate> delegate;
-    BOOL serverConnectionSuccess;
-    BOOL authenticationSuccess;
-}
 
 @property(nonatomic, readonly) BOOL serverConnectionSuccess;
 @property(nonatomic, readonly) BOOL authenticationSuccess;
 
 - (id)initWithHostName:(NSString *)aHostName
                   port:(NSUInteger)port
+                secure:(BOOL)secure
               userName:(NSString *)aUserName
               password:(NSString *)aPassword
               delegate:(id <ConnectionVerifierDelegate>)aDelegate;

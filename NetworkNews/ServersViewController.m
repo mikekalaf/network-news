@@ -11,8 +11,7 @@
 #import "FavouriteGroupsViewController.h"
 #import "AccountSettingsViewController.h"
 #import "AppDelegate.h"
-
-#define SERVERS_KEY @"Servers"
+#import "NetworkNews.h"
 
 @interface ServersViewController ()
 {
@@ -46,7 +45,7 @@
     [super viewWillAppear:animated];
 
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    _accounts = [userDefaults objectForKey:SERVERS_KEY];
+    _accounts = [userDefaults objectForKey:ACCOUNTS_NAME_KEY];
     if (!_accounts || [_accounts count] == 0)
         [self addButtonPressed:nil];
     else
@@ -99,7 +98,7 @@
     }
 
     NSDictionary *serverInfo = [_accounts objectAtIndex:[indexPath row]];
-    [[cell textLabel] setText:[serverInfo objectForKey:@"Host"]];
+    [[cell textLabel] setText:[serverInfo objectForKey:HOSTNAME_KEY]];
     
     return cell;
 }

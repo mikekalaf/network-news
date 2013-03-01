@@ -10,13 +10,23 @@
 #import "NNServer.h"
 #import "NNConnection.h"
 
-@implementation ConnectionVerifier
+@interface ConnectionVerifier ()
+{
+    NNServer *_server;
+    NNConnection *connection;
+    NSString *userName;
+    NSString *password;
+    id <ConnectionVerifierDelegate> delegate;
+}
 
-@synthesize serverConnectionSuccess;
-@synthesize authenticationSuccess;
+@end
+
+
+@implementation ConnectionVerifier
 
 - (id)initWithHostName:(NSString *)aHostName
                   port:(NSUInteger)port
+                secure:(BOOL)secure
               userName:(NSString *)aUserName
               password:(NSString *)aPassword
               delegate:(id <ConnectionVerifierDelegate>)aDelegate
@@ -24,10 +34,11 @@
     self = [super init];
     if (self)
     {
-        server = [[NNServer alloc] initWithHostName:aHostName port:port];
-        server.delegate = self;
+        _server = [[NNServer alloc] initWithHostName:aHostName port:port];
+        [_server setSecure:secure];
+        [_server setDelegate:self];
         
-        connection = [[NNConnection alloc] initWithServer:server];
+        connection = [[NNConnection alloc] initWithServer:_server];
 
         NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
         [nc addObserver:self
@@ -96,31 +107,31 @@
 
 - (void)commandResponded:(NSNotification *)notification
 {
-    serverConnectionSuccess = YES;
+    _serverConnectionSuccess = YES;
 
 //    if (connection.responseCode == 281)
     if (connection.responseCode == 100)
     {
-        authenticationSuccess = YES;
+        _authenticationSuccess = YES;
         [delegate connectionVerifier:self verified:YES];
     }
     else
     {
-        authenticationSuccess = NO;
+        _authenticationSuccess = NO;
         [delegate connectionVerifier:self verified:NO];
     }
 }
 
 - (void)connectionError:(NSNotification *)notification
 {
-    serverConnectionSuccess = NO;
-    authenticationSuccess = NO;
+    _serverConnectionSuccess = NO;
+    _authenticationSuccess = NO;
     [delegate connectionVerifier:self verified:NO];
 }
 
 - (void)authenticationFailed:(NSNotification *)notification
 {
-    authenticationSuccess = NO;
+    _authenticationSuccess = NO;
     [delegate connectionVerifier:self verified:NO];
 }
 
