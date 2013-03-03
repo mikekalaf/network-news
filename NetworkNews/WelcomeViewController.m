@@ -8,6 +8,7 @@
 
 #import "WelcomeViewController.h"
 #import "LogoTableViewCell.h"
+#import "NewsAccount.h"
 #import "NetworkNews.h"
 
 #define NEW_ACCOUNT_GIGANEWS        0
@@ -15,6 +16,13 @@
 //#define NEW_ACCOUNT_SUPERNEWS       2
 //#define NEW_ACCOUNT_USENET_DOT_NET  3
 #define NEW_ACCOUNT_OTHER           1
+
+@interface WelcomeViewController ()
+{
+    NSArray *_templateAccounts;
+}
+
+@end
 
 @implementation WelcomeViewController
 
@@ -25,29 +33,9 @@
 {
     [super viewDidLoad];
 
-//    self.clearsSelectionOnViewWillAppear = YES;
+    _templateAccounts = @[[NewsAccount accountWithTemplate:AccountTemplateGiganews],
+                          [NewsAccount accountWithTemplate:AccountTemplateDefault]];
 }
-
-/*
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-}
-*/
-/*
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-}
-*/
-/*
-- (void)viewWillDisappear:(BOOL)animated {
-    [super viewWillDisappear:animated];
-}
-*/
-/*
-- (void)viewDidDisappear:(BOOL)animated {
-    [super viewDidDisappear:animated];
-}
-*/
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
@@ -55,8 +43,7 @@
     return YES;
 }
 
-#pragma mark -
-#pragma mark Table view data source
+#pragma mark - UITableViewDataSource Methods
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
@@ -71,8 +58,6 @@
     return 2;
 }
 
-
-// Customize the appearance of table view cells.
 - (UITableViewCell *)tableView:(UITableView *)tableView
          cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -82,82 +67,31 @@
     if (cell == nil)
     {
         cell = [[LogoTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
-                                         reuseIdentifier:CellIdentifier];
+                                        reuseIdentifier:CellIdentifier];
     }
-    
-    if (indexPath.row == NEW_ACCOUNT_GIGANEWS)
+
+    NewsAccount *account = _templateAccounts[indexPath.row];
+    if ([account iconName])
     {
-        cell.imageView.image = [UIImage imageNamed:@"gn.png"];
+        [[cell imageView] setImage:[UIImage imageNamed:[account iconName]]];
     }
-//    else if (indexPath.row == NEW_ACCOUNT_POWER_USENET)
-//    {
-//        cell.imageView.image = [UIImage imageNamed:@"pu.png"];
-//    }
-//    else if (indexPath.row == NEW_ACCOUNT_SUPERNEWS)
-//    {
-//        cell.imageView.image = [UIImage imageNamed:@"sn.png"];
-//    }
-//    else if (indexPath.row == NEW_ACCOUNT_USENET_DOT_NET)
-//    {
-//        cell.imageView.image = [UIImage imageNamed:@"un.png"];
-//    }
-    else if (indexPath.row == NEW_ACCOUNT_OTHER)
+    else
     {
-        cell.textLabel.font = [UIFont boldSystemFontOfSize:24];
-        cell.textLabel.text = @"Other";
-        cell.textLabel.textAlignment = NSTextAlignmentCenter;
+        [[cell textLabel] setText:[account serviceName]];
+        [[cell textLabel] setFont:[UIFont boldSystemFontOfSize:24]];
+        [[cell textLabel] setTextAlignment:NSTextAlignmentCenter];
     }
     
     return cell;
 }
 
-#pragma mark - Table view delegate
+#pragma mark - UITableViewDelegate Methods
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSMutableDictionary *accountInfo = [NSMutableDictionary dictionary];
-
-    if (indexPath.row == NEW_ACCOUNT_GIGANEWS)
-    {
-        // Giganews
-        accountInfo[SERVICE_NAME_KEY] = @"Giganews";
-        accountInfo[SUPPORT_URL_KEY] = @"http://www.giganews.com/?c=gn1113881";
-        accountInfo[HOSTNAME_KEY] = @"news.giganews.com";
-        accountInfo[SECURE_KEY] = [NSNumber numberWithBool:YES];
-        accountInfo[PORT_KEY] = [NSNumber numberWithInteger:563];
-    }
-//    else if (indexPath.row == 1)
-//    {
-//        // Power Usenet
-//        [nai setObject:@"Power Usenet" forKey:@"Name"];
-//        [nai setObject:@"http://www.powerusenet.com/?a=synchroma" forKey:@"SupportURL"];
-//        [nai setObject:@"news.powerusenet.com" forKey:@"HostName"];
-//    }
-//    else if (indexPath.row == 2)
-//    {
-//        // Supernews
-//        [nai setObject:@"Supernews" forKey:@"Name"];
-//        [nai setObject:@"http://www.supernews.com/?a=synchroma" forKey:@"SupportURL"];
-//        [nai setObject:@"news.supernews.com" forKey:@"HostName"];
-//    }
-//    else if (indexPath.row == 3)
-//    {
-//        // Usenet.net
-//        [nai setObject:@"Usenet.net" forKey:@"Name"];
-//        [nai setObject:@"http://www.usenet.net/?a=synchroma" forKey:@"SupportURL"];
-//        [nai setObject:@"news.usenet.net" forKey:@"HostName"];
-//    }
-    else if (indexPath.row == NEW_ACCOUNT_OTHER)
-    {
-        // Other
-        accountInfo[SERVICE_NAME_KEY] = @"Usenet Server";
-        accountInfo[SECURE_KEY] = [NSNumber numberWithBool:NO];
-        accountInfo[PORT_KEY] = [NSNumber numberWithInteger:119];
-    }
-    
     AccountSettingsViewController *viewController = [[AccountSettingsViewController alloc] initWithNibName:@"AccountSettingsView"
                                                                                                     bundle:nil];
-    [viewController setAccountInfo:accountInfo];
+    [viewController setAccount:_templateAccounts[indexPath.row]];
     [viewController setDelegate:self];
 
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
@@ -182,16 +116,16 @@
 #pragma mark - NewAccountDelegate Methods
 
 - (void)newAccountViewController:(AccountSettingsViewController *)controller
-                  createdAccount:(NSDictionary *)accountInfo
+                  createdAccount:(NewsAccount *)account
 {
-    NSLog(@"New Account: %@", accountInfo);
+    [_accounts addObject:account];
 
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    NSMutableArray *array = [[userDefaults arrayForKey:ACCOUNTS_NAME_KEY] mutableCopy];
-    if (!array)
-        array = [[NSMutableArray alloc] initWithCapacity:1];
-    [array addObject:accountInfo];
-    [userDefaults setObject:array forKey:ACCOUNTS_NAME_KEY];
+    NSFileManager *fileMananger = [[NSFileManager alloc] init];
+    NSArray *urls = [fileMananger URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask];
+    NSURL *accountsURL = [[urls lastObject] URLByAppendingPathComponent:NetworkNewsAccountsFileName];
+
+    NSData *data = [NSKeyedArchiver archivedDataWithRootObject:_accounts];
+    [data writeToURL:accountsURL atomically:YES];
 
     [self dismissViewControllerAnimated:YES completion:NULL];
     [[self navigationController] popViewControllerAnimated:NO];

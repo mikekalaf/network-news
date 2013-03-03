@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		633D9C3E16E1A489008DD64F /* NewsAccount.m in Sources */ = {isa = PBXBuildFile; fileRef = 633D9C3D16E1A489008DD64F /* NewsAccount.m */; };
 		634191B516D0D6590069B528 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 634191B416D0D6590069B528 /* UIKit.framework */; };
 		634191B716D0D6590069B528 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 634191B616D0D6590069B528 /* Foundation.framework */; };
 		634191B916D0D6590069B528 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 634191B816D0D6590069B528 /* CoreGraphics.framework */; };
@@ -36,7 +37,7 @@
 		6341926F16D0D8800069B528 /* AccountSettingsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6341920C16D0D8800069B528 /* AccountSettingsView.xib */; };
 		6341927016D0D8800069B528 /* NewArticleView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6341920E16D0D8800069B528 /* NewArticleView.xib */; };
 		6341927116D0D8800069B528 /* SearchGroupsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6341921016D0D8800069B528 /* SearchGroupsView.xib */; };
-		6341927216D0D8800069B528 /* ServersView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6341921216D0D8800069B528 /* ServersView.xib */; };
+		6341927216D0D8800069B528 /* AccountsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6341921216D0D8800069B528 /* AccountsView.xib */; };
 		6341927316D0D8800069B528 /* ThreadListView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6341921416D0D8800069B528 /* ThreadListView.xib */; };
 		6341927416D0D8800069B528 /* ThreadView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6341921616D0D8800069B528 /* ThreadView.xib */; };
 		6341927516D0D8800069B528 /* WelcomeView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6341921816D0D8800069B528 /* WelcomeView.xib */; };
@@ -67,7 +68,7 @@
 		6341929316D0D8800069B528 /* pu.png in Resources */ = {isa = PBXBuildFile; fileRef = 6341924216D0D8800069B528 /* pu.png */; };
 		6341929416D0D8800069B528 /* pu@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6341924316D0D8800069B528 /* pu@2x.png */; };
 		6341929516D0D8800069B528 /* SearchGroupsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6341924516D0D8800069B528 /* SearchGroupsViewController.m */; };
-		6341929616D0D8800069B528 /* ServersViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6341924716D0D8800069B528 /* ServersViewController.m */; };
+		6341929616D0D8800069B528 /* AccountsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6341924716D0D8800069B528 /* AccountsViewController.m */; };
 		6341929716D0D8800069B528 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 6341924816D0D8800069B528 /* Settings.bundle */; };
 		6341929816D0D8800069B528 /* sn.png in Resources */ = {isa = PBXBuildFile; fileRef = 6341924916D0D8800069B528 /* sn.png */; };
 		6341929916D0D8800069B528 /* sn@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6341924A16D0D8800069B528 /* sn@2x.png */; };
@@ -139,6 +140,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		633D9C3C16E1A489008DD64F /* NewsAccount.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NewsAccount.h; sourceTree = "<group>"; };
+		633D9C3D16E1A489008DD64F /* NewsAccount.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NewsAccount.m; sourceTree = "<group>"; };
 		634191B116D0D6590069B528 /* NetworkNews.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NetworkNews.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		634191B416D0D6590069B528 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		634191B616D0D6590069B528 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -176,7 +179,7 @@
 		6341920D16D0D8800069B528 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/AccountSettingsView.xib; sourceTree = "<group>"; };
 		6341920F16D0D8800069B528 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/NewArticleView.xib; sourceTree = "<group>"; };
 		6341921116D0D8800069B528 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/SearchGroupsView.xib; sourceTree = "<group>"; };
-		6341921316D0D8800069B528 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ServersView.xib; sourceTree = "<group>"; };
+		6341921316D0D8800069B528 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/AccountsView.xib; sourceTree = "<group>"; };
 		6341921516D0D8800069B528 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ThreadListView.xib; sourceTree = "<group>"; };
 		6341921716D0D8800069B528 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ThreadView.xib; sourceTree = "<group>"; };
 		6341921916D0D8800069B528 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/WelcomeView.xib; sourceTree = "<group>"; };
@@ -219,8 +222,8 @@
 		6341924316D0D8800069B528 /* pu@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "pu@2x.png"; sourceTree = "<group>"; };
 		6341924416D0D8800069B528 /* SearchGroupsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SearchGroupsViewController.h; sourceTree = "<group>"; };
 		6341924516D0D8800069B528 /* SearchGroupsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SearchGroupsViewController.m; sourceTree = "<group>"; };
-		6341924616D0D8800069B528 /* ServersViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServersViewController.h; sourceTree = "<group>"; };
-		6341924716D0D8800069B528 /* ServersViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServersViewController.m; sourceTree = "<group>"; };
+		6341924616D0D8800069B528 /* AccountsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AccountsViewController.h; sourceTree = "<group>"; };
+		6341924716D0D8800069B528 /* AccountsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AccountsViewController.m; sourceTree = "<group>"; };
 		6341924816D0D8800069B528 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		6341924916D0D8800069B528 /* sn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = sn.png; sourceTree = "<group>"; };
 		6341924A16D0D8800069B528 /* sn@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "sn@2x.png"; sourceTree = "<group>"; };
@@ -549,6 +552,8 @@
 				634192C416D0DAED0069B528 /* GroupFavourite.h */,
 				634192C516D0DAED0069B528 /* GroupFavourite.m */,
 				634192CA16D0DAED0069B528 /* News.xcdatamodel */,
+				633D9C3C16E1A489008DD64F /* NewsAccount.h */,
+				633D9C3D16E1A489008DD64F /* NewsAccount.m */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -568,8 +573,8 @@
 				6341924116D0D8800069B528 /* ProgressView.m */,
 				6341924416D0D8800069B528 /* SearchGroupsViewController.h */,
 				6341924516D0D8800069B528 /* SearchGroupsViewController.m */,
-				6341924616D0D8800069B528 /* ServersViewController.h */,
-				6341924716D0D8800069B528 /* ServersViewController.m */,
+				6341924616D0D8800069B528 /* AccountsViewController.h */,
+				6341924716D0D8800069B528 /* AccountsViewController.m */,
 				6341924B16D0D8800069B528 /* ThreadIterator.h */,
 				6341924C16D0D8800069B528 /* ThreadIterator.m */,
 				6341924D16D0D8800069B528 /* ThreadListTableViewCell.h */,
@@ -598,7 +603,7 @@
 				6341920C16D0D8800069B528 /* AccountSettingsView.xib */,
 				6341920E16D0D8800069B528 /* NewArticleView.xib */,
 				6341921016D0D8800069B528 /* SearchGroupsView.xib */,
-				6341921216D0D8800069B528 /* ServersView.xib */,
+				6341921216D0D8800069B528 /* AccountsView.xib */,
 				6341921416D0D8800069B528 /* ThreadListView.xib */,
 				6341921616D0D8800069B528 /* ThreadView.xib */,
 				6341921816D0D8800069B528 /* WelcomeView.xib */,
@@ -748,7 +753,7 @@
 				6341926F16D0D8800069B528 /* AccountSettingsView.xib in Resources */,
 				6341927016D0D8800069B528 /* NewArticleView.xib in Resources */,
 				6341927116D0D8800069B528 /* SearchGroupsView.xib in Resources */,
-				6341927216D0D8800069B528 /* ServersView.xib in Resources */,
+				6341927216D0D8800069B528 /* AccountsView.xib in Resources */,
 				6341927316D0D8800069B528 /* ThreadListView.xib in Resources */,
 				6341927416D0D8800069B528 /* ThreadView.xib in Resources */,
 				6341927516D0D8800069B528 /* WelcomeView.xib in Resources */,
@@ -824,7 +829,7 @@
 				6341928E16D0D8800069B528 /* NewArticleViewController.m in Sources */,
 				6341929216D0D8800069B528 /* ProgressView.m in Sources */,
 				6341929516D0D8800069B528 /* SearchGroupsViewController.m in Sources */,
-				6341929616D0D8800069B528 /* ServersViewController.m in Sources */,
+				6341929616D0D8800069B528 /* AccountsViewController.m in Sources */,
 				6341929A16D0D8800069B528 /* ThreadIterator.m in Sources */,
 				6341929B16D0D8800069B528 /* ThreadListTableViewCell.m in Sources */,
 				6341929C16D0D8800069B528 /* ThreadListViewController.m in Sources */,
@@ -871,6 +876,7 @@
 				6341931B16D0DC0B0069B528 /* EmailAddressFormatter.m in Sources */,
 				6341931E16D0DDE30069B528 /* SizeFormatter.m in Sources */,
 				6398525816D0FBEA009303E2 /* LineIterator.m in Sources */,
+				633D9C3E16E1A489008DD64F /* NewsAccount.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -997,12 +1003,12 @@
 			name = SearchGroupsView.xib;
 			sourceTree = "<group>";
 		};
-		6341921216D0D8800069B528 /* ServersView.xib */ = {
+		6341921216D0D8800069B528 /* AccountsView.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				6341921316D0D8800069B528 /* en */,
 			);
-			name = ServersView.xib;
+			name = AccountsView.xib;
 			sourceTree = "<group>";
 		};
 		6341921416D0D8800069B528 /* ThreadListView.xib */ = {

@@ -7,31 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "NNServerDelegate.h"
 
-@class NNServer;
-@class NNConnection;
-@class ConnectionVerifier;
+@class NewsAccount;
 
-@protocol ConnectionVerifierDelegate
+@interface ConnectionVerifier : NSObject
 
-- (void)connectionVerifier:(ConnectionVerifier *)verifier verified:(BOOL)verified;
-
-@end
-
-
-@interface ConnectionVerifier : NSObject <NNServerDelegate>
-
-@property(nonatomic, readonly) BOOL serverConnectionSuccess;
-@property(nonatomic, readonly) BOOL authenticationSuccess;
-
-- (id)initWithHostName:(NSString *)aHostName
-                  port:(NSUInteger)port
-                secure:(BOOL)secure
-              userName:(NSString *)aUserName
-              password:(NSString *)aPassword
-              delegate:(id <ConnectionVerifierDelegate>)aDelegate;
-
-- (void)verify;
+- (void)verifyWithAccount:(NewsAccount *)account
+               completion:(void (^)(BOOL connected, BOOL authenticated, BOOL verified))completion;
 
 @end

@@ -1,35 +1,39 @@
 //
-//  ServersViewController.m
+//  AccountsViewController.m
 //  Network News
 //
 //  Created by David Schweinsberg on 26/02/11.
 //  Copyright 2011 David Schweinsberg. All rights reserved.
 //
 
-#import "ServersViewController.h"
+#import "AccountsViewController.h"
 #import "WelcomeViewController.h"
 #import "FavouriteGroupsViewController.h"
 #import "AccountSettingsViewController.h"
+#import "NewsAccount.h"
 #import "AppDelegate.h"
 #import "NetworkNews.h"
 
-@interface ServersViewController ()
+@interface AccountsViewController ()
 {
-    NSArray *_accounts;
+    NSMutableArray *_accounts;
 }
+
 
 - (void)addButtonPressed:(id)sender;
 
 @end
 
 
-@implementation ServersViewController
+@implementation AccountsViewController
 
 #pragma mark - View lifecycle
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+
+    [self setTitle:@"Accounts"];
 
     [[self navigationItem] setLeftBarButtonItem:[self editButtonItem]];
 
@@ -38,15 +42,25 @@
                                                   target:self
                                                   action:@selector(addButtonPressed:)];
     [[self navigationItem] setRightBarButtonItem:addButtonItem];
+
+    // Load the accounts data, if we have any
+    // (New accounts are written to the archive in WelcomeViewController)
+    NSFileManager *fileMananger = [[NSFileManager alloc] init];
+    NSArray *urls = [fileMananger URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask];
+    NSURL *accountsURL = [[urls lastObject] URLByAppendingPathComponent:NetworkNewsAccountsFileName];
+    NSData *accountsData = [NSData dataWithContentsOfURL:accountsURL];
+    if (accountsData)
+        _accounts = [NSKeyedUnarchiver unarchiveObjectWithData:accountsData];
+    else
+        _accounts = [NSMutableArray array];
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
 
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    _accounts = [userDefaults objectForKey:ACCOUNTS_NAME_KEY];
-    if (!_accounts || [_accounts count] == 0)
+    // If there are no accounts, we will prompt the user to create one
+    if ([_accounts count] == 0)
         [self addButtonPressed:nil];
     else
         [[self tableView] reloadData];
@@ -97,8 +111,8 @@
         [cell setAccessoryType:UITableViewCellAccessoryDetailDisclosureButton];
     }
 
-    NSDictionary *serverInfo = [_accounts objectAtIndex:[indexPath row]];
-    [[cell textLabel] setText:[serverInfo objectForKey:HOSTNAME_KEY]];
+    NewsAccount *account = [_accounts objectAtIndex:[indexPath row]];
+    [[cell textLabel] setText:[account hostName]];
     
     return cell;
 }
@@ -148,10 +162,10 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSDictionary *accountInfo = [_accounts objectAtIndex:[indexPath row]];
+    NewsAccount *account = _accounts[indexPath.row];
     
     AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    [appDelegate setUpConnectionWithServerInfo:accountInfo];
+    [appDelegate setUpConnectionWithAccount:account];
 
     FavouriteGroupsViewController *viewController = [[FavouriteGroupsViewController alloc] initWithNibName:@"FavouriteGroupsView"
                                                                                                     bundle:nil];
@@ -160,13 +174,13 @@
 
 - (void)tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath
 {
-    NSDictionary *accountInfo = [_accounts objectAtIndex:[indexPath row]];
+    NewsAccount *account = _accounts[indexPath.row];
 
     AccountSettingsViewController *viewController = [[AccountSettingsViewController alloc] initWithNibName:@"AccountSettingsView"
                                                                                                     bundle:nil];
 //    [viewController setTitle:title];
 //    [[viewController navigationItem] setHidesBackButton:hideBackButton];
-    [viewController setAccountInfo:accountInfo];
+    [viewController setAccount:account];
 
     [[self navigationController] pushViewController:viewController animated:YES];
 }
@@ -183,28 +197,25 @@
 
 - (void)addButtonPressed:(id)sender
 {
-    NSString *title;
-    BOOL animated;
-    BOOL hideBackButton;
-    if (sender)
-    {
-        title = @"Add News Server";
-        animated = YES;
-        hideBackButton = NO;
-    }
-    else
-    {
-        title = @"Welcome to Network News";
-        animated = NO;
-        hideBackButton = YES;
-    }
-    
     // Bring up the welcome view
     WelcomeViewController *viewController = [[WelcomeViewController alloc] initWithNibName:@"WelcomeView"
                                                                                     bundle:nil];
-    [viewController setTitle:title];
-    [[viewController navigationItem] setHidesBackButton:hideBackButton];
-    
+    [viewController setAccounts:_accounts];
+
+    BOOL animated;
+
+    if ([_accounts count] > 0)
+    {
+        [viewController setTitle:@"Add News Server"];
+        [[viewController navigationItem] setHidesBackButton:NO];
+        animated = YES;
+    }
+    else
+    {
+        [viewController setTitle:@"Welcome to Network News"];
+        [[viewController navigationItem] setHidesBackButton:YES];
+        animated = NO;
+    }
     [[self navigationController] pushViewController:viewController animated:animated];
 }
 

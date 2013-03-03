@@ -9,14 +9,15 @@
 #import "ConnectionVerifier.h"
 #import "NNServer.h"
 #import "NNConnection.h"
+#import "NNServerDelegate.h"
+#import "NewsAccount.h"
 
-@interface ConnectionVerifier ()
+@interface ConnectionVerifier () <NNServerDelegate>
 {
     NNServer *_server;
-    NNConnection *connection;
-    NSString *userName;
-    NSString *password;
-    id <ConnectionVerifierDelegate> delegate;
+    NNConnection *_connection;
+    NewsAccount *_account;
+    void (^_completion)(BOOL connected, BOOL authenticated, BOOL verified);
 }
 
 @end
@@ -24,39 +25,11 @@
 
 @implementation ConnectionVerifier
 
-- (id)initWithHostName:(NSString *)aHostName
-                  port:(NSUInteger)port
-                secure:(BOOL)secure
-              userName:(NSString *)aUserName
-              password:(NSString *)aPassword
-              delegate:(id <ConnectionVerifierDelegate>)aDelegate
+- (id)init
 {
     self = [super init];
     if (self)
     {
-        _server = [[NNServer alloc] initWithHostName:aHostName port:port];
-        [_server setSecure:secure];
-        [_server setDelegate:self];
-        
-        connection = [[NNConnection alloc] initWithServer:_server];
-
-        NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-        [nc addObserver:self
-               selector:@selector(commandResponded:)
-                   name:ServerCommandRespondedNotification
-                 object:connection];
-        [nc addObserver:self
-               selector:@selector(connectionError:)
-                   name:ServerReadErrorNotification
-                 object:connection];
-        [nc addObserver:self
-               selector:@selector(authenticationFailed:)
-                   name:ServerAuthenticationFailedNotification
-                 object:connection];
-        
-        userName = [aUserName copy];
-        password = [aPassword copy];
-        delegate = aDelegate;
     }
     return self;
 }
@@ -66,15 +39,41 @@
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc removeObserver:self];
 
-    [connection disconnect];
+    [_connection disconnect];
+
+    _completion = nil;
+    _server = nil;
 }
 
-- (void)verify
+- (void)verifyWithAccount:(NewsAccount *)account completion:(void (^)(BOOL, BOOL, BOOL))completion
 {
+    _account = account;
+    _completion = completion;
+
+    _server = [[NNServer alloc] initWithHostName:[account hostName] port:[account port]];
+    [_server setSecure:[account isSecure]];
+    [_server setDelegate:self];
+
+    _connection = [[NNConnection alloc] initWithServer:_server];
+
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+    [nc addObserver:self
+           selector:@selector(commandResponded:)
+               name:ServerCommandRespondedNotification
+             object:_connection];
+    [nc addObserver:self
+           selector:@selector(connectionError:)
+               name:ServerReadErrorNotification
+             object:_connection];
+    [nc addObserver:self
+           selector:@selector(authenticationFailed:)
+               name:ServerAuthenticationFailedNotification
+             object:_connection];
+
     // TODO This isn't so good.  The server may well return help prior to
     // any verification.  So we either need to explictly start any authentication,
     // or use some other command that will verify our connection
-    [connection help];
+    [_connection help];
 }
 
 #pragma mark -
@@ -82,12 +81,12 @@
 
 - (NSString *)userNameForServer:(NNServer *)aServer
 {
-    return userName;
+    return [_account userName];
 }
 
 - (NSString *)passwordForServer:(NNServer *)aServer
 {
-    return password;
+    return [_account password];
 }
 
 - (void)beginNetworkAccessForServer:(NNServer *)aServer
@@ -102,37 +101,27 @@
 //    app.networkActivityIndicatorVisible = NO;
 }
 
-#pragma mark -
-#pragma mark Notifications
+#pragma mark - Notifications
+
+// TODO: Once we've reworked the NNTP connection to use blocks, create a more
+// sensible scheme for passing info on the verification stages
 
 - (void)commandResponded:(NSNotification *)notification
 {
-    _serverConnectionSuccess = YES;
-
-//    if (connection.responseCode == 281)
-    if (connection.responseCode == 100)
-    {
-        _authenticationSuccess = YES;
-        [delegate connectionVerifier:self verified:YES];
-    }
+    if ([_connection responseCode] == 100)
+        _completion(YES, YES, YES);
     else
-    {
-        _authenticationSuccess = NO;
-        [delegate connectionVerifier:self verified:NO];
-    }
+        _completion(YES, NO, NO);
 }
 
 - (void)connectionError:(NSNotification *)notification
 {
-    _serverConnectionSuccess = NO;
-    _authenticationSuccess = NO;
-    [delegate connectionVerifier:self verified:NO];
+    _completion(NO, NO, NO);
 }
 
 - (void)authenticationFailed:(NSNotification *)notification
 {
-    _authenticationSuccess = NO;
-    [delegate connectionVerifier:self verified:NO];
+    _completion(YES, NO, NO);
 }
 
 @end

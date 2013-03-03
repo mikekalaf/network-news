@@ -39,6 +39,7 @@ NSString *NNConnectionBytesReceivedNotification = @"NNConnectionBytesReceivedNot
     NSInputStream *_inputStream;
     NSOutputStream *_outputStream;
 
+    UInt8 _buffer[BUFSIZE];
     NSString *_deferredCommandString;
     BOOL _connected;
     BOOL _executingCommand;
@@ -208,11 +209,9 @@ NSString *NNConnectionBytesReceivedNotification = @"NNConnectionBytesReceivedNot
 
         case NSStreamEventHasBytesAvailable:
         {
-            // TODO: shift this buffer to the heap
-            UInt8 buf[BUFSIZE];
-            unsigned int bytesRead = [_inputStream read:buf maxLength:BUFSIZE];
+            unsigned int bytesRead = [_inputStream read:_buffer maxLength:BUFSIZE];
             if (bytesRead > 0)
-                [self handleBytes:buf length:bytesRead];
+                [self handleBytes:_buffer length:bytesRead];
             break;
         }
 

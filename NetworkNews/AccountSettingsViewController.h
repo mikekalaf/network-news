@@ -7,22 +7,22 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "ConnectionVerifier.h"
 
 @class AccountSettingsViewController;
+@class NewsAccount;
 
 @protocol AccountSettingsDelegate
 
 - (void)newAccountViewController:(AccountSettingsViewController *)controller
-                  createdAccount:(NSDictionary *)accountInfo;
+                  createdAccount:(NewsAccount *)account;
 - (void)newAccountViewControllerCancelled:(AccountSettingsViewController *)controller;
 
 @end
 
 @interface AccountSettingsViewController : UITableViewController
-    <ConnectionVerifierDelegate, UITextFieldDelegate, UIActionSheetDelegate, UIAlertViewDelegate>
+    <UITextFieldDelegate, UIActionSheetDelegate, UIAlertViewDelegate>
 
-@property(nonatomic) NSDictionary *accountInfo;
+@property(nonatomic) NewsAccount *account;
 @property(nonatomic, weak) id <AccountSettingsDelegate> delegate;
 
 @end

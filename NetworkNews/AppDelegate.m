@@ -7,7 +7,8 @@
 //
 
 #import "AppDelegate.h"
-#import "ServersViewController.h"
+#import "AccountsViewController.h"
+#import "NewsAccount.h"
 #import "NNServerDelegate.h"
 #import "NNServer.h"
 #import "NNConnection.h"
@@ -29,7 +30,7 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 
     // Override point for customization after application launch.
-    UIViewController *viewController = [[ServersViewController alloc] initWithNibName:@"ServersView" bundle:nil];
+    UIViewController *viewController = [[AccountsViewController alloc] initWithNibName:@"AccountsView" bundle:nil];
     [self setNavigationController:[[UINavigationController alloc] initWithRootViewController:viewController]];
 
     [[self navigationController] setToolbarHidden:NO];
@@ -76,20 +77,15 @@
         return YES;
 }
 
-- (void)setUpConnectionWithServerInfo:(NSDictionary *)serverInfo
+- (void)setUpConnectionWithAccount:(NewsAccount *)account
 {
-    _userName = [[serverInfo objectForKey:USERNAME_KEY] copy];
-    _password = [[serverInfo objectForKey:PASSWORD_KEY] copy];
-    NSString *hostName = [serverInfo objectForKey:HOSTNAME_KEY];
-    BOOL secure = [[serverInfo objectForKey:SECURE_KEY] boolValue];
-    NSUInteger port = [[serverInfo objectForKey:PORT_KEY] integerValue];
+    _userName = [[account userName] copy];
+    _password = [[account password] copy];
+    NSString *hostName = [account hostName];
+    BOOL secure = [account isSecure];
+    NSUInteger port = [account port];
     if (port == 0)
         port = 119;
-
-//    // TESTING
-//    port = 563;
-//    secure = YES;
-//    // END TESTING
 
     if (hostName)
     {
@@ -102,56 +98,6 @@
 
     [self configureCacheForHostName:hostName];
 }
-
-//- (void)addFavouriteGroupName:(NSString *)name
-//{
-//    // Make sure this group isn't already in the list
-//    if ([myGroups containsObject:name])
-//        return;
-//
-//    [myGroups addObject:name];
-//
-//    // Store in the user defaults
-//    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-//    [userDefaults setObject:myGroups forKey:FAVOURITES_KEY];
-//}
-//
-//- (void)removeFavouriteGroupName:(NSString *)name
-//{
-//    [myGroups removeObject:name];
-//
-//    // Store the change in user defaults
-//    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-//    [userDefaults setObject:myGroups forKey:FAVOURITES_KEY];
-//
-//    // Delete the cache
-//    NSFileManager *fileManager = [NSFileManager defaultManager];
-//    NSString *path = [cacheRootDir stringByAppendingPathComponent:name];
-//    [fileManager removeItemAtPath:path error:NULL];
-//
-//    // Delete the database
-//    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,
-//                                                         NSUserDomainMask,
-//                                                         YES);
-//    NSString *documentDir = [paths lastObject];
-//    NSString *storeNameWithExt = [name stringByAppendingPathExtension:@"db"];
-//    path = [documentDir stringByAppendingPathComponent:storeNameWithExt];
-//    [fileManager removeItemAtPath:path error:NULL];
-//}
-//
-//- (void)moveFavouriteGroupFromIndex:(NSUInteger)fromIndex
-//                            toIndex:(NSUInteger)toIndex
-//{
-//    NSString *groupName = [myGroups objectAtIndex:fromIndex];
-//    [myGroups removeObjectAtIndex:fromIndex];
-//    [myGroups insertObject:groupName atIndex:toIndex];
-//
-////    NSLog(@"myGroups: %@", myGroups.description);
-//
-//    // Store in the user defaults
-//    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-//    [userDefaults setObject:myGroups forKey:FAVOURITES_KEY];
-//}
 
 #pragma mark - Private Methods
 

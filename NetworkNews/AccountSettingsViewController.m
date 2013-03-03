@@ -9,6 +9,8 @@
 #import "AccountSettingsViewController.h"
 #import "NetworkNews.h"
 #import "EditableTableViewCell.h"
+#import "NewsAccount.h"
+#import "ConnectionVerifier.h"
 
 #define SERVER_TAG      1
 #define USERNAME_TAG    2
@@ -20,12 +22,7 @@
     NSUInteger accountType;
     UIBarButtonItem *cancelButtonItem;
     UIBarButtonItem *saveButtonItem;
-
-    NSString *serverName;
-    NSString *name;
-    NSString *password;
-    NSString *description;
-    ConnectionVerifier *connectionVerifier;
+    ConnectionVerifier *_connectionVerifier;
     BOOL isVerified;
     BOOL isModified;
 }
@@ -36,7 +33,6 @@
 - (IBAction)linkTouchUp:(id)sender;
 
 - (UIView *)createVerifyView;
-//- (NSDictionary *)createdAccountInfo;
 - (BOOL)selectNextField;
 
 @end
@@ -49,16 +45,14 @@
 {
     [super viewDidLoad];
 
-    [self setTitle:[_accountInfo objectForKey:@"Name"]];
-    if ([_accountInfo objectForKey:@"SupportURL"])
-        [self.linkButton setTitle:[NSString stringWithFormat:
-                                   @"Learn More about %@",
-                                   [_accountInfo objectForKey:@"Name"]]
-                         forState:UIControlStateNormal];
+    [self setTitle:[_account serviceName]];
+    if ([_account supportURL])
+        [_linkButton setTitle:[NSString stringWithFormat:
+                               @"Learn More about %@",
+                               [_account serviceName]]
+                     forState:UIControlStateNormal];
     else
-        [[self linkButton] setHidden:YES];
-    
-    description = [[_accountInfo objectForKey:@"Name"] copy];
+        [_linkButton setHidden:YES];
 
     // Cancel and Save buttons
     // We only want to display a cancel button if we're the root view controller
@@ -111,10 +105,10 @@
     // Return the number of rows in the section.
     if (section == 0)
     {
-        if ([_accountInfo objectForKey:HOSTNAME_KEY])
-            return 2;
-        else
+        if ([_account accountTemplate] == AccountTemplateDefault)
             return 3;
+        else
+            return 2;
     }
 
     return 0;
@@ -140,13 +134,14 @@
             cell.textField.autocorrectionType = UITextAutocorrectionTypeNo;
             cell.textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
         }
-        
-        if (![_accountInfo objectForKey:HOSTNAME_KEY])
+
+        if ([_account accountTemplate] == AccountTemplateDefault)
         {
             if (indexPath.row == 0)
             {
                 cell.tag = SERVER_TAG;
                 cell.textLabel.text = @"Server";
+                [[cell textField] setText:[_account hostName]];
                 cell.textField.placeholder = @"Server address";
                 cell.textField.secureTextEntry = NO;
                 cell.textField.keyboardType = UIKeyboardTypeDefault;
@@ -155,6 +150,7 @@
             {
                 cell.tag = USERNAME_TAG;
                 cell.textLabel.text = @"User Name";
+                [[cell textField] setText:[_account userName]];
                 cell.textField.placeholder = @"username";
                 cell.textField.secureTextEntry = NO;
                 cell.textField.keyboardType = UIKeyboardTypeDefault;
@@ -163,7 +159,8 @@
             {
                 cell.tag = PASSWORD_TAG;
                 cell.textLabel.text = @"Password";
-                cell.textField.placeholder = @"Optional";
+                [[cell textField] setText:[_account password]];
+                cell.textField.placeholder = @"optional";
                 cell.textField.secureTextEntry = YES;
                 cell.textField.keyboardType = UIKeyboardTypeASCIICapable;
             }
@@ -171,7 +168,7 @@
             {
                 cell.tag = DESCRIPTION_TAG;
                 cell.textLabel.text = @"Description";
-                cell.textField.placeholder = @"Optional";
+                cell.textField.placeholder = @"optional";
                 cell.textField.secureTextEntry = NO;
                 cell.textField.keyboardType = UIKeyboardTypeDefault;
             }
@@ -182,6 +179,7 @@
             {
                 cell.tag = USERNAME_TAG;
                 cell.textLabel.text = @"User Name";
+                [[cell textField] setText:[_account userName]];
                 cell.textField.placeholder = @"username";
                 cell.textField.secureTextEntry = NO;
                 cell.textField.keyboardType = UIKeyboardTypeDefault;
@@ -190,7 +188,8 @@
             {
                 cell.tag = PASSWORD_TAG;
                 cell.textLabel.text = @"Password";
-                cell.textField.placeholder = @"Required";
+                [[cell textField] setText:[_account password]];
+                cell.textField.placeholder = @"required";
                 cell.textField.secureTextEntry = YES;
                 cell.textField.keyboardType = UIKeyboardTypeASCIICapable;
             }
@@ -198,7 +197,7 @@
             {
                 cell.tag = DESCRIPTION_TAG;
                 cell.textLabel.text = @"Description";
-                cell.textField.placeholder = @"Optional";
+                cell.textField.placeholder = @"optional";
                 cell.textField.secureTextEntry = NO;
                 cell.textField.keyboardType = UIKeyboardTypeDefault;
             }
@@ -213,7 +212,7 @@
 - (CGFloat)tableView:(UITableView *)tableView
 heightForFooterInSection:(NSInteger)section
 {
-    if (self.linkButton.hidden)
+    if ([_linkButton isHidden])
         return 0;
     else
         return 72;
@@ -222,37 +221,31 @@ heightForFooterInSection:(NSInteger)section
 - (UIView *)tableView:(UITableView *)tableView
 viewForFooterInSection:(NSInteger)section
 {
-    if (_linkButton.hidden)
+    if ([_linkButton isHidden])
         return nil;
     else
         return _linkButton;
 }
 
-#pragma mark -
-#pragma mark Table view delegate
+#pragma mark - UITableViewDelegate Methods
 
 - (void)tableView:(UITableView *)tableView
 didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     // Select the text field within the selected row
-    EditableTableViewCell *cell = (EditableTableViewCell *)[self.tableView cellForRowAtIndexPath:indexPath];
-    [cell.textField becomeFirstResponder];
+    EditableTableViewCell *cell = (EditableTableViewCell *)[[self tableView] cellForRowAtIndexPath:indexPath];
+    [[cell textField] becomeFirstResponder];
 }
 
 
-#pragma mark -
-#pragma mark Memory management
+#pragma mark - Memory management
 
-- (void)didReceiveMemoryWarning {
+- (void)didReceiveMemoryWarning
+{
     // Releases the view if it doesn't have a superview.
     [super didReceiveMemoryWarning];
     
     // Relinquish ownership any cached data, images, etc that aren't in use.
-}
-
-- (void)viewDidUnload {
-    // Relinquish ownership of anything that can be recreated in viewDidLoad or on demand.
-    // For example: self.myOutlet = nil;
 }
 
 - (void)tableViewCell:(UITableViewCell *)tableViewCell enable:(BOOL)enable
@@ -288,12 +281,7 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
     }
 }
 
-- (void)verifyConection
-{
-}
-
-#pragma mark -
-#pragma mark Actions
+#pragma mark - Actions
 
 - (IBAction)cancelButtonPressed:(id)sender
 {
@@ -302,8 +290,6 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 
 - (IBAction)saveButtonPressed:(id)sender
 {
-    [self updateAccountInfo];
-
     if (!isModified)
     {
         NSString *alertMessage = @"This account may not be able to send or receive news articles. Are you sure you want to save?";
@@ -335,22 +321,54 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
         self.navigationItem.titleView = [self createVerifyView];
         [self tableViewEnable:NO];
 
-        NSInteger port = 119;
-        BOOL secure = NO;
-        if ([_accountInfo objectForKey:HOSTNAME_KEY])
-            serverName = [_accountInfo objectForKey:HOSTNAME_KEY];
-        if ([_accountInfo objectForKey:PORT_KEY])
-            port = [[_accountInfo objectForKey:PORT_KEY] integerValue];
-        if ([_accountInfo objectForKey:SECURE_KEY])
-            secure = [[_accountInfo objectForKey:SECURE_KEY] boolValue];
+        _connectionVerifier = [[ConnectionVerifier alloc] init];
+        [_connectionVerifier verifyWithAccount:_account completion:^(BOOL connected, BOOL authenticated, BOOL verified) {
 
-        connectionVerifier = [[ConnectionVerifier alloc] initWithHostName:serverName
-                                                                     port:port
-                                                                   secure:secure
-                                                                 userName:name
-                                                                 password:password
-                                                                 delegate:self];
-        [connectionVerifier verify];
+            isVerified = verified;
+            isModified = NO;
+
+            // Remove the "verifying" title
+            [[self navigationItem] setTitleView:nil];
+
+            if (verified)
+            {
+                // Tick-off the entries
+                //        nameCell.accessoryType = UITableViewCellAccessoryCheckmark;
+                //        passwordCell.accessoryType = UITableViewCellAccessoryCheckmark;
+
+                // Report our success
+                [_delegate newAccountViewController:self createdAccount:_account];
+            }
+            else
+            {
+                // Complain bitterly
+                NSString *errorString;
+                if (!connected)
+                    errorString = [NSString stringWithFormat:
+                                   @"The connection to \"%@\" failed",
+                                   [_account hostName]];
+                else if (!authenticated)
+                    errorString = [NSString stringWithFormat:
+                                   @"The user name or password for \"%@\" is incorrect",
+                                   [_account hostName]];
+                else
+                    errorString = [NSString stringWithFormat:
+                                   @"There was an unknown problem with \"%@\"",
+                                   [_account hostName]];
+                UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Cannot Get News"
+                                                                    message:errorString
+                                                                   delegate:nil
+                                                          cancelButtonTitle:@"OK"
+                                                          otherButtonTitles:nil];
+                [alertView show];
+                
+                // Restore UI elements for verification
+                if (cancelButtonItem)
+                    self.navigationItem.leftBarButtonItem = cancelButtonItem;
+                self.navigationItem.rightBarButtonItem = saveButtonItem;
+                [self tableViewEnable:YES];
+            }
+        }];
     }
     else
     {
@@ -364,36 +382,36 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
     
     if (tag == SERVER_TAG)
     {
-        serverName = [textField.text copy];
+        [_account setHostName:[textField text]];
     }
     else if (tag == USERNAME_TAG)
     {
-        name = [textField.text copy];
+        [_account setUserName:[textField text]];
     }
     else if (tag == PASSWORD_TAG)
     {
-        password = [textField.text copy];
+        [_account setPassword:[textField text]];
     }
     else if (tag == DESCRIPTION_TAG)
     {
-        description = [textField.text copy];
+        //description = [textField.text copy];
     }
     
-    if ([_accountInfo objectForKey:HOSTNAME_KEY])
+    if ([_account hostName] && [[_account hostName] length])
     {
         // If both the username and password fields have entries, then we can
         // enable the save button, otherwise it should be disabled
-        if (name.length > 0 && password.length > 0)
-            saveButtonItem.enabled = YES;
+        if ([[_account userName] length] > 0 && [[_account password] length] > 0)
+            [saveButtonItem setEnabled:YES];
         else
-            saveButtonItem.enabled = NO;
+            [saveButtonItem setEnabled:NO];
     }
     else
     {
-        if (serverName.length > 0)
-            saveButtonItem.enabled = YES;
+        if ([[_account hostName] length] > 0)
+            [saveButtonItem setEnabled:YES];
         else
-            saveButtonItem.enabled = NO;
+            [saveButtonItem setEnabled:NO];
     }
     
     isModified = YES;
@@ -401,13 +419,10 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 
 - (IBAction)linkTouchUp:(id)sender
 {
-    NSURL *url = [NSURL URLWithString:[_accountInfo objectForKey:@"SupportURL"]];
-    if (url)
-        [[UIApplication sharedApplication] openURL:url];
+    [[UIApplication sharedApplication] openURL:[_account supportURL]];
 }
 
-#pragma mark -
-#pragma mark UITextFieldDelegate Methods
+#pragma mark - UITextFieldDelegate Methods
 
 - (void)textFieldDidBeginEditing:(UITextField *)textField
 {
@@ -438,7 +453,7 @@ didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
     if (buttonIndex == 0)
     {
-        [_delegate newAccountViewController:self createdAccount:_accountInfo];
+        [_delegate newAccountViewController:self createdAccount:_account];
     }
 }
 
@@ -449,56 +464,7 @@ didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
     if (buttonIndex == 0)
     {
-        [_delegate newAccountViewController:self createdAccount:_accountInfo];
-    }
-}
-
-#pragma mark - ConnectionVerifierDelegate Methods
-
-- (void)connectionVerifier:(ConnectionVerifier *)verifier
-                  verified:(BOOL)verified
-{
-    isVerified = verified;
-    isModified = NO;
-    self.navigationItem.titleView = nil;
-    
-    if (verified)
-    {
-        // Tick-off the entries
-//        nameCell.accessoryType = UITableViewCellAccessoryCheckmark;
-//        passwordCell.accessoryType = UITableViewCellAccessoryCheckmark;
-
-        // Report our success
-        [_delegate newAccountViewController:self createdAccount:_accountInfo];
-    }
-    else
-    {
-        // Complain bitterly
-        NSString *errorString;
-        if (!verifier.serverConnectionSuccess)
-            errorString = [NSString stringWithFormat:
-                           @"The connection to \"%@\" failed",
-                           serverName];
-        else if (!verifier.authenticationSuccess)
-            errorString = [NSString stringWithFormat:
-                           @"The user name or password for \"%@\" is incorrect",
-                           serverName];
-        else
-            errorString = [NSString stringWithFormat:
-                           @"There was an unknown problem with \"%@\"",
-                           serverName];
-        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Cannot Get News"
-                                                            message:errorString
-                                                           delegate:nil
-                                                  cancelButtonTitle:@"OK"
-                                                  otherButtonTitles:nil];
-        [alertView show];
-        
-        // Restore UI elements for verification
-        if (cancelButtonItem)
-            self.navigationItem.leftBarButtonItem = cancelButtonItem;
-        self.navigationItem.rightBarButtonItem = saveButtonItem;
-        [self tableViewEnable:YES];
+        [_delegate newAccountViewController:self createdAccount:_account];
     }
 }
 
@@ -542,33 +508,6 @@ didDismissWithButtonIndex:(NSInteger)buttonIndex
     [verifyView addSubview:label];
 
     return verifyView;
-}
-
-//- (NSDictionary *)createdAccountInfo
-//{
-//    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-//    [dict setObject:serverName forKey:HOST_KEY];
-//    if (name)
-//        [dict setObject:name forKey:USERNAME_KEY];
-//    if (password)
-//        [dict setObject:password forKey:PASSWORD_KEY];
-//    if (description)
-//        [dict setObject:description forKey:DESCRIPTION_KEY];
-//    return [dict copy];
-//}
-
-- (void)updateAccountInfo
-{
-    NSMutableDictionary *dict = [_accountInfo mutableCopy];
-    if (serverName)
-        [dict setObject:serverName forKey:HOSTNAME_KEY];
-    if (name)
-        [dict setObject:name forKey:USERNAME_KEY];
-    if (password)
-        [dict setObject:password forKey:PASSWORD_KEY];
-//    if (description)
-//        [dict setObject:description forKey:DESCRIPTION_KEY];
-    _accountInfo = [dict copy];
 }
 
 - (BOOL)selectNextField

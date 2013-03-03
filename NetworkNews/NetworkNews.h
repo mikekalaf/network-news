@@ -7,7 +7,8 @@
  *
  */
 
-extern NSString *const ACCOUNTS_NAME_KEY;
+extern NSString *const NetworkNewsAccountsFileName;
+
 extern NSString *const SERVICE_NAME_KEY;
 extern NSString *const SUPPORT_URL_KEY;
 extern NSString *const HOSTNAME_KEY;

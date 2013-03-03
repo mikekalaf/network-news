@@ -11,6 +11,7 @@
 @class ViewController;
 @class NNServer;
 @class NNConnection;
+@class NewsAccount;
 @class CoreDataStack;
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
@@ -26,6 +27,6 @@
 @property(nonatomic, retain) CoreDataStack *activeCoreDataStack;
 @property(nonatomic, readonly, getter=isServerSetUp) BOOL serverSetUp;
 
-- (void)setUpConnectionWithServerInfo:(NSDictionary *)serverInfo;
+- (void)setUpConnectionWithAccount:(NewsAccount *)account;
 
 @end

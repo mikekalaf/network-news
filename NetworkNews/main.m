@@ -10,7 +10,8 @@
 
 #import "AppDelegate.h"
 
-NSString *const ACCOUNTS_NAME_KEY = @"Accounts";
+NSString *const NetworkNewsAccountsFileName = @"user.accounts";
+
 NSString *const SERVICE_NAME_KEY = @"ServiceName";
 NSString *const SUPPORT_URL_KEY = @"SupportURL";
 NSString *const HOSTNAME_KEY = @"HostName";

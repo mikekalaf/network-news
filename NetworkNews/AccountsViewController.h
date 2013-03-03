@@ -1,5 +1,5 @@
 //
-//  ServersViewController.h
+//  AccountsViewController.h
 //  Network News
 //
 //  Created by David Schweinsberg on 26/02/11.
@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ServersViewController : UITableViewController
+@interface AccountsViewController : UITableViewController
 
 @end

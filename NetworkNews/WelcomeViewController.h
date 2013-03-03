@@ -10,7 +10,7 @@
 #import "AccountSettingsViewController.h"
 
 @interface WelcomeViewController : UITableViewController <AccountSettingsDelegate>
-{
-}
+
+@property (nonatomic) NSMutableArray *accounts;
 
 @end
