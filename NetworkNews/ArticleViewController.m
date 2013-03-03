@@ -45,8 +45,8 @@
     NSUInteger partCount;
     NSString *attachmentPath;
     NSArray *_headEntries;
-    NSData *bodyTextDataTop;
-    NSData *bodyTextDataBottom;
+    NSData *_bodyTextDataTop;
+    NSData *_bodyTextDataBottom;
     NSUInteger bytesCached;
     BOOL toolbarSetForPortrait;
 }
@@ -436,8 +436,6 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
             // Grab the initial text in the first part
             // Calculate the range of the header text and the body text up to
             // the attachment
-            NSRange range = NSMakeRange(0, attachment.rangeInArticleData.location);
-            bodyTextDataTop = [task.articlePartContent.bodyData subdataWithRange:range];
 
             // Cache this initial text
             NSString *mIdHeadPath = [self cachePathForMessageId:task.articlePart.messageId
@@ -446,10 +444,17 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
             NSData *headData = [content.data subdataWithRange:content.headRange];
             [headData writeToFile:mIdHeadPath atomically:NO];
 
-            NSString *mIdPath = [self cachePathForMessageId:task.articlePart.messageId
-                                                  extension:@"top.txt"];
-            [bodyTextDataTop writeToFile:mIdPath atomically:NO];
-            
+            // Only cache the top text if there is actually any
+            if ([attachment rangeInArticleData].location > 0)
+            {
+                NSRange range = NSMakeRange(0, attachment.rangeInArticleData.location);
+                _bodyTextDataTop = [task.articlePartContent.bodyData subdataWithRange:range];
+
+                NSString *mIdPath = [self cachePathForMessageId:task.articlePart.messageId
+                                                      extension:@"top.txt"];
+                [_bodyTextDataTop writeToFile:mIdPath atomically:NO];
+            }
+
             // Note the attachment filename
             attachmentPath = [self cachePathForMessageId:task.articlePart.messageId
                                                extension:attachment.fileName.pathExtension];
@@ -457,8 +462,14 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 
             AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
             [appDelegate.activeCoreDataStack save];
+
+//            // TESTING
+//            NSString *mIdPath = [self cachePathForMessageId:task.articlePart.messageId
+//                                                  extension:@"dump.txt"];
+//            [[content data] writeToFile:mIdPath atomically:NO];
+//            // END TESTING
         }
-        
+
         if (partNumber == completePartCount)
         {
             // Grab the trailing text in the last part (this could still be
@@ -467,12 +478,17 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
             NSUInteger end = NSMaxRange(attachment.rangeInArticleData);
             NSRange range = NSMakeRange(end,
                                         task.articlePartContent.bodyData.length - end);
-            bodyTextDataBottom = [task.articlePartContent.bodyData subdataWithRange:range];
 
-            // Cache this trailing text
-            NSString *mIdPath = [self cachePathForMessageId:task.articlePart.messageId
-                                                  extension:@"bottom.txt"];
-            [bodyTextDataBottom writeToFile:mIdPath atomically:NO];
+            // Only cache it if there is actual content
+            if (range.length > 0)
+            {
+                _bodyTextDataBottom = [task.articlePartContent.bodyData subdataWithRange:range];
+
+                // Cache this trailing text
+                NSString *mIdPath = [self cachePathForMessageId:task.articlePart.messageId
+                                                      extension:@"bottom.txt"];
+                [_bodyTextDataBottom writeToFile:mIdPath atomically:NO];
+            }
         }
         
         NSString *path = attachmentPath;
@@ -505,12 +521,12 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
         {
             BOOL quotedPrintable = [QuotedPrintableDecoder isQuotedPrintable:_headEntries];
 
-            bodyTextDataTop = task.articlePartContent.bodyData;
+            _bodyTextDataTop = task.articlePartContent.bodyData;
             
             if (quotedPrintable)
             {
                 QuotedPrintableDecoder *quotedPrintableDecoder = [[QuotedPrintableDecoder alloc] init];
-                bodyTextDataTop = [quotedPrintableDecoder decodeData:bodyTextDataTop];
+                _bodyTextDataTop = [quotedPrintableDecoder decodeData:_bodyTextDataTop];
             }
             
             // Save to the cache
@@ -522,7 +538,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 
             NSString *mIdPath = [self cachePathForMessageId:task.articlePart.messageId
                                                   extension:@"top.txt"];
-            [bodyTextDataTop writeToFile:mIdPath atomically:NO];
+            [_bodyTextDataTop writeToFile:mIdPath atomically:NO];
             
             NSLog(@"cache path: %@", mIdPath);
         }
@@ -610,11 +626,11 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 {
     // - Insert '>' quote markers at the head of each line
     // - Drop any signature
-    NNQuoteLevelParser *qlp = [[NNQuoteLevelParser alloc] initWithData:bodyTextDataTop
+    NNQuoteLevelParser *qlp = [[NNQuoteLevelParser alloc] initWithData:_bodyTextDataTop
                                                                 flowed:YES];
     NSArray *quoteLevels = qlp.quoteLevels;
 
-    NSMutableString *mutableString = [NSMutableString stringWithCapacity:bodyTextDataTop.length];
+    NSMutableString *mutableString = [NSMutableString stringWithCapacity:_bodyTextDataTop.length];
     
     [mutableString appendFormat:@"%@ wrote:\n", [_article from]];
     
@@ -623,7 +639,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
         if (quoteLevel.signatureDivider)
             break;
         
-        NSData *lineData = [bodyTextDataTop subdataWithRange:quoteLevel.range];
+        NSData *lineData = [_bodyTextDataTop subdataWithRange:quoteLevel.range];
         NSString *str = [[NSString alloc] initWithData:lineData
                                               encoding:NSUTF8StringEncoding];
         if (!str)
@@ -1006,7 +1022,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     // If there is an attachment, include it in the HTML, otherwise just
     // present the text
     // Append the text preceeding any attachment
-    [self appendBodyData:bodyTextDataTop encoding:encoding flowed:flowed];
+    [self appendBodyData:_bodyTextDataTop encoding:encoding flowed:flowed];
 
     if (attachmentPath)
     {
@@ -1022,7 +1038,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
             [self appendLinkURL:attachmentURL];
         
         // Append the text following the attachment
-        [self appendBodyData:bodyTextDataBottom encoding:encoding flowed:flowed];
+        [self appendBodyData:_bodyTextDataBottom encoding:encoding flowed:flowed];
     }
     
     [self endHTML];
@@ -1035,8 +1051,8 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     partCount = 0;
     attachmentPath = nil;
     _headEntries = nil;
-    bodyTextDataTop = nil;
-    bodyTextDataBottom = nil;
+    _bodyTextDataTop = nil;
+    _bodyTextDataBottom = nil;
     bytesCached = 0;
 
     // Reference the current article
@@ -1083,24 +1099,24 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 
     // First, check if we have a cached copy?
     NSString *messageId = [[sortedParts objectAtIndex:0] messageId];
-    NSString *mIdPath = [self cachePathForMessageId:messageId extension:@"top.txt"];
+    NSString *mIdPath = [self cachePathForMessageId:messageId extension:@"head.txt"];
     NSFileManager *fileManager = [NSFileManager defaultManager];
     if ([fileManager fileExistsAtPath:mIdPath])
     {
         NSLog(@"Found cached copy");
         
-        bodyTextDataTop = [[NSData alloc] initWithContentsOfFile:mIdPath];
-        
         // Load the headers
-        mIdPath = [self cachePathForMessageId:messageId
-                                    extension:@"head.txt"];
         NSData *headData = [NSData dataWithContentsOfFile:mIdPath];
         if (headData)
         {
             NNHeaderParser *hp = [[NNHeaderParser alloc] initWithData:headData];
             _headEntries = [hp entries];
         }
-        
+
+        mIdPath = [self cachePathForMessageId:messageId
+                                    extension:@"top.txt"];
+        _bodyTextDataTop = [[NSData alloc] initWithContentsOfFile:mIdPath];
+
         // Is there an attachment to load?
         NSString *attachmentFileName = [_article attachmentFileName];
         if (attachmentFileName)
@@ -1113,7 +1129,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
         // Is there following text?
         mIdPath = [self cachePathForMessageId:messageId extension:@"bottom.txt"];
         if ([fileManager fileExistsAtPath:mIdPath])
-            bodyTextDataBottom = [[NSData alloc] initWithContentsOfFile:mIdPath];
+            _bodyTextDataBottom = [[NSData alloc] initWithContentsOfFile:mIdPath];
 
         // Display the cached copy
         [self updateContent];

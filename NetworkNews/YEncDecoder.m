@@ -248,15 +248,25 @@ static NSUInteger endOfData(const char *bytes,
             encodedRange = NSMakeRange(beginOfBlock, endOfBlock - beginOfBlock);
 
             decodedData = [NSMutableData dataWithCapacity:length];
+            BOOL newLine = YES;
             char output;
             for (NSUInteger i = begin; i < end; ++i)
             {
                 if (bytes[i] == 10)
                 {
+                    newLine = YES;
                     continue;
                 }
                 else if (bytes[i] == 13)
                 {
+                    newLine = YES;
+                    continue;
+                }
+                else if (newLine && bytes[i] == '.')
+                {
+                    // Skip any '.' that appear at the beginning of a line
+                    // (it will be doubled-up)
+                    newLine = NO;
                     continue;
                 }
                 else if (bytes[i] == '=')
@@ -268,6 +278,7 @@ static NSUInteger endOfData(const char *bytes,
                 else
                     output = bytes[i] - 42;
                 [decodedData appendBytes:&output length:1];
+                newLine = NO;
             }
         }
         else

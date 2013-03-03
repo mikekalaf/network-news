@@ -7,25 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "ArticleViewController.h"
 
-@interface ThreadViewController : UITableViewController <ArticleSource>
-{
-    NSArray *articles;
-    NSString *threadTitle;
-    NSDate *threadDate;
-    NSString *groupName;
-    NSDateFormatter *dateFormatter;
-    NSFormatter *emailAddressFormatter;
-    UIImage *unreadIconImage;
-    UIImage *readIconImage;
-    UIImage *incompleteIconImage;
-}
+@interface ThreadViewController : UITableViewController
 
-- (id)initWithArticles:(NSArray *)articleArray
-           threadTitle:(NSString *)aThreadTitle
-            threadDate:(NSDate *)aThreadDate
-             groupName:(NSString *)aGroupName;
+@property (nonatomic) NSArray *articles;
+@property (nonatomic) NSString *threadTitle;
+@property (nonatomic) NSDate *threadDate;
+@property (nonatomic) NSString *groupName;
 
 - (void)returningFromArticleIndex:(NSUInteger)fromArticleIndex;
 

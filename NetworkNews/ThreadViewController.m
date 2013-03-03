@@ -14,32 +14,20 @@
 #import "AppDelegate.h"
 #import "ThreadTableViewCell.h"
 #import "ThreadSectionHeaderView.h"
+#import "ArticleViewController.h"
+
+@interface ThreadViewController () <ArticleSource>
+{
+    NSDateFormatter *dateFormatter;
+    NSFormatter *emailAddressFormatter;
+    UIImage *unreadIconImage;
+    UIImage *readIconImage;
+    UIImage *incompleteIconImage;
+}
+
+@end
 
 @implementation ThreadViewController
-
-- (id)initWithArticles:(NSArray *)articleArray
-           threadTitle:(NSString *)aThreadTitle
-            threadDate:(NSDate *)aThreadDate
-             groupName:(NSString *)aGroupName
-{
-    self = [super initWithNibName:@"ThreadView" bundle:nil];
-    if (self)
-    {
-        articles = articleArray;
-        threadTitle = [aThreadTitle copy];
-        groupName = [aGroupName copy];
-        threadDate = aThreadDate;
-
-        dateFormatter = [[ExtendedDateFormatter alloc] init];
-        emailAddressFormatter = [[EmailAddressFormatter alloc] init];
-        unreadIconImage = [UIImage imageNamed:@"icon-dot-unread.png"];
-        readIconImage = [UIImage imageNamed:@"icon-blank.png"];
-        incompleteIconImage = [UIImage imageNamed:@"icon-dot-incomplete.png"];
-
-//        [[self tableView] setContentOffset:CGPointMake(0, 22)];
-    }
-    return self;
-}
 
 #pragma mark -
 #pragma mark View lifecycle
@@ -48,7 +36,7 @@
 {
     [super viewDidLoad];
     
-    [self setTitle:[NSString stringWithFormat:@"%d Articles", [articles count]]];
+    [self setTitle:[NSString stringWithFormat:@"%d Articles", [_articles count]]];
 
     // We need to do this just to have the back button show "Thread" rather than the title
     UIBarButtonItem *backButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Thread"
@@ -56,6 +44,12 @@
                                                                       target:nil
                                                                       action:nil];
     [[self navigationItem] setBackBarButtonItem:backButtonItem];
+
+    dateFormatter = [[ExtendedDateFormatter alloc] init];
+    emailAddressFormatter = [[EmailAddressFormatter alloc] init];
+    unreadIconImage = [UIImage imageNamed:@"icon-dot-unread.png"];
+    readIconImage = [UIImage imageNamed:@"icon-blank.png"];
+    incompleteIconImage = [UIImage imageNamed:@"icon-dot-incomplete.png"];
 
 //    // Set up toolbar
 ////    UIBarButtonItem *refreshButtonItem =
@@ -120,20 +114,18 @@
 //    [super viewDidAppear:animated];
 //}
 
-//- (void)viewWillDisappear:(BOOL)animated
-//{
-////    // So the read status is up-t-date on returning
-////    ThreadListViewController *threadListViewController = (ThreadListViewController *)currentViewController;
-////    [threadListViewController returningFromArticleIndex:articleIndex];
-//    
-//    [super viewWillDisappear:animated];
-//}
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
 
-/*
-- (void)viewDidDisappear:(BOOL)animated {
-    [super viewDidDisappear:animated];
+    // So the read status is up-to-date on returning
+    UIViewController *currentViewController = self.navigationController.topViewController;
+    if ([currentViewController isKindOfClass:[ThreadListViewController class]])
+    {
+        ThreadListViewController *threadListViewController = (ThreadListViewController *)currentViewController;
+        [threadListViewController returningFromThreadView];
+    }
 }
-*/
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
@@ -179,12 +171,12 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return [articles count];
+    return [_articles count];
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-    return threadTitle;
+    return _threadTitle;
 }
 
 // Customize the appearance of table view cells.
@@ -201,7 +193,7 @@
             cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     }
     
-    Article *article = [articles objectAtIndex:indexPath.row];
+    Article *article = [_articles objectAtIndex:indexPath.row];
     cell.textLabel.text = [emailAddressFormatter stringForObjectValue:article.from];
     cell.detailTextLabel.text = article.subject;
     cell.dateLabel.text = [dateFormatter stringFromDate:article.date];
@@ -252,7 +244,7 @@
                                                                                         bundle:nil];
         viewController.articleSource = self;
         viewController.articleIndex = indexPath.row;
-        viewController.groupName = groupName;
+        viewController.groupName = _groupName;
 
         [self.navigationController pushViewController:viewController animated:YES];
     }
@@ -271,8 +263,8 @@
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
     ThreadSectionHeaderView *view = [[ThreadSectionHeaderView alloc] initWithFrame:CGRectZero];
-    [[view textLabel] setText:threadTitle];
-    [[view dateLabel] setText:[dateFormatter stringFromDate:threadDate]];
+    [[view textLabel] setText:_threadTitle];
+    [[view dateLabel] setText:[dateFormatter stringFromDate:_threadDate]];
     return view;
 }
 
@@ -281,12 +273,12 @@
 
 - (NSUInteger)articleCount
 {
-    return [articles count];
+    return [_articles count];
 }
 
 - (Article *)articleAtIndex:(NSUInteger)index
 {
-    return [articles objectAtIndex:index];
+    return [_articles objectAtIndex:index];
 }
 
 #pragma mark -

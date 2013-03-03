@@ -254,8 +254,15 @@
                            scrollPosition:scrollPosition];
 }
 
-#pragma mark -
-#pragma mark UITableViewDataSource Methods
+- (void)returningFromThreadView
+{
+    // Update any read/unread info display
+    NSArray *indexPaths = [[self tableView] indexPathsForVisibleRows];
+    [[self tableView] reloadRowsAtIndexPaths:indexPaths
+                            withRowAnimation:NO];
+}
+
+#pragma mark - UITableViewDataSource Methods
 
 - (NSInteger)tableView:(UITableView *)aTableView numberOfRowsInSection:(NSInteger)section
 {
@@ -385,10 +392,16 @@
 
         Thread *thread = [[self activeThreads] objectAtIndex:[indexPath row]];
         if ([[thread articles] count] > 1)
-            viewController = [[ThreadViewController alloc] initWithArticles:[thread sortedArticles]
-                                                                threadTitle:[thread subject]
-                                                                 threadDate:[thread latestDate]
-                                                                  groupName:_groupName];
+        {
+            ThreadViewController *threadViewController = [[ThreadViewController alloc] initWithNibName:@"ThreadView"
+                                                                                                bundle:nil];
+            [threadViewController setArticles:[thread sortedArticles]];
+            [threadViewController setThreadTitle:[thread subject]];
+            [threadViewController setGroupName:_groupName];
+            [threadViewController setThreadDate:[thread latestDate]];
+
+            viewController = threadViewController;
+        }
         else
         {
 

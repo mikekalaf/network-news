@@ -21,4 +21,6 @@
 
 - (void)returningFromArticleIndex:(NSUInteger)articleIndex;
 
+- (void)returningFromThreadView;
+
 @end
