@@ -206,11 +206,6 @@
     [nc removeObserver:self];
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-    return YES;
-}
-
 #pragma mark - Public Methods
 
 - (void)returningFromArticleIndex:(NSUInteger)articleIndex

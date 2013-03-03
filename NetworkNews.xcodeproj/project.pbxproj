@@ -17,8 +17,6 @@
 		634191C716D0D6590069B528 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 634191C616D0D6590069B528 /* Default.png */; };
 		634191C916D0D6590069B528 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 634191C816D0D6590069B528 /* Default@2x.png */; };
 		634191CB16D0D6590069B528 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 634191CA16D0D6590069B528 /* Default-568h@2x.png */; };
-		634191CE16D0D6590069B528 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 634191CD16D0D6590069B528 /* ViewController.m */; };
-		634191D116D0D6590069B528 /* ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 634191CF16D0D6590069B528 /* ViewController.xib */; };
 		634191D916D0D6590069B528 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 634191D816D0D6590069B528 /* SenTestingKit.framework */; };
 		634191DA16D0D6590069B528 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 634191B416D0D6590069B528 /* UIKit.framework */; };
 		634191DB16D0D6590069B528 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 634191B616D0D6590069B528 /* Foundation.framework */; };
@@ -27,13 +25,11 @@
 		6341926016D0D8800069B528 /* ArticleViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 634191F416D0D87F0069B528 /* ArticleViewController.m */; };
 		6341926516D0D8800069B528 /* changes.txt in Resources */ = {isa = PBXBuildFile; fileRef = 634191F916D0D87F0069B528 /* changes.txt */; };
 		6341926616D0D8800069B528 /* EditableTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 634191FB16D0D87F0069B528 /* EditableTableViewCell.m */; };
-		6341926816D0D8800069B528 /* AllGroupsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 634191FE16D0D8800069B528 /* AllGroupsView.xib */; };
 		6341926916D0D8800069B528 /* ArticleListView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6341920016D0D8800069B528 /* ArticleListView.xib */; };
 		6341926A16D0D8800069B528 /* ArticleView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6341920216D0D8800069B528 /* ArticleView.xib */; };
 		6341926B16D0D8800069B528 /* EditableTextTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6341920416D0D8800069B528 /* EditableTextTableViewCell.xib */; };
 		6341926C16D0D8800069B528 /* FavouriteGroupsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6341920616D0D8800069B528 /* FavouriteGroupsView.xib */; };
 		6341926D16D0D8800069B528 /* GroupInfoView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6341920816D0D8800069B528 /* GroupInfoView.xib */; };
-		6341926E16D0D8800069B528 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6341920A16D0D8800069B528 /* MainWindow.xib */; };
 		6341926F16D0D8800069B528 /* AccountSettingsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6341920C16D0D8800069B528 /* AccountSettingsView.xib */; };
 		6341927016D0D8800069B528 /* NewArticleView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6341920E16D0D8800069B528 /* NewArticleView.xib */; };
 		6341927116D0D8800069B528 /* SearchGroupsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6341921016D0D8800069B528 /* SearchGroupsView.xib */; };
@@ -155,9 +151,6 @@
 		634191C616D0D6590069B528 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
 		634191C816D0D6590069B528 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
 		634191CA16D0D6590069B528 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
-		634191CC16D0D6590069B528 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		634191CD16D0D6590069B528 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
-		634191D016D0D6590069B528 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController.xib; sourceTree = "<group>"; };
 		634191D716D0D6590069B528 /* NetworkNewsTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NetworkNewsTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		634191D816D0D6590069B528 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
 		634191E016D0D6590069B528 /* NetworkNewsTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "NetworkNewsTests-Info.plist"; sourceTree = "<group>"; };
@@ -169,13 +162,11 @@
 		634191F916D0D87F0069B528 /* changes.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = changes.txt; path = NetworkNews/changes.txt; sourceTree = "<group>"; };
 		634191FA16D0D87F0069B528 /* EditableTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditableTableViewCell.h; sourceTree = "<group>"; };
 		634191FB16D0D87F0069B528 /* EditableTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EditableTableViewCell.m; sourceTree = "<group>"; };
-		634191FF16D0D8800069B528 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/AllGroupsView.xib; sourceTree = "<group>"; };
 		6341920116D0D8800069B528 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ArticleListView.xib; sourceTree = "<group>"; };
 		6341920316D0D8800069B528 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ArticleView.xib; sourceTree = "<group>"; };
 		6341920516D0D8800069B528 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/EditableTextTableViewCell.xib; sourceTree = "<group>"; };
 		6341920716D0D8800069B528 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/FavouriteGroupsView.xib; sourceTree = "<group>"; };
 		6341920916D0D8800069B528 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/GroupInfoView.xib; sourceTree = "<group>"; };
-		6341920B16D0D8800069B528 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainWindow.xib; sourceTree = "<group>"; };
 		6341920D16D0D8800069B528 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/AccountSettingsView.xib; sourceTree = "<group>"; };
 		6341920F16D0D8800069B528 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/NewArticleView.xib; sourceTree = "<group>"; };
 		6341921116D0D8800069B528 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/SearchGroupsView.xib; sourceTree = "<group>"; };
@@ -410,9 +401,6 @@
 				634192A616D0D8D90069B528 /* Images */,
 				634191C316D0D6590069B528 /* AppDelegate.h */,
 				634191C416D0D6590069B528 /* AppDelegate.m */,
-				634191CC16D0D6590069B528 /* ViewController.h */,
-				634191CD16D0D6590069B528 /* ViewController.m */,
-				634191CF16D0D6590069B528 /* ViewController.xib */,
 				638F78DB16D432A20085B896 /* Categories */,
 				634191BB16D0D6590069B528 /* Supporting Files */,
 			);
@@ -593,13 +581,11 @@
 				634191F416D0D87F0069B528 /* ArticleViewController.m */,
 				634191FA16D0D87F0069B528 /* EditableTableViewCell.h */,
 				634191FB16D0D87F0069B528 /* EditableTableViewCell.m */,
-				634191FE16D0D8800069B528 /* AllGroupsView.xib */,
 				6341920016D0D8800069B528 /* ArticleListView.xib */,
 				6341920216D0D8800069B528 /* ArticleView.xib */,
 				6341920416D0D8800069B528 /* EditableTextTableViewCell.xib */,
 				6341920616D0D8800069B528 /* FavouriteGroupsView.xib */,
 				6341920816D0D8800069B528 /* GroupInfoView.xib */,
-				6341920A16D0D8800069B528 /* MainWindow.xib */,
 				6341920C16D0D8800069B528 /* AccountSettingsView.xib */,
 				6341920E16D0D8800069B528 /* NewArticleView.xib */,
 				6341921016D0D8800069B528 /* SearchGroupsView.xib */,
@@ -741,15 +727,12 @@
 				634191C716D0D6590069B528 /* Default.png in Resources */,
 				634191C916D0D6590069B528 /* Default@2x.png in Resources */,
 				634191CB16D0D6590069B528 /* Default-568h@2x.png in Resources */,
-				634191D116D0D6590069B528 /* ViewController.xib in Resources */,
 				6341926516D0D8800069B528 /* changes.txt in Resources */,
-				6341926816D0D8800069B528 /* AllGroupsView.xib in Resources */,
 				6341926916D0D8800069B528 /* ArticleListView.xib in Resources */,
 				6341926A16D0D8800069B528 /* ArticleView.xib in Resources */,
 				6341926B16D0D8800069B528 /* EditableTextTableViewCell.xib in Resources */,
 				6341926C16D0D8800069B528 /* FavouriteGroupsView.xib in Resources */,
 				6341926D16D0D8800069B528 /* GroupInfoView.xib in Resources */,
-				6341926E16D0D8800069B528 /* MainWindow.xib in Resources */,
 				6341926F16D0D8800069B528 /* AccountSettingsView.xib in Resources */,
 				6341927016D0D8800069B528 /* NewArticleView.xib in Resources */,
 				6341927116D0D8800069B528 /* SearchGroupsView.xib in Resources */,
@@ -815,7 +798,6 @@
 			files = (
 				634191C116D0D6590069B528 /* main.m in Sources */,
 				634191C516D0D6590069B528 /* AppDelegate.m in Sources */,
-				634191CE16D0D6590069B528 /* ViewController.m in Sources */,
 				6341926016D0D8800069B528 /* ArticleViewController.m in Sources */,
 				6341926616D0D8800069B528 /* EditableTableViewCell.m in Sources */,
 				6341927616D0D8800069B528 /* ExtendedDateFormatter.m in Sources */,
@@ -907,28 +889,12 @@
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
-		634191CF16D0D6590069B528 /* ViewController.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				634191D016D0D6590069B528 /* en */,
-			);
-			name = ViewController.xib;
-			sourceTree = "<group>";
-		};
 		634191E116D0D6590069B528 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
 				634191E216D0D6590069B528 /* en */,
 			);
 			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-		634191FE16D0D8800069B528 /* AllGroupsView.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				634191FF16D0D8800069B528 /* en */,
-			);
-			name = AllGroupsView.xib;
 			sourceTree = "<group>";
 		};
 		6341920016D0D8800069B528 /* ArticleListView.xib */ = {
@@ -969,14 +935,6 @@
 				6341920916D0D8800069B528 /* en */,
 			);
 			name = GroupInfoView.xib;
-			sourceTree = "<group>";
-		};
-		6341920A16D0D8800069B528 /* MainWindow.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				6341920B16D0D8800069B528 /* en */,
-			);
-			name = MainWindow.xib;
 			sourceTree = "<group>";
 		};
 		6341920C16D0D8800069B528 /* AccountSettingsView.xib */ = {

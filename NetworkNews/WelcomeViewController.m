@@ -37,12 +37,6 @@
                           [NewsAccount accountWithTemplate:AccountTemplateDefault]];
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-//    return (interfaceOrientation == UIInterfaceOrientationPortrait);
-    return YES;
-}
-
 #pragma mark - UITableViewDataSource Methods
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
