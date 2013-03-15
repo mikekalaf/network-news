@@ -12,7 +12,8 @@
 @class NNServer;
 @class NNConnection;
 @class NewsAccount;
-@class CoreDataStack;
+@class CoreDataStore;
+@class NewsConnectionPool;
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
@@ -24,8 +25,9 @@
 @property(nonatomic, retain, readonly) NNServer *server;
 @property(nonatomic, retain, readonly) NNConnection *connection;
 @property(nonatomic, retain, readonly) NSString *cacheRootDir;
-@property(nonatomic, retain) CoreDataStack *activeCoreDataStack;
+@property(nonatomic, retain) CoreDataStore *activeCoreDataStack;
 @property(nonatomic, readonly, getter=isServerSetUp) BOOL serverSetUp;
+@property(nonatomic, readonly) NewsConnectionPool *connectionPool;
 
 - (void)setUpConnectionWithAccount:(NewsAccount *)account;
 

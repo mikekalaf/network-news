@@ -12,6 +12,7 @@
 #import "NNServerDelegate.h"
 #import "NNServer.h"
 #import "NNConnection.h"
+#import "NewsConnectionPool.h"
 #import "NSArray+NewsAdditions.h"
 #import "NetworkNews.h"
 
@@ -97,6 +98,8 @@
     }
 
     [self configureCacheForHostName:hostName];
+
+    _connectionPool = [[NewsConnectionPool alloc] initWithAccount:account];
 }
 
 #pragma mark - Private Methods

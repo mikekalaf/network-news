@@ -7,20 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "GroupInfoViewController.h"
-#import "NewArticleViewController.h"
 
-@interface ThreadListViewController : UITableViewController <
-    UISearchBarDelegate,
-    UIActionSheetDelegate,
-    GroupInfoDelegate,
-    NewArticleDelegate
->
+@interface ThreadListViewController : UITableViewController
 
 @property(nonatomic, copy) NSString *groupName;
 
 - (void)returningFromArticleIndex:(NSUInteger)articleIndex;
-
 - (void)returningFromThreadView;
 
 @end

@@ -26,7 +26,7 @@
 #import "NetworkNews.h"
 #import "QuotedPrintableDecoder.h"
 #import "ContentType.h"
-#import "CoreDataStack.h"
+#import "CoreDataStore.h"
 #import "NSString+NewsAdditions.h"
 #import "EncodedWordDecoder.h"
 #import "WelcomeViewController.h"

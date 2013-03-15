@@ -7,15 +7,28 @@
 //
 
 #import "SearchGroupsViewController.h"
-#import "GroupListSearchTask.h"
+#import "GroupListSearchOperation.h"
+#import "GroupListing.h"
 #import "AppDelegate.h"
 #import "NNConnection.h"
 #import "NetworkNews.h"
 
-@implementation SearchGroupsViewController
+@interface SearchGroupsViewController () <UISearchBarDelegate>
+{
+    UIActivityIndicatorView *activityIndicatorView;
+    NSString *searchText;
+    NSInteger searchScope;
+    NSArray *foundGroupList;
+    BOOL modified;
+    NSOperationQueue *_operationQueue;
+}
 
-@synthesize searchBar;
-@synthesize checkedGroups;
+@property(nonatomic, retain) IBOutlet UISearchBar *searchBar;
+
+@end
+
+
+@implementation SearchGroupsViewController
 
 - (void)viewDidLoad
 {
@@ -27,21 +40,17 @@
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     searchScope = [userDefaults integerForKey:MOST_RECENT_GROUP_SEARCH_SCOPE];
     
-    searchBar.text = searchText;
-    searchBar.selectedScopeButtonIndex = searchScope;
+    _searchBar.text = searchText;
+    _searchBar.selectedScopeButtonIndex = searchScope;
     
     // Create an activity indicator
     activityIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
     activityIndicatorView.hidesWhenStopped = YES;
     [self.view addSubview:activityIndicatorView];
     activityIndicatorView.center = self.view.center;
-}
 
-/*
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
+    _operationQueue = [[NSOperationQueue alloc] init];
 }
-*/
 
 - (void)viewDidAppear:(BOOL)animated
 {
@@ -55,41 +64,19 @@
     [super viewWillDisappear:animated];
 
     // Cancel any live task/connection
-    if (currentTask)
-    {
-        [currentTask cancel];
-        currentTask = nil;
-    }
-    
+    [_operationQueue cancelAllOperations];
+
     // Save the group list if it has changed
     if (modified)
     {
         AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
         NSString *path = [[appDelegate cacheRootDir] stringByAppendingPathComponent:@"groups.plist"];
-        [checkedGroups writeToFile:path atomically:YES];
+        [_checkedGroups writeToFile:path atomically:YES];
         modified = NO;
     }
 }
 
-#pragma mark -
-#pragma mark Public Methods
-
-- (void)restoreLevel
-{
-    // Restore from the cache
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    searchText = [userDefaults objectForKey:MOST_RECENT_GROUP_SEARCH];
-//    searchScope = [userDefaults integerForKey:MOST_RECENT_GROUP_SEARCH_SCOPE];
-    if (searchText)
-    {
-        AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-        NSString *path = [appDelegate.cacheRootDir stringByAppendingPathComponent:@"search_results.archive"];
-        foundGroupList = [NSKeyedUnarchiver unarchiveObjectWithFile:path];
-    }
-}
-
-#pragma mark -
-#pragma mark Table view data source
+#pragma mark - UITableViewDataSource Methods
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
@@ -119,10 +106,10 @@
         cell.textLabel.lineBreakMode = NSLineBreakByTruncatingMiddle;
     }
     
-    GroupListInfo *listInfo = [foundGroupList objectAtIndex:indexPath.row];
-    NSString *groupName = listInfo.name;
+    GroupListing *listing = [foundGroupList objectAtIndex:indexPath.row];
+    NSString *groupName = listing.name;
 //    long long articleCount = listInfo.high - listInfo.low + 1;
-    long long articleCount = [listInfo count];
+    long long articleCount = [listing count];
     cell.textLabel.text = groupName;
     if (articleCount > 0)
     {
@@ -140,7 +127,7 @@
     }
     
     // Is it selected as a favourite?
-    if ([checkedGroups containsObject:groupName])
+    if ([_checkedGroups containsObject:groupName])
         cell.accessoryType = UITableViewCellAccessoryCheckmark;
     else
         cell.accessoryType = UITableViewCellAccessoryNone;
@@ -160,15 +147,15 @@
     // Add to or remove from favourites, adding or removing a checkmark also
     NSString *groupName = [[foundGroupList objectAtIndex:indexPath.row] name];
     UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-    if ([checkedGroups containsObject:groupName])
+    if ([_checkedGroups containsObject:groupName])
     {
         [cell setAccessoryType:UITableViewCellAccessoryNone];
-        [checkedGroups removeObject:groupName];
+        [_checkedGroups removeObject:groupName];
     }
     else
     {
         [cell setAccessoryType:UITableViewCellAccessoryCheckmark];
-        [checkedGroups addObject:groupName];
+        [_checkedGroups addObject:groupName];
     }
     modified = YES;
 }
@@ -184,21 +171,15 @@
     // Relinquish ownership any cached data, images, etc that aren't in use.
 }
 
-- (void)viewDidUnload {
-    // Relinquish ownership of anything that can be recreated in viewDidLoad or on demand.
-    // For example: self.myOutlet = nil;
-}
-
-#pragma mark -
-#pragma mark UISearchBarDelegate Methods
+#pragma mark - UISearchBarDelegate Methods
 
 - (void)searchBar:(UISearchBar *)aSearchBar selectedScopeButtonIndexDidChange:(NSInteger)selectedScope
 {
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    [userDefaults setInteger:searchBar.selectedScopeButtonIndex
+    [userDefaults setInteger:_searchBar.selectedScopeButtonIndex
                       forKey:MOST_RECENT_GROUP_SEARCH_SCOPE];
 
-    [searchBar becomeFirstResponder];
+    [_searchBar becomeFirstResponder];
 }
 
 - (void)searchBarSearchButtonClicked:(UISearchBar *)aSearchBar
@@ -206,132 +187,70 @@
     NSLog(@"searchBarSearchButtonClicked:");
 
     // Ensure the search text is at least three characters long
-    if (searchBar.text.length < 3)
+    if (_searchBar.text.length < 3)
         return;
     
     // Remove the focus from the search field, so the keyboard disappears
-    [searchBar resignFirstResponder];
+    [_searchBar resignFirstResponder];
 
     [activityIndicatorView startAnimating];
     
     // Cache the search request
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    [userDefaults setObject:searchBar.text forKey:MOST_RECENT_GROUP_SEARCH];
+    [userDefaults setObject:_searchBar.text forKey:MOST_RECENT_GROUP_SEARCH];
     
     // Build the wildmat
     NSString *wildmat = nil;
-    switch (searchBar.selectedScopeButtonIndex)
+    switch (_searchBar.selectedScopeButtonIndex)
     {
         case 0:  // Contains
-            wildmat = [NSString stringWithFormat:@"*%@*", searchBar.text];
+            wildmat = [NSString stringWithFormat:@"*%@*", _searchBar.text];
             break;
         case 1:  // Begins with
-            wildmat = [NSString stringWithFormat:@"%@*", searchBar.text];
+            wildmat = [NSString stringWithFormat:@"%@*", _searchBar.text];
             break;
         case 2:  // Ends with
-            wildmat = [NSString stringWithFormat:@"*%@", searchBar.text];
+            wildmat = [NSString stringWithFormat:@"*%@", _searchBar.text];
             break;
     }
-    
-//    refreshButtonItem.enabled = NO;
-//    [activityIndicatorView startAnimating];
-//    activityTextField.text = @"Downloading all groups...";
-//    activityTextField.hidden = NO;
-    
-    // Issue a LIST ACTIVE <wildmat> command
-    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    currentTask = [[GroupListSearchTask alloc] initWithConnection:appDelegate.connection
-                                                          wildmat:wildmat];
-    
-    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc addObserver:self
-           selector:@selector(listNotification:)
-               name:GroupListSearchTaskCompletedNotification
-             object:currentTask];
-    [nc addObserver:self
-           selector:@selector(progressNotification:)
-               name:GroupListSearchTaskProgressNotification
-             object:currentTask];
-    [nc addObserver:self
-           selector:@selector(listError:)
-               name:TaskErrorNotification
-             object:currentTask];
 
-    [currentTask start];
-    
+    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    GroupListSearchOperation *operation = [[GroupListSearchOperation alloc] initWithConnectionPool:[appDelegate connectionPool]
+                                                                                           wildmat:wildmat];
+    GroupListSearchOperation __weak* weakRef = operation;
+    [operation setCompletionBlock:^{
+        [self cacheGroupList:[weakRef groups]];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [activityIndicatorView stopAnimating];
+            [[self tableView] reloadData];
+        });
+    }];
+    [_operationQueue addOperation:operation];
 }
 
 - (void)searchBarTextDidBeginEditing:(UISearchBar *)aSearchBar
 {
     // Cancel any live task/connection
-    if (currentTask)
-    {
-        [currentTask cancel];
-        currentTask = nil;
-
-        [activityIndicatorView stopAnimating];
-    }
+    [_operationQueue cancelAllOperations];
+    //[activityIndicatorView stopAnimating];  // This shouldn't be needed
 
     // Clear the results list
     foundGroupList = nil;
-    [self.tableView reloadData];
+    [[self tableView] reloadData];
 }
 
-//#pragma mark -
-//#pragma mark UINavigationBarDelegate Methods
-//
-//- (void)navigationBar:(UINavigationBar *)navigationBar didPopItem:(UINavigationItem *)item
-//{
-//    int foo = 0;
-//}
+#pragma mark - Private Methods
 
-#pragma mark -
-#pragma mark Notifications
-
-- (void)progressNotification:(NSNotification *)notification
+- (void)cacheGroupList:(NSArray *)groupList
 {
-//    activityTextField.text = [NSString stringWithFormat:
-//                              @"%d groups",
-//                              ((GroupListTask *)currentTask).groupsRead];
-//    [activityTextField setNeedsDisplay];
-}
-
-- (void)listNotification:(NSNotification *)notification
-{
-    //    activityTextField.text = @"Sorting...";
-    
-//    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"name"
-//                                                                   ascending:YES];
     NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"count"
                                                                    ascending:NO];
-    foundGroupList = [((GroupListSearchTask *)currentTask).groupList
-                       sortedArrayUsingDescriptors:[NSArray arrayWithObject:sortDescriptor]];
+    foundGroupList = [groupList sortedArrayUsingDescriptors:@[sortDescriptor]];
 
     // Cache the results
     AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     NSString *path = [appDelegate.cacheRootDir stringByAppendingPathComponent:@"search_results.archive"];
     [NSKeyedArchiver archiveRootObject:foundGroupList toFile:path];
-    
-    // We've finished our task
-    currentTask = nil;
-    
-    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc removeObserver:self];
-    
-//    [activityIndicatorView stopAnimating];
-//    activityTextField.hidden = YES;
-//    refreshButtonItem.enabled = YES;
-    
-    [activityIndicatorView stopAnimating];
-
-    // Update view
-    [self.tableView reloadData];
-}
-
-- (void)listError:(NSNotification *)notification
-{
-    AlertViewFailedConnection(currentTask.connection.hostName);
-    [self listNotification:notification];
 }
 
 @end

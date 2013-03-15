@@ -10,11 +10,10 @@
 
 @interface FavouriteGroupsViewController : UITableViewController
 {
-    NSMutableArray *groups;
     BOOL modified;
 }
 
-@property(nonatomic, copy) NSArray *groups;
+@property(nonatomic, copy) NSMutableArray *groupNames;
 
 - (void)restoreLevelWithSelectionArray:(NSArray *)aSelectionArray;
 

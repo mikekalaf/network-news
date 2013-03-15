@@ -10,21 +10,8 @@
 
 @class Task;
 
-@interface SearchGroupsViewController : UITableViewController <UISearchBarDelegate>
-{
-    NSMutableArray *checkedGroups;
-    UISearchBar *searchBar;
-    UIActivityIndicatorView *activityIndicatorView;
-    NSString *searchText;
-    NSInteger searchScope;
-    NSArray *foundGroupList;
-    Task *currentTask;
-    BOOL modified;
-}
+@interface SearchGroupsViewController : UITableViewController
 
-@property(nonatomic, retain) IBOutlet UISearchBar *searchBar;
 @property(nonatomic, retain) NSMutableArray *checkedGroups;
-
-- (void)restoreLevel;
 
 @end

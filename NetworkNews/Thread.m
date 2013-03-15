@@ -9,7 +9,7 @@
 #import "Thread.h"
 #import "Article.h"
 //#import "NetworkNewsAppDelegate.h"
-#import "CoreDataStack.h"
+#import "CoreDataStore.h"
 
 @implementation Thread
 

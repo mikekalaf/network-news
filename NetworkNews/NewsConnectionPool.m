@@ -1,0 +1,65 @@
+//
+//  NewsConnectionPool.m
+//  NetworkNews
+//
+//  Created by David Schweinsberg on 10/03/13.
+//  Copyright (c) 2013 David Schweinsberg. All rights reserved.
+//
+
+#import "NewsConnectionPool.h"
+#import "NewsConnection.h"
+#import "NewsAccount.h"
+
+@interface NewsConnectionPool ()
+{
+    NSMutableArray *_connections;
+    NewsAccount *_account;
+}
+
+@end
+
+
+@implementation NewsConnectionPool
+
+- (id)initWithAccount:(NewsAccount *)account
+{
+    self = [super init];
+    if (self)
+    {
+        _account = account;
+        _connections = [[NSMutableArray alloc] init];
+    }
+    return self;
+}
+
+- (NewsConnection *)dequeueConnection
+{
+    NewsConnection *newsConnection = nil;
+
+    if ([_connections count] == 0)
+    {
+        newsConnection = [[NewsConnection alloc] initWithHost:[_account hostName]
+                                                         port:[_account port]
+                                                     isSecure:[_account isSecure]];
+        [newsConnection loginWithUser:[_account userName] password:[_account password]];
+    }
+    else
+    {
+        @synchronized(self)
+        {
+            newsConnection = [_connections lastObject];
+            [_connections removeLastObject];
+        }
+    }
+    return newsConnection;
+}
+
+- (void)enqueueConnection:(NewsConnection *)connection
+{
+    @synchronized(self)
+    {
+        [_connections addObject:connection];
+    }
+}
+
+@end

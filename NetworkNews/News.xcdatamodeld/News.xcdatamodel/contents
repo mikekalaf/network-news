@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model name="" userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="2057" systemVersion="12C60" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
+    <entity name="Article" representedClassName="Article" syncable="YES">
+        <attribute name="attachmentFileName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="completePartCount" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
+        <attribute name="date" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="from" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="read" attributeType="Boolean" defaultValueString="NO" syncable="YES"/>
+        <attribute name="references" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="subject" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="totalByteCount" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
+        <attribute name="totalLineCount" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
+        <relationship name="parts" toMany="YES" minCount="1" deletionRule="Nullify" destinationEntity="ArticlePart" inverseName="article" inverseEntity="ArticlePart" indexed="YES" syncable="YES"/>
+    </entity>
+    <entity name="ArticlePart" representedClassName="ArticlePart" syncable="YES">
+        <attribute name="articleNumber" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="byteCount" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
+        <attribute name="date" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="lineCount" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
+        <attribute name="messageId" attributeType="String" syncable="YES"/>
+        <attribute name="partNumber" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
+        <relationship name="article" optional="YES" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="Article" inverseName="parts" inverseEntity="Article" indexed="YES" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="Article" positionX="160" positionY="192" width="128" height="195"/>
+        <element name="ArticlePart" positionX="160" positionY="192" width="128" height="150"/>
+    </elements>
+</model>

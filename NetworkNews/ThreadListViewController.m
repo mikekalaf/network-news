@@ -8,22 +8,24 @@
 
 #import "ThreadListViewController.h"
 #import "ThreadViewController.h"
-#import "GroupCoreDataStack.h"
-#import "Group.h"
+#import "GroupStore.h"
+//#import "Group.h"
 #import "Article.h"
 #import "ArticlePart.h"
 #import "Thread.h"
-#import "DownloadArticleOverviewsTask.h"
+#import "ArticleOverviewsOperation.h"
 #import "ExtendedDateFormatter.h"
 #import "EmailAddressFormatter.h"
 #import "NSString+NewsAdditions.h"
 #import "NNConnection.h"
 #import "AppDelegate.h"
 #import "ThreadListTableViewCell.h"
-#import "ProgressView.h"
+//#import "ProgressView.h"
 #import "ThreadIterator.h"
 #import "NetworkNews.h"
 #import "NNServer.h"
+#import "GroupInfoViewController.h"
+#import "NewArticleViewController.h"
 
 #define ONE_DAY_IN_SECONDS      86400
 #define ONE_WEEK_IN_SECONDS     7 * ONE_DAY_IN_SECONDS
@@ -37,19 +39,22 @@
 #define THREAD_DISPLAY_KEY      @"ThreadDisplay"
 
 
-@interface ThreadListViewController ()
+@interface ThreadListViewController () <
+    UISearchBarDelegate,
+    UIActionSheetDelegate,
+    GroupInfoDelegate,
+    NewArticleDelegate
+>
 {
     NSFetchedResultsController *searchFetchedResultsController;
-    ProgressView *progressView;
+    //ProgressView *progressView;
     UILabel *_statusLabel;
     NSArray *threads;
     NSArray *fileThreads;
     NSArray *messageThreads;
     ThreadIterator *threadIterator;
-    GroupCoreDataStack *stack;
-    Task *currentTask;
+    GroupStore *_store;
     BOOL silentlyFailConnection;
-    BOOL restoreArticleComposer;
     NSString *searchText;
     NSUInteger searchScope;
     NSUInteger threadTypeDisplay;
@@ -61,14 +66,15 @@
     UIImage *partReadIconImage;
     UIImage *readIconImage;
     NSArray *fileExtensions;
+    NSOperationQueue *_operationQueue;
 }
 
 - (NSArray *)activeThreads;
 
 - (NSArray *)threadsWithArticles:(NSArray *)articles;
 - (void)groupFileSets:(NSMutableDictionary *)threadDict;
-- (void)downloadWithMode:(DownloadArticleOverviewsTaskMode)mode;
-- (void)removeArticlesEarlierThanDate:(NSDate *)date;
+//- (void)downloadWithMode:(DownloadArticleOverviewsTaskMode)mode;
+//- (void)removeArticlesEarlierThanDate:(NSDate *)date;
 - (void)toolbarEnabled:(BOOL)enabled;
 - (void)buildThreadListToolbar;
 
@@ -82,10 +88,10 @@
     
     AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
 
-    stack = [[GroupCoreDataStack alloc] initWithGroupName:_groupName
-                                              inDirectory:[[appDelegate server] hostName]];
+    _store = [[GroupStore alloc] initWithGroupName:_groupName
+                                       inDirectory:[[appDelegate server] hostName]];
 
-    [appDelegate setActiveCoreDataStack:stack];
+    [appDelegate setActiveCoreDataStack:_store];
     
     [self setTitle:[_groupName shortGroupName]];
 }
@@ -132,36 +138,23 @@
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     NSDictionary *dict = [userDefaults dictionaryForKey:_groupName];
     threadTypeDisplay = [[dict objectForKey:THREAD_DISPLAY_KEY] integerValue];
-    
-    if (restoreArticleComposer)
-    {
-        // Compose article
-        NewArticleViewController *viewController = [[NewArticleViewController alloc] initWithGroupName:_groupName
-                                                                                               subject:nil
-                                                                                            references:nil
-                                                                                              bodyText:nil];
-        viewController.delegate = self;
-        UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
-        [viewController restoreLevel];
 
-        [self presentViewController:navigationController animated:NO completion:NULL];
-    }   
-    else if (threads == nil)
+    _operationQueue = [[NSOperationQueue alloc] init];
+
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+    [nc addObserver:self
+           selector:@selector(contextDidSave:)
+               name:NSManagedObjectContextDidSaveNotification
+             object:nil];
+
+    [self updateThreads];
+
+    if (threads == nil)
     {
         // Download the latest articles (this will also do a fetch request)
         silentlyFailConnection = YES;
-        [[self refreshControl] beginRefreshing];
-        [self downloadWithMode:DownloadArticleOverviewsTaskLatest];
-        [self toolbarEnabled:NO];
-    }
-
-    // Restore a search?
-    if (searchText)
-    {
-        self.searchDisplayController.active = YES;
-        self.searchDisplayController.searchBar.text = searchText;
-        self.searchDisplayController.searchBar.selectedScopeButtonIndex = searchScope;
-        [self searchBarSearchButtonClicked:self.searchDisplayController.searchBar];
+        //[self downloadWithMode:DownloadArticleOverviewsTaskLatest];
+        [self downloadLatestArticles];
     }
 }
 
@@ -190,11 +183,11 @@
 	[super viewWillDisappear:animated];
 
     // Cancel any live task/connection
-    if (currentTask)
-    {
-        [currentTask cancel];
-        currentTask = nil;
-    }
+//    if (currentTask)
+//    {
+//        [currentTask cancel];
+//        currentTask = nil;
+//    }
 }
 
 - (void)dealloc
@@ -381,7 +374,8 @@
         // Was "Load More" selected?
         if ([indexPath row] >= [[self activeThreads] count])
         {
-            [self downloadWithMode:DownloadArticleOverviewsTaskMore];
+            //[self downloadWithMode:DownloadArticleOverviewsTaskMore];
+            [self downloadMoreArticles];
             return;
         }
 
@@ -445,7 +439,7 @@
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     [userDefaults setObject:searchBar.text forKey:MOST_RECENT_ARTICLE_SEARCH];
     
-    NSManagedObjectContext *context = stack.managedObjectContext;
+    NSManagedObjectContext *context = _store.managedObjectContext;
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Article"
                                               inManagedObjectContext:context];
@@ -555,7 +549,6 @@
                          didSend:(BOOL)send
 {
     [self dismissViewControllerAnimated:YES completion:NULL];
-    restoreArticleComposer = NO;
 }
 
 #pragma mark - GroupInfoDelegate Methods
@@ -569,8 +562,9 @@
 
 - (void)refresh:(id)sender
 {
-    [self downloadWithMode:DownloadArticleOverviewsTaskLatest];
-    [self toolbarEnabled:NO];
+    //[self downloadWithMode:DownloadArticleOverviewsTaskLatest];
+    [self downloadLatestArticles];
+    //[self toolbarEnabled:NO];
 }
 
 - (void)actionButtonPressed:(id)sender
@@ -607,18 +601,68 @@
 
 #pragma mark - Notifications
 
-- (void)articleOverviewsLoaded:(NSNotification *)notification
+- (void)contextDidSave:(NSNotification *)notification
 {
-    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc removeObserver:self];
-    
-    // We've finished our task
-    currentTask = nil;
-    
+    // This is called on the thread of the context doing the changes
+    NSLog(@"contextDidSave:");
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSLog(@"(merging)");
+        [[_store managedObjectContext] mergeChangesFromContextDidSaveNotification:notification];
+        [self updateThreads];
+    });
+
+    //[_managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
+}
+
+//- (void)noSuchGroup:(NSNotification *)notification
+//{
+//    NSString *errorString = [NSString stringWithFormat:
+//                             @"Group doesn't exist on the server \"%@\".",
+//                             currentTask.connection.hostName];
+//    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Cannot Get News"
+//                                                        message:errorString
+//                                                       delegate:nil
+//                                              cancelButtonTitle:@"OK"
+//                                              otherButtonTitles:nil];
+//    [alertView show];
+//    
+//    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+//    [nc removeObserver:self];
+//    
+//    // We've finished our task
+//    currentTask = nil;
+//    
+////    progressView.updatedDate = stack.group.lastUpdate;
+////    progressView.status = ProgressViewStatusUpdated;
+//    [self setStatusUpdatedDate:[_store lastSaveDate]];
+//}
+//
+//- (void)articleOverviewsError:(NSNotification *)notification
+//{
+//    // Complain, if not failing silently
+//    if (!silentlyFailConnection)
+//        AlertViewFailedConnection([[currentTask connection] hostName]);
+//    else if ([notification userInfo])
+//    {
+//        NSString *message = [[notification userInfo] objectForKey:@"Message"];
+//        if (message)
+//            AlertViewFailedConnectionWithMessage([[currentTask connection] hostName],
+//                                                 message);
+//    }
+//
+//    // Forward on, so we perform the fetch
+//    [self articleOverviewsLoaded:notification];
+//}
+
+#pragma mark - Private Methods
+
+- (void)updateThreads
+{
     NSLog(@"Fetching articles");
 
     // Retrieve the articles from core data
-    NSManagedObjectContext *context = stack.managedObjectContext;
+    NSManagedObjectContext *context = _store.managedObjectContext;
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Article"
                                               inManagedObjectContext:context];
@@ -638,70 +682,27 @@
 
     // Update the thread iterator
     threadIterator = [[ThreadIterator alloc] initWithThreads:[self activeThreads]];
-    
+
     // Cache the results
     AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     NSString *path = [appDelegate.cacheRootDir stringByAppendingPathComponent:@"threads.archive"];
     [NSKeyedArchiver archiveRootObject:threads toFile:path];
-    
+
     // Show the results
     [self.tableView reloadData];
-    
-//    // Push the search bar off the top of the view
-//    // (This doesn't work properly because an empty table view with a visible
-//    // search bar is first visible)
-//    [tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]
-//                     atScrollPosition:UITableViewScrollPositionTop
-//                             animated:NO];
-    
-    progressView.updatedDate = stack.group.lastUpdate;
-    progressView.status = ProgressViewStatusUpdated;
+
+    //    // Push the search bar off the top of the view
+    //    // (This doesn't work properly because an empty table view with a visible
+    //    // search bar is first visible)
+    //    [tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]
+    //                     atScrollPosition:UITableViewScrollPositionTop
+    //                             animated:NO];
+
+    //    progressView.updatedDate = stack.group.lastUpdate;
+    //    progressView.status = ProgressViewStatusUpdated;
+    [self setStatusUpdatedDate:[_store lastSaveDate]];
     silentlyFailConnection = NO;
-    [self toolbarEnabled:YES];
-
-    [[self refreshControl] endRefreshing];
 }
-
-- (void)noSuchGroup:(NSNotification *)notification
-{
-    NSString *errorString = [NSString stringWithFormat:
-                             @"Group doesn't exist on the server \"%@\".",
-                             currentTask.connection.hostName];
-    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Cannot Get News"
-                                                        message:errorString
-                                                       delegate:nil
-                                              cancelButtonTitle:@"OK"
-                                              otherButtonTitles:nil];
-    [alertView show];
-    
-    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc removeObserver:self];
-    
-    // We've finished our task
-    currentTask = nil;
-    
-    progressView.updatedDate = stack.group.lastUpdate;
-    progressView.status = ProgressViewStatusUpdated;
-}
-
-- (void)articleOverviewsError:(NSNotification *)notification
-{
-    // Complain, if not failing silently
-    if (!silentlyFailConnection)
-        AlertViewFailedConnection([[currentTask connection] hostName]);
-    else if ([notification userInfo])
-    {
-        NSString *message = [[notification userInfo] objectForKey:@"Message"];
-        if (message)
-            AlertViewFailedConnectionWithMessage([[currentTask connection] hostName],
-                                                 message);
-    }
-
-    // Forward on, so we perform the fetch
-    [self articleOverviewsLoaded:notification];
-}
-
-#pragma mark - Private Methods
 
 - (NSArray *)activeThreads
 {
@@ -850,122 +851,158 @@
     }
 }
 
-- (void)downloadWithMode:(DownloadArticleOverviewsTaskMode)mode
+- (void)downloadLatestArticles
 {
-    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    [self setStatusMessage:@"Checking for News..."];
+    [[self refreshControl] beginRefreshing];
+    [self toolbarEnabled:NO];
 
-    // Remove old articles
-    // (Is this really the best place to do this?)
-    NSInteger maxAgeInDays = [userDefaults integerForKey:DELETE_AFTER_DAYS_KEY];
-    if (maxAgeInDays == 0)
-        maxAgeInDays = 7;
-
-//    NSDate *cutoffDate = [NSDate dateWithTimeIntervalSinceNow:-(maxAgeInDays * ONE_DAY_IN_SECONDS)];
-//    [self removeArticlesEarlierThanDate:cutoffDate];
-
-    progressView.status = ProgressViewStatusChecking;
-    
-    NSUInteger maxCount = [userDefaults integerForKey:MAX_ARTICLE_COUNT_KEY];
+    NSUInteger maxCount = [[NSUserDefaults standardUserDefaults] integerForKey:MAX_ARTICLE_COUNT_KEY];
     if (maxCount == 0)
         maxCount = 1000;
-    
+
     NSLog(@"Max Article Count: %d", maxCount);
-    
+
+    // TESTING
+    [_store persistentStoreCoordinator];
+
     // Issue an OVER/XOVER command
-    currentTask = [[DownloadArticleOverviewsTask alloc] initWithConnection:appDelegate.connection
-                                                      managedObjectContext:stack.managedObjectContext
-                                                                     group:stack.group
-                                                                      mode:mode
-                                                           maxArticleCount:maxCount];
-    
-    // Notifications we're interested in
-    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc addObserver:self
-           selector:@selector(articleOverviewsLoaded:)
-               name:ArticleOverviewsDownloadedNotification
-             object:currentTask];
-    [nc addObserver:self
-           selector:@selector(noSuchGroup:)
-               name:NoSuchGroupNotification
-             object:currentTask];
-    [nc addObserver:self
-           selector:@selector(articleOverviewsError:)
-               name:TaskErrorNotification
-             object:currentTask];
-    
-    [currentTask start];
-}
-
-- (void)removeArticlesEarlierThanDate:(NSDate *)date
-{
-    NSFileManager *fileManager = [NSFileManager defaultManager];
     AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    NSString *groupCachePath = [appDelegate.cacheRootDir stringByAppendingPathComponent:_groupName];
-
-    // Delete article parts, and articles, from the database
-    NSManagedObjectContext *context = stack.managedObjectContext;
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-    NSEntityDescription *entity = [NSEntityDescription entityForName:@"ArticlePart"
-                                              inManagedObjectContext:context];
-    [fetchRequest setEntity:entity];
-
-    fetchRequest.predicate = [NSPredicate predicateWithFormat:@"date < %@", date];
-    
-    NSError *error;
-    NSArray *fetchedArticleParts = [context executeFetchRequest:fetchRequest
-                                                          error:&error];
-    if (fetchedArticleParts)
-    {
-        long long highestRemovedArticleNumber = 0;
-
-        for (ArticlePart *articlePart in fetchedArticleParts)
-        {
-            NSLog(@"Removing part: %@ (%@)", articlePart.articleNumber, articlePart.date);
-            
-            Article *article = articlePart.article;
-            [article removePartsObject:articlePart];
-            [context deleteObject:articlePart];
-            
-            long long articleNumber = articlePart.articleNumber.longLongValue;
-            if (highestRemovedArticleNumber < articleNumber)
-                highestRemovedArticleNumber = articleNumber;
-            
-            // If this article has no parts left, then remove the article also
-            if (article.parts.count == 0)
-            {
-//                NSLog(@"Removing: %@ (%@) %@", article.subject, article.from);
-                [context deleteObject:article];
-            }
-
-            // If this is the first part, then delete any cached files
-            if (articlePart.partNumber.integerValue == 1)
-            {
-                NSString *mIDFileName = [articlePart.messageId messageIDFileName];
-                NSString *basePath = [groupCachePath stringByAppendingPathComponent:mIDFileName];
-
-                NSString *path = [basePath stringByAppendingPathExtension:@"head.txt"];
-                [fileManager removeItemAtPath:path error:NULL];
-                
-                path = [basePath stringByAppendingPathExtension:@"top.txt"];
-                [fileManager removeItemAtPath:path error:NULL];
-                
-                NSString *ext = article.attachmentFileName.pathExtension;
-                if (ext)
-                {
-                    path = [basePath stringByAppendingPathExtension:ext];
-                    [fileManager removeItemAtPath:path error:NULL];
-                }
-
-                path = [basePath stringByAppendingPathExtension:@"bottom.txt"];
-                [fileManager removeItemAtPath:path error:NULL];
-            }
-        }
-
-        // Adjust the lowest article number of the group
-        stack.group.lowestArticleNumber = [NSNumber numberWithLongLong:highestRemovedArticleNumber + 1];
-    }
+    ArticleOverviewsOperation *operation = [[ArticleOverviewsOperation alloc] initWithConnectionPool:[appDelegate connectionPool]
+                                                                                          groupStore:_store
+                                                                                                mode:ArticleOverviewsLatest
+                                                                                     maxArticleCount:maxCount];
+    [operation setCompletionBlock:^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[self refreshControl] endRefreshing];
+            [self toolbarEnabled:YES];
+        });
+    }];
+    [_operationQueue addOperation:operation];
 }
+
+- (void)downloadMoreArticles
+{
+    // TODO: Implement based on above
+}
+
+//- (void)downloadWithMode:(DownloadArticleOverviewsTaskMode)mode
+//{
+//    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+//    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+//
+//    // Remove old articles
+//    // (Is this really the best place to do this?)
+//    NSInteger maxAgeInDays = [userDefaults integerForKey:DELETE_AFTER_DAYS_KEY];
+//    if (maxAgeInDays == 0)
+//        maxAgeInDays = 7;
+//
+////    NSDate *cutoffDate = [NSDate dateWithTimeIntervalSinceNow:-(maxAgeInDays * ONE_DAY_IN_SECONDS)];
+////    [self removeArticlesEarlierThanDate:cutoffDate];
+//
+//    //progressView.status = ProgressViewStatusChecking;
+//    [self setStatusMessage:@"Checking for News..."];
+//    
+//    NSUInteger maxCount = [userDefaults integerForKey:MAX_ARTICLE_COUNT_KEY];
+//    if (maxCount == 0)
+//        maxCount = 1000;
+//    
+//    NSLog(@"Max Article Count: %d", maxCount);
+//    
+//    // Issue an OVER/XOVER command
+//    currentTask = [[DownloadArticleOverviewsTask alloc] initWithConnection:appDelegate.connection
+//                                                      managedObjectContext:_store.managedObjectContext
+//                                                                     group:_store.group
+//                                                                      mode:mode
+//                                                           maxArticleCount:maxCount];
+//    
+//    // Notifications we're interested in
+//    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+//    [nc addObserver:self
+//           selector:@selector(articleOverviewsLoaded:)
+//               name:ArticleOverviewsDownloadedNotification
+//             object:currentTask];
+//    [nc addObserver:self
+//           selector:@selector(noSuchGroup:)
+//               name:NoSuchGroupNotification
+//             object:currentTask];
+//    [nc addObserver:self
+//           selector:@selector(articleOverviewsError:)
+//               name:TaskErrorNotification
+//             object:currentTask];
+//    
+//    [currentTask start];
+//}
+
+//- (void)removeArticlesEarlierThanDate:(NSDate *)date
+//{
+//    NSFileManager *fileManager = [NSFileManager defaultManager];
+//    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+//    NSString *groupCachePath = [appDelegate.cacheRootDir stringByAppendingPathComponent:_groupName];
+//
+//    // Delete article parts, and articles, from the database
+//    NSManagedObjectContext *context = _store.managedObjectContext;
+//    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+//    NSEntityDescription *entity = [NSEntityDescription entityForName:@"ArticlePart"
+//                                              inManagedObjectContext:context];
+//    [fetchRequest setEntity:entity];
+//
+//    fetchRequest.predicate = [NSPredicate predicateWithFormat:@"date < %@", date];
+//    
+//    NSError *error;
+//    NSArray *fetchedArticleParts = [context executeFetchRequest:fetchRequest
+//                                                          error:&error];
+//    if (fetchedArticleParts)
+//    {
+//        long long highestRemovedArticleNumber = 0;
+//
+//        for (ArticlePart *articlePart in fetchedArticleParts)
+//        {
+//            NSLog(@"Removing part: %@ (%@)", articlePart.articleNumber, articlePart.date);
+//            
+//            Article *article = articlePart.article;
+//            [article removePartsObject:articlePart];
+//            [context deleteObject:articlePart];
+//            
+//            long long articleNumber = articlePart.articleNumber.longLongValue;
+//            if (highestRemovedArticleNumber < articleNumber)
+//                highestRemovedArticleNumber = articleNumber;
+//            
+//            // If this article has no parts left, then remove the article also
+//            if (article.parts.count == 0)
+//            {
+////                NSLog(@"Removing: %@ (%@) %@", article.subject, article.from);
+//                [context deleteObject:article];
+//            }
+//
+//            // If this is the first part, then delete any cached files
+//            if (articlePart.partNumber.integerValue == 1)
+//            {
+//                NSString *mIDFileName = [articlePart.messageId messageIDFileName];
+//                NSString *basePath = [groupCachePath stringByAppendingPathComponent:mIDFileName];
+//
+//                NSString *path = [basePath stringByAppendingPathExtension:@"head.txt"];
+//                [fileManager removeItemAtPath:path error:NULL];
+//                
+//                path = [basePath stringByAppendingPathExtension:@"top.txt"];
+//                [fileManager removeItemAtPath:path error:NULL];
+//                
+//                NSString *ext = article.attachmentFileName.pathExtension;
+//                if (ext)
+//                {
+//                    path = [basePath stringByAppendingPathExtension:ext];
+//                    [fileManager removeItemAtPath:path error:NULL];
+//                }
+//
+//                path = [basePath stringByAppendingPathExtension:@"bottom.txt"];
+//                [fileManager removeItemAtPath:path error:NULL];
+//            }
+//        }
+//
+//        // Adjust the lowest article number of the group
+//        _store.group.lowestArticle = highestRemovedArticleNumber + 1;
+//    }
+//}
 
 - (void)toolbarEnabled:(BOOL)enabled
 {
@@ -997,25 +1034,11 @@
 //    progressView.status = ProgressViewStatusUpdated;
 //    UIBarButtonItem *progressItem = [[UIBarButtonItem alloc] initWithCustomView:progressView];
 
-    NSMutableAttributedString *text = [[NSMutableAttributedString alloc] init];
-    UIFont *boldFont = [UIFont boldSystemFontOfSize:12.0];
-    UIFont *regularFont = [UIFont systemFontOfSize:12.0];
-    [text appendAttributedString:[[NSMutableAttributedString alloc] initWithString:@"Updated  "
-                                                                        attributes:@{NSFontAttributeName: boldFont}]];
-    [text appendAttributedString:[[NSMutableAttributedString alloc] initWithString:@"01/01/13  "
-                                                                        attributes:@{NSFontAttributeName: regularFont}]];
-    [text appendAttributedString:[[NSMutableAttributedString alloc] initWithString:@"12:00 "
-                                                                        attributes:@{NSFontAttributeName: boldFont}]];
-    [text appendAttributedString:[[NSMutableAttributedString alloc] initWithString:@"PM"
-                                                                        attributes:@{NSFontAttributeName: regularFont}]];
-
     _statusLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     [_statusLabel setOpaque:NO];
     [_statusLabel setBackgroundColor:[UIColor clearColor]];
     [_statusLabel setShadowColor:[UIColor darkGrayColor]];
     [_statusLabel setTextColor:[UIColor whiteColor]];
-    [_statusLabel setAttributedText:text];
-    [_statusLabel sizeToFit];
     UIBarButtonItem *statusItem = [[UIBarButtonItem alloc] initWithCustomView:_statusLabel];
 
     UIBarButtonItem *composeButtonItem =
@@ -1033,5 +1056,44 @@
                          nil];
 }
 
-@end
+- (void)setStatusUpdatedDate:(NSDate *)date
+{
+    NSString *str = [NSDateFormatter localizedStringFromDate:date
+                                                   dateStyle:NSDateFormatterShortStyle
+                                                   timeStyle:NSDateFormatterShortStyle];
+    NSArray *components = @[@"Updated"];
+    components = [components arrayByAddingObjectsFromArray:[str componentsSeparatedByString:@" "]];
+    NSArray *fonts = @[[UIFont boldSystemFontOfSize:12.0],
+                       [UIFont systemFontOfSize:12.0]];
 
+    NSMutableAttributedString *text = [[NSMutableAttributedString alloc] init];
+    int index = 0;
+    for (NSString *component in components)
+    {
+        if ([text length] > 0)
+            [text appendAttributedString:[[NSAttributedString alloc] initWithString:@" "]];
+        [text appendAttributedString:[[NSMutableAttributedString alloc] initWithString:component
+                                                                            attributes:@{NSFontAttributeName: fonts[index]}]];
+        index = (index + 1) % [fonts count];
+    }
+
+//    [text appendAttributedString:[[NSMutableAttributedString alloc] initWithString:@"Updated  "
+//                                                                        attributes:@{NSFontAttributeName: boldFont}]];
+//    [text appendAttributedString:[[NSMutableAttributedString alloc] initWithString:@"01/01/13  "
+//                                                                        attributes:@{NSFontAttributeName: regularFont}]];
+//    [text appendAttributedString:[[NSMutableAttributedString alloc] initWithString:@"12:00 "
+//                                                                        attributes:@{NSFontAttributeName: boldFont}]];
+//    [text appendAttributedString:[[NSMutableAttributedString alloc] initWithString:@"PM"
+//                                                                        attributes:@{NSFontAttributeName: regularFont}]];
+    [_statusLabel setAttributedText:text];
+    [_statusLabel sizeToFit];
+}
+
+- (void)setStatusMessage:(NSString *)message
+{
+    [_statusLabel setText:message];
+    [_statusLabel setFont:[UIFont boldSystemFontOfSize:12.0]];
+    [_statusLabel sizeToFit];
+}
+
+@end

@@ -17,8 +17,6 @@
 
 @implementation FavouriteGroupsViewController
 
-@synthesize groups;
-
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -37,9 +35,9 @@
     // Load the subscribed groups
     AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     NSString *path = [[appDelegate cacheRootDir] stringByAppendingPathComponent:@"groups.plist"];
-    groups = [[NSMutableArray alloc] initWithContentsOfFile:path];
-    if (!groups)
-        groups = [[NSMutableArray alloc] initWithCapacity:1];
+    _groupNames = [[NSMutableArray alloc] initWithContentsOfFile:path];
+    if (!_groupNames)
+        _groupNames = [[NSMutableArray alloc] initWithCapacity:1];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -71,7 +69,7 @@
     {
         AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
         NSString *path = [[appDelegate cacheRootDir] stringByAppendingPathComponent:@"groups.plist"];
-        [groups writeToFile:path atomically:YES];
+        [_groupNames writeToFile:path atomically:YES];
         modified = NO;
     }
 }
@@ -131,7 +129,7 @@
 - (NSInteger)tableView:(UITableView *)tableView
  numberOfRowsInSection:(NSInteger)section
 {
-    return [groups count];
+    return [_groupNames count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView
@@ -148,7 +146,7 @@
         [[cell textLabel] setLineBreakMode:NSLineBreakByTruncatingMiddle];
     }
 
-    NSString *name = [groups objectAtIndex:[indexPath row]];
+    NSString *name = [_groupNames objectAtIndex:[indexPath row]];
     [[cell textLabel] setText:name];
 
     return cell;
@@ -160,7 +158,7 @@
 -       (void)tableView:(UITableView *)tableView
 didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSString *name = [groups objectAtIndex:[indexPath row]];
+    NSString *name = [_groupNames objectAtIndex:[indexPath row]];
 
     ThreadListViewController *viewController = [[ThreadListViewController alloc] initWithNibName:@"ThreadListView"
                                                                                           bundle:nil];
@@ -176,7 +174,7 @@ commitEditingStyle:(UITableViewCellEditingStyle)editingStyle
     {
         // Delete the cache
         NSFileManager *fileManager = [NSFileManager defaultManager];
-        NSString *name = [groups objectAtIndex:[indexPath row]];
+        NSString *name = [_groupNames objectAtIndex:[indexPath row]];
         AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
         NSString *path = [[appDelegate cacheRootDir] stringByAppendingPathComponent:name];
         [fileManager removeItemAtPath:path error:NULL];
@@ -187,13 +185,13 @@ commitEditingStyle:(UITableViewCellEditingStyle)editingStyle
                                                              YES);
         NSString *documentDir = [paths lastObject];
         NSString *serverDir = [documentDir stringByAppendingPathComponent:[[appDelegate server] hostName]];
-        NSString *storeNameWithExt = [name stringByAppendingPathExtension:@"db"];
+        NSString *storeNameWithExt = [name stringByAppendingPathExtension:@"sqlite"];
         path = [serverDir stringByAppendingPathComponent:storeNameWithExt];
         NSLog(@"Removing path: %@", path);
         [fileManager removeItemAtPath:path error:NULL];
 
         // Remove from the table view
-        [groups removeObjectAtIndex:[indexPath row]];
+        [_groupNames removeObjectAtIndex:[indexPath row]];
 
         // Delete the row from the data source
         [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath]
@@ -211,9 +209,9 @@ commitEditingStyle:(UITableViewCellEditingStyle)editingStyle
 moveRowAtIndexPath:(NSIndexPath *)fromIndexPath
       toIndexPath:(NSIndexPath *)toIndexPath
 {
-    NSString *groupName = [groups objectAtIndex:[fromIndexPath row]];
-    [groups removeObjectAtIndex:[fromIndexPath row]];
-    [groups insertObject:groupName atIndex:[toIndexPath row]];
+    NSString *groupName = [_groupNames objectAtIndex:[fromIndexPath row]];
+    [_groupNames removeObjectAtIndex:[fromIndexPath row]];
+    [_groupNames insertObject:groupName atIndex:[toIndexPath row]];
     modified = YES;
 }
 
@@ -225,7 +223,7 @@ moveRowAtIndexPath:(NSIndexPath *)fromIndexPath
     // Load the SearchGroupsViewController
     SearchGroupsViewController *viewController = [[SearchGroupsViewController alloc] initWithNibName:@"SearchGroupsView"
                                                                                               bundle:nil];
-    [viewController setCheckedGroups:groups];
+    [viewController setCheckedGroups:_groupNames];
     [[self navigationController] pushViewController:viewController
                                            animated:YES];
 }
