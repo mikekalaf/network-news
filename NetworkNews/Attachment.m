@@ -7,7 +7,6 @@
 //
 
 #import "Attachment.h"
-#import "ArticlePartContent.h"
 #import "ContentType.h"
 #import "YEncDecoder.h"
 #import "UUDecoder.h"
@@ -16,15 +15,13 @@
 
 @implementation Attachment
 
--   (id)initWithContent:(ArticlePartContent *)content
-            contentType:(ContentType *)contentType
-contentTransferEncoding:(NSString *)contentTransferEncoding
+-   (id)initWithBodyData:(NSData *)bodyData
+             contentType:(ContentType *)contentType
+ contentTransferEncoding:(NSString *)contentTransferEncoding
 {
     self = [super init];
     if (self)
     {
-        NSData *bodyData = [content bodyData];
-
         if ([[contentType mediaType] hasPrefix:@"image"])
         {
             if ([contentTransferEncoding caseInsensitiveCompare:@"base64"] == NSOrderedSame)

@@ -15,8 +15,7 @@
 
 @property (nonatomic, readonly) NSString *groupName;
 @property (nonatomic, readonly) ArticleRange articleRange;
-
-- (id)initWithGroupName:(NSString *)groupName inDirectory:(NSString *)dirPath;
+@property (nonatomic, readonly) NSDate *lastUpdate;
 
 - (GroupStore *)concurrentGroupStore;
 

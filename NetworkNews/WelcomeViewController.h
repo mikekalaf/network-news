@@ -7,9 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "AccountSettingsViewController.h"
 
-@interface WelcomeViewController : UITableViewController <AccountSettingsDelegate>
+@interface WelcomeViewController : UITableViewController
 
 @property (nonatomic) NSMutableArray *accounts;
 

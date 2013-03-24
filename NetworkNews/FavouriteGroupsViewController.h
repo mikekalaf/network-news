@@ -8,12 +8,12 @@
 
 #import <UIKit/UIKit.h>
 
-@interface FavouriteGroupsViewController : UITableViewController
-{
-    BOOL modified;
-}
+@class NewsConnectionPool;
 
-@property(nonatomic, copy) NSMutableArray *groupNames;
+@interface FavouriteGroupsViewController : UITableViewController
+
+@property (nonatomic) NewsConnectionPool *connectionPool;
+@property (nonatomic, copy) NSMutableArray *groupNames;
 
 - (void)restoreLevelWithSelectionArray:(NSArray *)aSelectionArray;
 

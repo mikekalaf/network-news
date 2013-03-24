@@ -18,27 +18,6 @@
 
 @implementation GroupStore
 
-- (id)initWithGroupName:(NSString *)groupName inDirectory:(NSString *)dirPath;
-{
-    self = [super initWithStoreName:groupName inDirectory:dirPath];
-    if (self)
-    {
-    }
-    return self;
-}
-
-//- (id)initWithPersistentStoreCoordinator:(NSPersistentStoreCoordinator *)persistentStoreCoordinator
-//                               groupName:(NSString *)groupName
-//                             inDirectory:(NSString *)dirPath
-//{
-//    self = [self initWithGroupName:groupName inDirectory:dirPath];
-//    if (self)
-//    {
-//        [self setPersistentStoreCoordinator:
-//    }
-//    return self;
-//}
-
 - (NSString *)groupName
 {
     return [self storeName];
@@ -77,27 +56,51 @@
     return _articleRange;
 }
 
+- (NSDate *)lastUpdate
+{
+    NSManagedObject *group = [self group];
+    return [group valueForKey:@"lastUpdate"];
+}
+
 - (GroupStore *)concurrentGroupStore
 {
 //    NSManagedObjectContext *context = [self managedObjectContext];
 
     // Create a new store with the same persistent store coordinator, but a
     // new managed object context
-    GroupStore *groupStore = [[GroupStore alloc] initWithGroupName:[self groupName]
-                                                       inDirectory:[self dirPath]];
-    [groupStore setPersistentStoreCoordinator:[self persistentStoreCoordinator]];
-
-//    // Do we really need to do this?
-//    @try {
-//        //[groupStore setManagedObjectContext:[[NSManagedObjectContext alloc] initWithConcurrencyType:NSConfinementConcurrencyType]];
-//        [groupStore setManagedObjectContext:[[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType]];
-//        [[groupStore managedObjectContext] setParentContext:context];
-//    }
-//    @catch (NSException *exception) {
-//        NSLog(@"%@", exception);
-//    }
+    GroupStore *groupStore = [[GroupStore alloc] initWithStoreName:[self groupName]
+                                                       inDirectory:[self dirPath]
+                                    withPersistentStoreCoordinator:[self persistentStoreCoordinator]];
 
     return groupStore;
+}
+
+- (void)save
+{
+    NSManagedObject *group = [self group];
+    [group setValue:[NSDate date] forKey:@"lastUpdate"];
+
+    [super save];
+}
+
+- (NSManagedObject *)group
+{
+    NSEntityDescription *groupEntity = [NSEntityDescription entityForName:@"Group"
+                                                   inManagedObjectContext:[self managedObjectContext]];
+    NSFetchRequest *request = [[NSFetchRequest alloc] init];
+    [request setEntity:groupEntity];
+
+    NSError *error;
+    NSArray *array = [[self managedObjectContext] executeFetchRequest:request error:&error];
+    if ([array count] > 0)
+    {
+        return [array lastObject];
+    }
+    else
+    {
+        return [[NSManagedObject alloc] initWithEntity:groupEntity
+                        insertIntoManagedObjectContext:[self managedObjectContext]];
+    }
 }
 
 @end

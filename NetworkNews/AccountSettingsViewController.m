@@ -12,19 +12,23 @@
 #import "NewsAccount.h"
 #import "ConnectionVerifier.h"
 
-#define SERVER_TAG      1
-#define USERNAME_TAG    2
-#define PASSWORD_TAG    3
-#define DESCRIPTION_TAG 4
+typedef enum {
+    AccountSettingsNameTag,
+    AccountSettingsHostTag,
+    AccountSettingsUserNameTag,
+    AccountSettingsPasswordTag,
+    //AccountSettingsDescriptionTag,
+} AccountSettingsTag;
 
 @interface AccountSettingsViewController ()
 {
     NSUInteger accountType;
     UIBarButtonItem *cancelButtonItem;
     UIBarButtonItem *saveButtonItem;
-    ConnectionVerifier *_connectionVerifier;
     BOOL isVerified;
     BOOL isModified;
+    BOOL _isNameValid;
+    NSMutableArray *_fields;
 }
 
 @property(nonatomic, weak) IBOutlet UIButton *linkButton;
@@ -71,12 +75,50 @@
                                                   action:@selector(saveButtonPressed:)];
     [saveButtonItem setEnabled:NO];
     [[self navigationItem] setRightBarButtonItem:saveButtonItem];
+
+    _fields = [[NSMutableArray alloc] init];
+
+    if ([_account accountTemplate] == AccountTemplateDefault)
+    {
+        [_fields addObject:@{
+         @"tag": [NSNumber numberWithInteger:AccountSettingsHostTag],
+         @"textLabel.text": @"Server",
+         @"textField.text": [_account hostName] ? [_account hostName] : @"",
+         @"textField.placeholder": @"Server address",
+         @"textField.secureTextEntry": [NSNumber numberWithBool:NO],
+         @"textField.keyboardType": [NSNumber numberWithInteger:UIKeyboardTypeDefault]}];
+    }
+
+    [_fields addObject:@{
+     @"tag": [NSNumber numberWithInteger:AccountSettingsUserNameTag],
+     @"textLabel.text": @"User Name",
+     @"textField.text": [_account userName] ? [_account userName] : @"",
+     @"textField.placeholder": @"username",
+     @"textField.secureTextEntry": [NSNumber numberWithBool:NO],
+     @"textField.keyboardType": [NSNumber numberWithInteger:UIKeyboardTypeDefault]}];
+
+    [_fields addObject:@{
+     @"tag": [NSNumber numberWithInteger:AccountSettingsPasswordTag],
+     @"textLabel.text": @"Password",
+     @"textField.text": [_account password] ? [_account password] : @"",
+     @"textField.placeholder": @"optional",
+     @"textField.secureTextEntry": [NSNumber numberWithBool:YES],
+     @"textField.keyboardType": [NSNumber numberWithInteger:UIKeyboardTypeASCIICapable]}];
+
+    [_fields addObject:@{
+     @"tag": [NSNumber numberWithInteger:AccountSettingsNameTag],
+     @"textLabel.text": @"Name",
+     @"textField.text": [_account serviceName],
+     @"textField.placeholder": @"required",
+     @"textField.secureTextEntry": [NSNumber numberWithBool:NO],
+     @"textField.keyboardType": [NSNumber numberWithInteger:UIKeyboardTypeDefault],
+     @"validation": [NSValue valueWithPointer:@selector(isNameValid)]}];
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    
+
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
     {
         // Set the first field ready for entry
@@ -97,15 +139,7 @@
  numberOfRowsInSection:(NSInteger)section
 {
     // Return the number of rows in the section.
-    if (section == 0)
-    {
-        if ([_account accountTemplate] == AccountTemplateDefault)
-            return 3;
-        else
-            return 2;
-    }
-
-    return 0;
+    return [_fields count];
 }
 
 
@@ -129,73 +163,26 @@
             cell.textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
         }
 
-        if ([_account accountTemplate] == AccountTemplateDefault)
+        NSDictionary *field = _fields[[indexPath row]];
+        cell.tag = [field[@"tag"] integerValue];
+        [[cell textLabel] setText:field[@"textLabel.text"]];
+        [[cell textField] setText:field[@"textField.text"]];
+        [[cell textField] setPlaceholder:field[@"textField.placeholder"]];
+        [[cell textField] setSecureTextEntry:[field[@"textField.secureTextEntry"] boolValue]];
+        [[cell textField] setKeyboardType:[field[@"textField.keyboardType"] integerValue]];
+
+        BOOL isValid = YES;
+        NSValue *value = field[@"validation"];
+        if (value)
         {
-            if (indexPath.row == 0)
-            {
-                cell.tag = SERVER_TAG;
-                cell.textLabel.text = @"Server";
-                [[cell textField] setText:[_account hostName]];
-                cell.textField.placeholder = @"Server address";
-                cell.textField.secureTextEntry = NO;
-                cell.textField.keyboardType = UIKeyboardTypeDefault;
-            }
-            else if (indexPath.row == 1)
-            {
-                cell.tag = USERNAME_TAG;
-                cell.textLabel.text = @"User Name";
-                [[cell textField] setText:[_account userName]];
-                cell.textField.placeholder = @"username";
-                cell.textField.secureTextEntry = NO;
-                cell.textField.keyboardType = UIKeyboardTypeDefault;
-            }
-            else if (indexPath.row == 2)
-            {
-                cell.tag = PASSWORD_TAG;
-                cell.textLabel.text = @"Password";
-                [[cell textField] setText:[_account password]];
-                cell.textField.placeholder = @"optional";
-                cell.textField.secureTextEntry = YES;
-                cell.textField.keyboardType = UIKeyboardTypeASCIICapable;
-            }
-            else if (indexPath.row == 3)
-            {
-                cell.tag = DESCRIPTION_TAG;
-                cell.textLabel.text = @"Description";
-                cell.textField.placeholder = @"optional";
-                cell.textField.secureTextEntry = NO;
-                cell.textField.keyboardType = UIKeyboardTypeDefault;
-            }
+            SEL validationSelector = [value pointerValue];
+            isValid = [[self performSelector:validationSelector] boolValue];
         }
+
+        if (isValid)
+            [[cell textField] setTextColor:[UIColor blackColor]];
         else
-        {
-            if (indexPath.row == 0)
-            {
-                cell.tag = USERNAME_TAG;
-                cell.textLabel.text = @"User Name";
-                [[cell textField] setText:[_account userName]];
-                cell.textField.placeholder = @"username";
-                cell.textField.secureTextEntry = NO;
-                cell.textField.keyboardType = UIKeyboardTypeDefault;
-            }
-            else if (indexPath.row == 1)
-            {
-                cell.tag = PASSWORD_TAG;
-                cell.textLabel.text = @"Password";
-                [[cell textField] setText:[_account password]];
-                cell.textField.placeholder = @"required";
-                cell.textField.secureTextEntry = YES;
-                cell.textField.keyboardType = UIKeyboardTypeASCIICapable;
-            }
-            else if (indexPath.row == 2)
-            {
-                cell.tag = DESCRIPTION_TAG;
-                cell.textLabel.text = @"Description";
-                cell.textField.placeholder = @"optional";
-                cell.textField.secureTextEntry = NO;
-                cell.textField.keyboardType = UIKeyboardTypeDefault;
-            }
-        }
+            [[cell textField] setTextColor:[UIColor redColor]];
 
         return cell;
     }
@@ -279,7 +266,7 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 
 - (IBAction)cancelButtonPressed:(id)sender
 {
-    [_delegate newAccountViewControllerCancelled:self];
+    [_delegate accountSettingsViewControllerCancelled:self];
 }
 
 - (IBAction)saveButtonPressed:(id)sender
@@ -315,8 +302,7 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
         self.navigationItem.titleView = [self createVerifyView];
         [self tableViewEnable:NO];
 
-        _connectionVerifier = [[ConnectionVerifier alloc] init];
-        [_connectionVerifier verifyWithAccount:_account completion:^(BOOL connected, BOOL authenticated, BOOL verified) {
+        [ConnectionVerifier verifyWithAccount:_account completion:^(BOOL connected, BOOL authenticated, BOOL verified) {
 
             isVerified = verified;
             isModified = NO;
@@ -331,7 +317,7 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
                 //        passwordCell.accessoryType = UITableViewCellAccessoryCheckmark;
 
                 // Report our success
-                [_delegate newAccountViewController:self createdAccount:_account];
+                [_delegate accountSettingsViewController:self modifiedAccount:_account];
             }
             else
             {
@@ -374,40 +360,60 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
     UITextField *textField = sender;
     NSUInteger tag = textField.superview.superview.tag;
     
-    if (tag == SERVER_TAG)
+    if (tag == AccountSettingsHostTag)
     {
         [_account setHostName:[textField text]];
     }
-    else if (tag == USERNAME_TAG)
+    else if (tag == AccountSettingsUserNameTag)
     {
         [_account setUserName:[textField text]];
     }
-    else if (tag == PASSWORD_TAG)
+    else if (tag == AccountSettingsPasswordTag)
     {
         [_account setPassword:[textField text]];
     }
-    else if (tag == DESCRIPTION_TAG)
+    else if (tag == AccountSettingsNameTag)
     {
-        //description = [textField.text copy];
-    }
-    
-    if ([_account hostName] && [[_account hostName] length])
-    {
-        // If both the username and password fields have entries, then we can
-        // enable the save button, otherwise it should be disabled
-        if ([[_account userName] length] > 0 && [[_account password] length] > 0)
-            [saveButtonItem setEnabled:YES];
+        [_account setServiceName:[textField text]];
+        [self isNameValid];
+        if (_isNameValid)
+            [textField setTextColor:[UIColor blackColor]];
         else
-            [saveButtonItem setEnabled:NO];
+            [textField setTextColor:[UIColor redColor]];
+    }
+//    else if (tag == AccountSettingsDescriptionTag)
+//    {
+//        description = [textField.text copy];
+//    }
+
+
+    // Is the name unique? If not, disable save and display the name in red
+    BOOL nameIsValid = [[self isNameValid] boolValue];
+
+    if (nameIsValid)
+    {
+        if ([_account hostName] && [[_account hostName] length])
+        {
+            // If both the username and password fields have entries, then we can
+            // enable the save button, otherwise it should be disabled
+            if ([[_account userName] length] > 0 && [[_account password] length] > 0)
+                [saveButtonItem setEnabled:YES];
+            else
+                [saveButtonItem setEnabled:NO];
+        }
+        else
+        {
+            if ([[_account hostName] length] > 0)
+                [saveButtonItem setEnabled:YES];
+            else
+                [saveButtonItem setEnabled:NO];
+        }
     }
     else
     {
-        if ([[_account hostName] length] > 0)
-            [saveButtonItem setEnabled:YES];
-        else
-            [saveButtonItem setEnabled:NO];
+        [saveButtonItem setEnabled:NO];
     }
-    
+
     isModified = YES;
 }
 
@@ -447,7 +453,7 @@ didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
     if (buttonIndex == 0)
     {
-        [_delegate newAccountViewController:self createdAccount:_account];
+        [_delegate accountSettingsViewController:self modifiedAccount:_account];
     }
 }
 
@@ -458,11 +464,21 @@ didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
     if (buttonIndex == 0)
     {
-        [_delegate newAccountViewController:self createdAccount:_account];
+        [_delegate accountSettingsViewController:self modifiedAccount:_account];
     }
 }
 
 #pragma mark - Private Methods
+
+- (NSNumber *)isNameValid
+{
+    if ([[_account serviceName] length] == 0 ||
+        [_delegate accountSettingsViewController:self verifyAccountName:[_account serviceName]] == NO)
+        _isNameValid = NO;
+    else
+        _isNameValid = YES;
+    return [NSNumber numberWithBool:_isNameValid];
+}
 
 - (UIView *)createVerifyView
 {

@@ -7,12 +7,10 @@
 //
 
 #import "ArticleViewController.h"
-#import "DownloadArticlesTask.h"
+#import "FetchArticleOperation.h"
 #import "AppDelegate.h"
 #import "Article.h"
 #import "ArticlePart.h"
-#import "NNConnection.h"
-#import "Task.h"
 #import "Attachment.h"
 #import "ArticlePartContent.h"
 #import "NNHeaderParser.h"
@@ -30,6 +28,8 @@
 #import "NSString+NewsAdditions.h"
 #import "EncodedWordDecoder.h"
 #import "WelcomeViewController.h"
+#import "NewsConnectionPool.h"
+#import "NewsAccount.h"
 
 @interface ArticleViewController ()
 {
@@ -40,10 +40,10 @@
 
     Article *_article;
     NSMutableString *htmlString;
-    Task *currentTask;
-    NSString *cacheDir;
+    NSOperationQueue *_operationQueue;
+    NSURL *_cacheURL;
     NSUInteger partCount;
-    NSString *attachmentPath;
+    NSURL *_attachmentURL;
     NSArray *_headEntries;
     NSData *_bodyTextDataTop;
     NSData *_bodyTextDataBottom;
@@ -56,8 +56,7 @@
 @property(nonatomic, weak) IBOutlet UIBarButtonItem *replyButtonItem;
 @property(nonatomic, weak) IBOutlet UIBarButtonItem *composeButtonItem;
 
-- (NSString *)cachePathForMessageId:(NSString *)messageId
-                          extension:(NSString *)extension;
+- (NSURL *)cacheURLForMessageId:(NSString *)messageId extension:(NSString *)extension;
 - (NSString *)bodyTextForFollowUp;
 - (void)followUpToGroup;
 - (void)replyViaEmail;
@@ -66,7 +65,7 @@
 - (void)endHTML;
 - (void)appendHeadFromArticle;
 - (void)updateWithPlaceholder;
-- (void)downloadArticle;
+- (void)loadArticle;
 - (void)updateContent;
 - (void)updateTitle;
 - (void)updateNavigationControls;
@@ -90,6 +89,10 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+
+    // Set up the operation queue to download one part at a time
+    _operationQueue = [[NSOperationQueue alloc] init];
+    [_operationQueue setMaxConcurrentOperationCount:1];
     
     htmlString = [NSMutableString string];
 
@@ -122,26 +125,26 @@
     _progressView.hidden = YES;
 
     // Determine the cache directory, and make sure it exists
-    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    cacheDir = [appDelegate.cacheRootDir stringByAppendingPathComponent:_groupName];
+    _cacheURL = [[[_connectionPool account] cacheURL] URLByAppendingPathComponent:_groupName];
     
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    [fileManager createDirectoryAtPath:cacheDir
-           withIntermediateDirectories:YES
-                            attributes:nil
-                                 error:NULL];
+    NSFileManager *fileManager = [[NSFileManager alloc] init];
+    [fileManager createDirectoryAtURL:_cacheURL
+          withIntermediateDirectories:YES
+                           attributes:nil
+                                error:NULL];
+
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+    [nc addObserver:self
+           selector:@selector(fetchArticleCompleted:)
+               name:FetchArticleCompletedNotification
+             object:nil];
 
     [self updateArticle];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
 {
-    // Cancel any live task/connection
-    if (currentTask)
-    {
-        [currentTask cancel];
-        currentTask = nil;
-    }
+    [_operationQueue cancelAllOperations];
 
     // Which view are we going to?
     UIViewController *currentViewController = self.navigationController.topViewController;
@@ -171,18 +174,14 @@
 	// Release any cached data, images, etc that aren't in use.
 }
 
-#pragma mark -
-#pragma mark Public Methods
+#pragma mark - Public Methods
 
 - (void)updateArticle
 {
     if (_popoverController)
         [_popoverController dismissPopoverAnimated:YES];
     
-//    if (articles)
-        [self downloadArticle];
-//    else
-//        [self updateWithPlaceholder];
+    [self loadArticle];
 }
 
 - (void)showWelcomeView
@@ -195,8 +194,7 @@
     //[self presentModalViewController:navigationController animated:NO];
 }
 
-#pragma mark -
-#pragma mark NewArticleDelegate Methods
+#pragma mark - NewArticleDelegate Methods
 
 - (void)newArticleViewController:(NewArticleViewController *)controller
                          didSend:(BOOL)send
@@ -204,8 +202,7 @@
     [self dismissViewControllerAnimated:YES completion:NULL];
 }
 
-#pragma mark -
-#pragma mark WelcomeDelegate Methods
+#pragma mark - WelcomeDelegate Methods
 
 - (void)welcomeViewControllerFinished:(WelcomeViewController *)controller
 {
@@ -219,8 +216,7 @@
 //    [appDelegate establishConnection];
 }
 
-#pragma mark -
-#pragma mark MFMailComposeViewControllerDelegate Methods
+#pragma mark - MFMailComposeViewControllerDelegate Methods
 
 - (void)mailComposeController:(MFMailComposeViewController*)controller
           didFinishWithResult:(MFMailComposeResult)result
@@ -229,8 +225,7 @@
     [self dismissViewControllerAnimated:YES completion:NULL];
 }
 
-#pragma mark -
-#pragma mark UIWebViewDelegate Methods
+#pragma mark - UIWebViewDelegate Methods
 
 -            (BOOL)webView:(UIWebView *)aWebView
 shouldStartLoadWithRequest:(NSURLRequest *)request
@@ -249,8 +244,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     return YES;
 }
 
-#pragma mark -
-#pragma mark UIActionSheetDelegate Methods
+#pragma mark - UIActionSheetDelegate Methods
 
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
@@ -266,8 +260,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     }
 }
 
-#pragma mark -
-#pragma mark UISplitViewControllerDelegate Methods
+#pragma mark - UISplitViewControllerDelegate Methods
 
 - (void)splitViewController:(UISplitViewController *)svc
      willHideViewController:(UIViewController *)aViewController
@@ -325,8 +318,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     toolbarSetForPortrait = NO;
 }
 
-#pragma mark -
-#pragma mark Actions
+#pragma mark - Actions
 
 - (void)articleNavigation:(id)sender
 {
@@ -337,7 +329,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
         if (_articleIndex > 0)
         {
             --_articleIndex;
-            [self downloadArticle];
+            [self loadArticle];
         }
     }
     else if (index == 1)
@@ -346,7 +338,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
         if (_articleIndex < [_articleSource articleCount] - 1)
         {
             ++_articleIndex;
-            [self downloadArticle];
+            [self loadArticle];
         }
     }
 
@@ -381,6 +373,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
                                                                                            subject:nil
                                                                                         references:nil
                                                                                           bodyText:nil];
+    [viewController setConnectionPool:_connectionPool];
     viewController.delegate = self;
     
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
@@ -390,231 +383,98 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 
 #pragma mark - Notifications
 
-- (void)bytesLoaded:(NSNotification *)notification
+//- (void)articleLoaded:(NSNotification *)notification
+//{
+//    // Do we have all parts?
+//    NSUInteger completePartCount = [[_article completePartCount] integerValue];
+//    if (completePartCount == 1 && _attachmentURL == nil)
+//    {
+//        // NOP
+//    }
+//    else if (completePartCount == partCount && _attachmentURL != nil)
+//    {
+//        // NOP
+//    }
+//    else
+//    {
+//        NSLog(@"Incomplete parts");
+//    }
+//    
+//    [self updateContent];
+//    [_webView loadHTMLString:htmlString baseURL:nil];
+//    [self updateNavigationControls];
+//    [self showArticleToolbar];
+//
+//    // We've finished our task
+//    currentTask = nil;
+//
+//    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+//    [nc removeObserver:self];
+//
+//    // TODO: This notification is also being called by articleError: so we
+//    // can't assume that the article has in fact been read. The above code, and
+//    // all other code that updates and displays article HTML should be factored-out
+//    // and called by these notifications, rather than having one notification
+//    // calling another.
+//
+//    // Mark it as read, since we're loading it to be viewed
+//    [_article setRead:[NSNumber numberWithBool:YES]];
+//    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+//    [appDelegate.activeCoreDataStack save];
+//}
+//
+//- (void)articleUnavailable:(NSNotification *)notification
+//{
+//    // Clear the body
+//    [self beginHTML];
+//    [self appendHeadFromArticle];
+//    
+//    [htmlString appendString:@"<p class=\"status\">Article Unavailable</p>"];
+//    
+//    [self endHTML];
+//    [_webView loadHTMLString:htmlString baseURL:nil];
+//    [self updateNavigationControls];
+//    [self showArticleToolbar];
+//
+//    // We've finished our task
+//    currentTask = nil;
+//
+//    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+//    [nc removeObserver:self];
+//}
+//
+//- (void)articleError:(NSNotification *)notification
+//{
+//    AlertViewFailedConnection(currentTask.connection.hostName);
+//    [self articleLoaded:notification];
+//}
+
+- (void)fetchArticleCompleted:(NSNotification *)notification
 {
-    DownloadArticlesTask *task = notification.object;
-    NSUInteger loadedBytes = task.articlePartContent.data.length;
-    NSInteger totalBytes = [[_article totalByteCount] integerValue];
-    _progressView.progress = (float)(bytesCached + loadedBytes) / totalBytes;
-}
-
-- (void)partLoaded:(NSNotification *)notification
-{
-    ++partCount;
-    
-    NSUInteger completePartCount = [[_article completePartCount] integerValue];
-    
-    DownloadArticlesTask *task = notification.object;
-    NSUInteger partNumber = task.articlePart.partNumber.integerValue;
-
-    if (partNumber == 1)
+    NSDictionary *userInfo = [notification userInfo];
+    NSInteger statusCode = [userInfo[@"statusCode"] integerValue];
+    if (statusCode == 220 || statusCode == 222)
     {
-        // This is the first part, so grab those headers
-        _headEntries = [[task articlePartContent] headEntries];
-    }
-
-    NSString *contentTransferEncoding = [self headerValueWithName:@"Content-Transfer-Encoding"];
-
-    Attachment *attachment = [[Attachment alloc] initWithContent:[task articlePartContent]
-                                                     contentType:[self contentType]
-                                         contentTransferEncoding:contentTransferEncoding];
-    if (attachment)
-    {
-        if (partNumber != partCount)
+        if ([userInfo[@"partNumber"] integerValue] == [userInfo[@"totalPartCount"] integerValue])
         {
-            NSLog(@"Expected part %d but received part %d", partCount, partNumber);
-            return;
-        }
-        
-        if (partNumber == 1)
-        {
-            // Grab the initial text in the first part
-            // Calculate the range of the header text and the body text up to
-            // the attachment
-
-            // Cache this initial text
-            NSString *mIdHeadPath = [self cachePathForMessageId:task.articlePart.messageId
-                                                      extension:@"head.txt"];
-            ArticlePartContent *content = task.articlePartContent;
-            NSData *headData = [content.data subdataWithRange:content.headRange];
-            [headData writeToFile:mIdHeadPath atomically:NO];
-
-            // Only cache the top text if there is actually any
-            if ([attachment rangeInArticleData].location > 0)
-            {
-                NSRange range = NSMakeRange(0, attachment.rangeInArticleData.location);
-                _bodyTextDataTop = [task.articlePartContent.bodyData subdataWithRange:range];
-
-                NSString *mIdPath = [self cachePathForMessageId:task.articlePart.messageId
-                                                      extension:@"top.txt"];
-                [_bodyTextDataTop writeToFile:mIdPath atomically:NO];
-            }
-
-            // Note the attachment filename
-            attachmentPath = [self cachePathForMessageId:task.articlePart.messageId
-                                               extension:attachment.fileName.pathExtension];
-            [_article setAttachmentFileName:[attachment fileName]];
-
-            AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-            [appDelegate.activeCoreDataStack save];
-
-//            // TESTING
-//            NSString *mIdPath = [self cachePathForMessageId:task.articlePart.messageId
-//                                                  extension:@"dump.txt"];
-//            [[content data] writeToFile:mIdPath atomically:NO];
-//            // END TESTING
-        }
-
-        if (partNumber == completePartCount)
-        {
-            // Grab the trailing text in the last part (this could still be
-            // the first part)
-
-            NSUInteger end = NSMaxRange(attachment.rangeInArticleData);
-            NSRange range = NSMakeRange(end,
-                                        task.articlePartContent.bodyData.length - end);
-
-            // Only cache it if there is actual content
-            if (range.length > 0)
-            {
-                _bodyTextDataBottom = [task.articlePartContent.bodyData subdataWithRange:range];
-
-                // Cache this trailing text
-                NSString *mIdPath = [self cachePathForMessageId:task.articlePart.messageId
-                                                      extension:@"bottom.txt"];
-                [_bodyTextDataBottom writeToFile:mIdPath atomically:NO];
-            }
-        }
-        
-        NSString *path = attachmentPath;
-        if (partNumber == 1)
-        {
-            // Create the file
-            NSError *error;
-            if ([attachment.data writeToFile:path options:0 error:&error] == NO)
-            {
-                NSLog(@"Error in caching file: %@", error.description);
-            }
-            else
-                bytesCached = task.articlePartContent.data.length;
-        }
-        else
-        {
-            // Append to the end of the file
-            NSFileHandle *fileHandle = [NSFileHandle fileHandleForWritingAtPath:path];
-            [fileHandle seekToEndOfFile];
-            [fileHandle writeData:attachment.data];
-            [fileHandle closeFile];
-
-            bytesCached += task.articlePartContent.data.length;
+            // All parts have loaded
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self loadArticle];
+            });
         }
     }
     else
     {
-        // This is text only
-        if (partNumber == 1)
-        {
-            BOOL quotedPrintable = [QuotedPrintableDecoder isQuotedPrintable:_headEntries];
-
-            _bodyTextDataTop = task.articlePartContent.bodyData;
-            
-            if (quotedPrintable)
-            {
-                QuotedPrintableDecoder *quotedPrintableDecoder = [[QuotedPrintableDecoder alloc] init];
-                _bodyTextDataTop = [quotedPrintableDecoder decodeData:_bodyTextDataTop];
-            }
-            
-            // Save to the cache
-            NSString *mIdHeadPath = [self cachePathForMessageId:task.articlePart.messageId
-                                                      extension:@"head.txt"];
-            ArticlePartContent *content = task.articlePartContent;
-            NSData *headData = [content.data subdataWithRange:content.headRange];
-            [headData writeToFile:mIdHeadPath atomically:NO];
-
-            NSString *mIdPath = [self cachePathForMessageId:task.articlePart.messageId
-                                                  extension:@"top.txt"];
-            [_bodyTextDataTop writeToFile:mIdPath atomically:NO];
-            
-            NSLog(@"cache path: %@", mIdPath);
-        }
+        
     }
 }
 
-- (void)articleLoaded:(NSNotification *)notification
-{
-    // Do we have all parts?
-    NSUInteger completePartCount = [[_article completePartCount] integerValue];
-    if (completePartCount == 1 && attachmentPath == nil)
-    {
-        // NOP
-    }
-    else if (completePartCount == partCount && attachmentPath != nil)
-    {
-        // NOP
-    }
-    else
-    {
-        NSLog(@"Incomplete parts");
-    }
-    
-    [self updateContent];
-    [_webView loadHTMLString:htmlString baseURL:nil];
-    [self updateNavigationControls];
-    [self showArticleToolbar];
+#pragma mark - Private Methods
 
-    // We've finished our task
-    currentTask = nil;
-
-    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc removeObserver:self];
-
-    // TODO: This notification is also being called by articleError: so we
-    // can't assume that the article has in fact been read. The above code, and
-    // all other code that updates and displays article HTML should be factored-out
-    // and called by these notifications, rather than having one notification
-    // calling another.
-
-    // Mark it as read, since we're loading it to be viewed
-    [_article setRead:[NSNumber numberWithBool:YES]];
-    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    [appDelegate.activeCoreDataStack save];
-}
-
-- (void)articleUnavailable:(NSNotification *)notification
-{
-    // Clear the body
-    [self beginHTML];
-    [self appendHeadFromArticle];
-    
-    [htmlString appendString:@"<p class=\"status\">Article Unavailable</p>"];
-    
-    [self endHTML];
-    [_webView loadHTMLString:htmlString baseURL:nil];
-    [self updateNavigationControls];
-    [self showArticleToolbar];
-
-    // We've finished our task
-    currentTask = nil;
-
-    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc removeObserver:self];
-}
-
-- (void)articleError:(NSNotification *)notification
-{
-    AlertViewFailedConnection(currentTask.connection.hostName);
-    [self articleLoaded:notification];
-}
-
-#pragma mark -
-#pragma mark Private Methods
-
-- (NSString *)cachePathForMessageId:(NSString *)messageId
-                          extension:(NSString *)extension
+- (NSURL *)cacheURLForMessageId:(NSString *)messageId extension:(NSString *)extension
 {
     NSString *fileName = [messageId messageIDFileName];
-    return [cacheDir stringByAppendingPathComponent:
-            [fileName stringByAppendingPathExtension:extension]];
+    return [_cacheURL URLByAppendingPathComponent:[fileName stringByAppendingPathExtension:extension]];
 }
 
 - (NSString *)bodyTextForFollowUp
@@ -671,6 +531,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
                                                                                            subject:[_article reSubject]
                                                                                         references:references
                                                                                           bodyText:[self bodyTextForFollowUp]];
+    [viewController setConnectionPool:_connectionPool];
     viewController.delegate = self;
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
 
@@ -1019,18 +880,15 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     // Append the text preceeding any attachment
     [self appendBodyData:_bodyTextDataTop encoding:encoding flowed:flowed];
 
-    if (attachmentPath)
+    if (_attachmentURL)
     {
         // Append the attachment
-        NSString *path = attachmentPath;
-        NSURL *attachmentURL = [NSURL fileURLWithPath:path isDirectory:NO];
-        
-        if ([attachmentPath.pathExtension caseInsensitiveCompare:@"jpg"] == NSOrderedSame)
-            [self appendImageURL:attachmentURL];
-        else if ([attachmentPath.pathExtension caseInsensitiveCompare:@"mp3"] == NSOrderedSame)
-            [self appendAudioURL:attachmentURL];
+        if ([[_attachmentURL pathExtension] caseInsensitiveCompare:@"jpg"] == NSOrderedSame)
+            [self appendImageURL:_attachmentURL];
+        else if ([[_attachmentURL pathExtension] caseInsensitiveCompare:@"mp3"] == NSOrderedSame)
+            [self appendAudioURL:_attachmentURL];
         else
-            [self appendLinkURL:attachmentURL];
+            [self appendLinkURL:_attachmentURL];
         
         // Append the text following the attachment
         [self appendBodyData:_bodyTextDataBottom encoding:encoding flowed:flowed];
@@ -1041,10 +899,28 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     _progressView.hidden = YES;
 }
 
-- (void)downloadArticle
+- (NSArray *)cachedURLsForMessageID:(NSString *)messageID
+{
+    // Get the contents of the cache directory and filter on the message ID
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSError *error;
+    NSArray *contents = [fileManager contentsOfDirectoryAtURL:_cacheURL
+                                   includingPropertiesForKeys:nil
+                                                      options:NSDirectoryEnumerationSkipsHiddenFiles
+                                                        error:&error];
+    if (error)
+        return nil;
+
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:
+                              @"lastPathComponent CONTAINS %@",
+                              [messageID messageIDFileName]];
+    return [contents filteredArrayUsingPredicate:predicate];
+}
+
+- (void)loadArticle
 {
     partCount = 0;
-    attachmentPath = nil;
+    _attachmentURL = nil;
     _headEntries = nil;
     _bodyTextDataTop = nil;
     _bodyTextDataBottom = nil;
@@ -1052,13 +928,6 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 
     // Reference the current article
     _article = [_articleSource articleAtIndex:_articleIndex];
-    
-//    // Mark it as read, since we're loading it to be viewed
-//    // TODO: Mark the article as read AFTER it is loaded, not before
-//    article.read = [NSNumber numberWithBool:YES];
-
-//    NetworkNewsAppDelegate *appDelegate = (NetworkNewsAppDelegate *)[[UIApplication sharedApplication] delegate];
-//    [appDelegate.activeCoreDataStack save];
     
     // Clear the body
     [self beginHTML];
@@ -1092,90 +961,75 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     NSArray *sortedParts = [[[_article parts] allObjects] sortedArrayUsingDescriptors:
                             [NSArray arrayWithObject:descriptor]];
 
-    // First, check if we have a cached copy?
-    NSString *messageId = [[sortedParts objectAtIndex:0] messageId];
-    NSString *mIdPath = [self cachePathForMessageId:messageId extension:@"head.txt"];
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    if ([fileManager fileExistsAtPath:mIdPath])
+    NSString *messageID = [[sortedParts objectAtIndex:0] messageId];
+    NSArray *URLs = [self cachedURLsForMessageID:messageID];
+    if ([URLs count])
     {
-        NSLog(@"Found cached copy");
-        
-        // Load the headers
-        NSData *headData = [NSData dataWithContentsOfFile:mIdPath];
-        if (headData)
-        {
-            NNHeaderParser *hp = [[NNHeaderParser alloc] initWithData:headData];
-            _headEntries = [hp entries];
-        }
+        NSLog(@"Found cached content");
 
-        mIdPath = [self cachePathForMessageId:messageId
-                                    extension:@"top.txt"];
-        _bodyTextDataTop = [[NSData alloc] initWithContentsOfFile:mIdPath];
-
-        // Is there an attachment to load?
-        NSString *attachmentFileName = [_article attachmentFileName];
-        if (attachmentFileName)
+        for (NSURL *cacheURL in URLs)
         {
-            // Retrieve the cached attachment
-            attachmentPath = [self cachePathForMessageId:messageId
-                                               extension:attachmentFileName.pathExtension];
+            NSString *lastPathComponent = [cacheURL lastPathComponent];
+            if ([lastPathComponent hasSuffix:@"0.txt"])
+            {
+                // Load the headers
+                NSData *headData = [NSData dataWithContentsOfURL:cacheURL];
+                if (headData)
+                {
+                    NNHeaderParser *hp = [[NNHeaderParser alloc] initWithData:headData];
+                    _headEntries = [hp entries];
+                }
+            }
+            else if ([lastPathComponent hasSuffix:@"1.txt"])
+            {
+                _bodyTextDataTop = [[NSData alloc] initWithContentsOfURL:cacheURL];
+            }
+            else if ([lastPathComponent hasSuffix:@"3.txt"])
+            {
+                _bodyTextDataBottom = [[NSData alloc] initWithContentsOfURL:cacheURL];
+            }
+            else
+            {
+                _attachmentURL = cacheURL;
+            }
         }
-        
-        // Is there following text?
-        mIdPath = [self cachePathForMessageId:messageId extension:@"bottom.txt"];
-        if ([fileManager fileExistsAtPath:mIdPath])
-            _bodyTextDataBottom = [[NSData alloc] initWithContentsOfFile:mIdPath];
 
         // Display the cached copy
         [self updateContent];
         [_webView loadHTMLString:htmlString baseURL:nil];
         [self updateNavigationControls];
         [self showArticleToolbar];
-
-//        // Mark it as read
-//        [_article setRead:[NSNumber numberWithBool:YES]];
-//        AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-//        [appDelegate.activeCoreDataStack save];
-
-        return;
     }
-    
-    // Proceed with the download
-    [self disableNavigationControls];
-    [self showProgressToolbar];
-    _progressView.progress = 0;
-    _progressView.hidden = NO;
-    
-    // Download the article(s)
-    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    currentTask = [[DownloadArticlesTask alloc] initWithConnection:appDelegate.connection
-                                                      articleParts:sortedParts];
-    
-    NSLog(@"Downloading %d part(s)", sortedParts.count);
-    
-    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc addObserver:self
-           selector:@selector(bytesLoaded:)
-               name:ArticleBytesReceivedNotification
-             object:currentTask];
-    [nc addObserver:self
-           selector:@selector(partLoaded:)
-               name:ArticleDownloadedNotification
-             object:currentTask];
-    [nc addObserver:self
-           selector:@selector(articleLoaded:)
-               name:AllArticlesDownloadedNotification
-             object:currentTask];
-    [nc addObserver:self
-           selector:@selector(articleUnavailable:)
-               name:ArticleUnavailableNotification
-             object:currentTask];
-    [nc addObserver:self
-           selector:@selector(articleError:)
-               name:TaskErrorNotification
-             object:currentTask];
-    
-    [currentTask start];
+    else
+    {
+        // Download from the server
+        [self disableNavigationControls];
+        [self showProgressToolbar];
+        _progressView.progress = 0;
+        _progressView.hidden = NO;
+        
+        NSLog(@"Downloading %d part(s)", [sortedParts count]);
+
+        NSUInteger totalBytes = [[_article totalByteCount] integerValue];
+        __block NSUInteger bytesFetchedSoFar = 0;
+
+        for (ArticlePart *part in sortedParts)
+        {
+            FetchArticleOperation *operation =
+            [[FetchArticleOperation alloc] initWithConnectionPool:_connectionPool
+                                                        messageID:[part messageId]
+                                                       partNumber:[[part partNumber] integerValue]
+                                                   totalPartCount:[sortedParts count]
+                                                         cacheURL:_cacheURL
+                                                         progress:^(NSUInteger bytesReceived) {
+                                                             bytesFetchedSoFar += bytesReceived;
+                                                             dispatch_async(dispatch_get_main_queue(), ^{
+                                                                 [_progressView setProgress:(float)bytesFetchedSoFar / totalBytes];
+                                                             });
+                                                         }];
+            [_operationQueue addOperation:operation];
+        }
+    }
 }
 
 - (void)updateTitle

@@ -21,8 +21,12 @@
         <attribute name="partNumber" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
         <relationship name="article" optional="YES" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="Article" inverseName="parts" inverseEntity="Article" indexed="YES" syncable="YES"/>
     </entity>
+    <entity name="Group" syncable="YES">
+        <attribute name="lastUpdate" optional="YES" attributeType="Date" syncable="YES"/>
+    </entity>
     <elements>
         <element name="Article" positionX="160" positionY="192" width="128" height="195"/>
         <element name="ArticlePart" positionX="160" positionY="192" width="128" height="150"/>
+        <element name="Group" positionX="160" positionY="192" width="128" height="60"/>
     </elements>
 </model>

@@ -8,7 +8,6 @@
 
 #import <Foundation/Foundation.h>
 
-@class ArticlePartContent;
 @class ContentType;
 
 @interface Attachment : NSObject
@@ -17,8 +16,8 @@
 @property(nonatomic, readonly) NSData *data;
 @property(nonatomic, readonly) NSRange rangeInArticleData;
 
--   (id)initWithContent:(ArticlePartContent *)content
-            contentType:(ContentType *)contentType
-contentTransferEncoding:(NSString *)contentTransferEncoding;
+-   (id)initWithBodyData:(NSData *)bodyData
+             contentType:(ContentType *)contentType
+ contentTransferEncoding:(NSString *)contentTransferEncoding;
 
 @end

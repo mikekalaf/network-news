@@ -38,7 +38,6 @@
 		6341927416D0D8800069B528 /* ThreadView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6341921616D0D8800069B528 /* ThreadView.xib */; };
 		6341927516D0D8800069B528 /* WelcomeView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6341921816D0D8800069B528 /* WelcomeView.xib */; };
 		6341927616D0D8800069B528 /* ExtendedDateFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 6341921B16D0D8800069B528 /* ExtendedDateFormatter.m */; };
-		6341927716D0D8800069B528 /* ExtendedTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6341921D16D0D8800069B528 /* ExtendedTextView.m */; };
 		6341927816D0D8800069B528 /* FavouriteGroupsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6341921F16D0D8800069B528 /* FavouriteGroupsViewController.m */; };
 		6341927916D0D8800069B528 /* FieldView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6341922116D0D8800069B528 /* FieldView.m */; };
 		6341927A16D0D8800069B528 /* giganews_64.png in Resources */ = {isa = PBXBuildFile; fileRef = 6341922216D0D8800069B528 /* giganews_64.png */; };
@@ -84,29 +83,27 @@
 		634192F816D0DAEE0069B528 /* ConnectionVerifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 634192B516D0DAEC0069B528 /* ConnectionVerifier.m */; };
 		634192F916D0DAEE0069B528 /* ContentType.m in Sources */ = {isa = PBXBuildFile; fileRef = 634192B716D0DAEC0069B528 /* ContentType.m */; };
 		634192FA16D0DAEE0069B528 /* CoreDataStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 634192B916D0DAED0069B528 /* CoreDataStore.m */; };
-		634192FC16D0DAEE0069B528 /* DownloadArticlesTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 634192BD16D0DAED0069B528 /* DownloadArticlesTask.m */; };
 		634192FD16D0DAEE0069B528 /* EncodedWordDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 634192BF16D0DAED0069B528 /* EncodedWordDecoder.m */; };
 		634192FE16D0DAEE0069B528 /* GroupListing.m in Sources */ = {isa = PBXBuildFile; fileRef = 634192C116D0DAED0069B528 /* GroupListing.m */; };
 		634192FF16D0DAEE0069B528 /* GroupStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 634192C316D0DAED0069B528 /* GroupStore.m */; };
 		6341930416D0DAEE0069B528 /* NNArticleFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 634192CD16D0DAED0069B528 /* NNArticleFormatter.m */; };
 		6341930516D0DAEE0069B528 /* NNBase64Decoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 634192CF16D0DAED0069B528 /* NNBase64Decoder.m */; };
-		6341930616D0DAEE0069B528 /* NNConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 634192D116D0DAED0069B528 /* NNConnection.m */; };
 		6341930716D0DAEE0069B528 /* NNHeaderEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 634192D316D0DAED0069B528 /* NNHeaderEntry.m */; };
 		6341930816D0DAEE0069B528 /* NNHeaderParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 634192D516D0DAED0069B528 /* NNHeaderParser.m */; };
 		6341930916D0DAEE0069B528 /* NNQuoteLevel.m in Sources */ = {isa = PBXBuildFile; fileRef = 634192D716D0DAED0069B528 /* NNQuoteLevel.m */; };
 		6341930A16D0DAEE0069B528 /* NNQuoteLevelParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 634192D916D0DAED0069B528 /* NNQuoteLevelParser.m */; };
-		6341930B16D0DAEE0069B528 /* NNServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 634192DB16D0DAED0069B528 /* NNServer.m */; };
 		6341930C16D0DAEE0069B528 /* NSArray+NewsAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 634192DE16D0DAEE0069B528 /* NSArray+NewsAdditions.m */; };
 		6341930D16D0DAEE0069B528 /* NSData+NewsAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 634192E016D0DAEE0069B528 /* NSData+NewsAdditions.m */; };
 		6341930F16D0DAEE0069B528 /* NSString+NewsAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 634192E416D0DAEE0069B528 /* NSString+NewsAdditions.m */; };
-		6341931016D0DAEE0069B528 /* PostArticleTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 634192E616D0DAEE0069B528 /* PostArticleTask.m */; };
 		6341931116D0DAEE0069B528 /* QuotedPrintableDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 634192E816D0DAEE0069B528 /* QuotedPrintableDecoder.m */; };
-		6341931216D0DAEE0069B528 /* Task.m in Sources */ = {isa = PBXBuildFile; fileRef = 634192EA16D0DAEE0069B528 /* Task.m */; };
 		6341931316D0DAEE0069B528 /* Thread.m in Sources */ = {isa = PBXBuildFile; fileRef = 634192EC16D0DAEE0069B528 /* Thread.m */; };
 		6341931416D0DAEE0069B528 /* UUDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 634192EE16D0DAEE0069B528 /* UUDecoder.m */; };
 		6341931516D0DAEE0069B528 /* YEncDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 634192F016D0DAEE0069B528 /* YEncDecoder.m */; };
 		6341931B16D0DC0B0069B528 /* EmailAddressFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 6341931A16D0DC0B0069B528 /* EmailAddressFormatter.m */; };
 		6341931E16D0DDE30069B528 /* SizeFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 6341931D16D0DDE30069B528 /* SizeFormatter.m */; };
+		63529AA416FDB31C0089E65E /* AssemblePartsOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 63529AA316FDB31C0089E65E /* AssemblePartsOperation.m */; };
+		63529AA716FEB5320089E65E /* PostArticleOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 63529AA616FEB5320089E65E /* PostArticleOperation.m */; };
+		63529AAA16FEC7A60089E65E /* UIApplication+NewsAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 63529AA916FEC7A60089E65E /* UIApplication+NewsAdditions.m */; };
 		6398525816D0FBEA009303E2 /* LineIterator.m in Sources */ = {isa = PBXBuildFile; fileRef = 6398525716D0FBEA009303E2 /* LineIterator.m */; };
 		63A7205216F32B6B000AC69C /* FetchArticleOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 63A7205116F32B6B000AC69C /* FetchArticleOperation.m */; };
 		63E3A76C16E99BD300BD3D13 /* NewsConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 63E3A76B16E99BD300BD3D13 /* NewsConnection.m */; };
@@ -174,8 +171,6 @@
 		6341921916D0D8800069B528 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/WelcomeView.xib; sourceTree = "<group>"; };
 		6341921A16D0D8800069B528 /* ExtendedDateFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtendedDateFormatter.h; sourceTree = "<group>"; };
 		6341921B16D0D8800069B528 /* ExtendedDateFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExtendedDateFormatter.m; sourceTree = "<group>"; };
-		6341921C16D0D8800069B528 /* ExtendedTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtendedTextView.h; sourceTree = "<group>"; };
-		6341921D16D0D8800069B528 /* ExtendedTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExtendedTextView.m; sourceTree = "<group>"; };
 		6341921E16D0D8800069B528 /* FavouriteGroupsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FavouriteGroupsViewController.h; sourceTree = "<group>"; };
 		6341921F16D0D8800069B528 /* FavouriteGroupsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FavouriteGroupsViewController.m; sourceTree = "<group>"; };
 		6341922016D0D8800069B528 /* FieldView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FieldView.h; sourceTree = "<group>"; };
@@ -246,8 +241,6 @@
 		634192B716D0DAEC0069B528 /* ContentType.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ContentType.m; sourceTree = "<group>"; };
 		634192B816D0DAEC0069B528 /* CoreDataStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreDataStore.h; sourceTree = "<group>"; };
 		634192B916D0DAED0069B528 /* CoreDataStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CoreDataStore.m; sourceTree = "<group>"; };
-		634192BC16D0DAED0069B528 /* DownloadArticlesTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DownloadArticlesTask.h; sourceTree = "<group>"; };
-		634192BD16D0DAED0069B528 /* DownloadArticlesTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DownloadArticlesTask.m; sourceTree = "<group>"; };
 		634192BE16D0DAED0069B528 /* EncodedWordDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EncodedWordDecoder.h; sourceTree = "<group>"; };
 		634192BF16D0DAED0069B528 /* EncodedWordDecoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EncodedWordDecoder.m; sourceTree = "<group>"; };
 		634192C016D0DAED0069B528 /* GroupListing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GroupListing.h; sourceTree = "<group>"; };
@@ -259,8 +252,6 @@
 		634192CD16D0DAED0069B528 /* NNArticleFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NNArticleFormatter.m; sourceTree = "<group>"; };
 		634192CE16D0DAED0069B528 /* NNBase64Decoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NNBase64Decoder.h; sourceTree = "<group>"; };
 		634192CF16D0DAED0069B528 /* NNBase64Decoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NNBase64Decoder.m; sourceTree = "<group>"; };
-		634192D016D0DAED0069B528 /* NNConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NNConnection.h; sourceTree = "<group>"; };
-		634192D116D0DAED0069B528 /* NNConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NNConnection.m; sourceTree = "<group>"; };
 		634192D216D0DAED0069B528 /* NNHeaderEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NNHeaderEntry.h; sourceTree = "<group>"; };
 		634192D316D0DAED0069B528 /* NNHeaderEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NNHeaderEntry.m; sourceTree = "<group>"; };
 		634192D416D0DAED0069B528 /* NNHeaderParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NNHeaderParser.h; sourceTree = "<group>"; };
@@ -269,8 +260,6 @@
 		634192D716D0DAED0069B528 /* NNQuoteLevel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NNQuoteLevel.m; sourceTree = "<group>"; };
 		634192D816D0DAED0069B528 /* NNQuoteLevelParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NNQuoteLevelParser.h; sourceTree = "<group>"; };
 		634192D916D0DAED0069B528 /* NNQuoteLevelParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NNQuoteLevelParser.m; sourceTree = "<group>"; };
-		634192DA16D0DAED0069B528 /* NNServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NNServer.h; sourceTree = "<group>"; };
-		634192DB16D0DAED0069B528 /* NNServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NNServer.m; sourceTree = "<group>"; };
 		634192DC16D0DAED0069B528 /* NNServerDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NNServerDelegate.h; sourceTree = "<group>"; };
 		634192DD16D0DAED0069B528 /* NSArray+NewsAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+NewsAdditions.h"; sourceTree = "<group>"; };
 		634192DE16D0DAEE0069B528 /* NSArray+NewsAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+NewsAdditions.m"; sourceTree = "<group>"; };
@@ -278,12 +267,8 @@
 		634192E016D0DAEE0069B528 /* NSData+NewsAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+NewsAdditions.m"; sourceTree = "<group>"; };
 		634192E316D0DAEE0069B528 /* NSString+NewsAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+NewsAdditions.h"; sourceTree = "<group>"; };
 		634192E416D0DAEE0069B528 /* NSString+NewsAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+NewsAdditions.m"; sourceTree = "<group>"; };
-		634192E516D0DAEE0069B528 /* PostArticleTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PostArticleTask.h; sourceTree = "<group>"; };
-		634192E616D0DAEE0069B528 /* PostArticleTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PostArticleTask.m; sourceTree = "<group>"; };
 		634192E716D0DAEE0069B528 /* QuotedPrintableDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QuotedPrintableDecoder.h; sourceTree = "<group>"; };
 		634192E816D0DAEE0069B528 /* QuotedPrintableDecoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QuotedPrintableDecoder.m; sourceTree = "<group>"; };
-		634192E916D0DAEE0069B528 /* Task.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Task.h; sourceTree = "<group>"; };
-		634192EA16D0DAEE0069B528 /* Task.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Task.m; sourceTree = "<group>"; };
 		634192EB16D0DAEE0069B528 /* Thread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Thread.h; sourceTree = "<group>"; };
 		634192EC16D0DAEE0069B528 /* Thread.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Thread.m; sourceTree = "<group>"; };
 		634192ED16D0DAEE0069B528 /* UUDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UUDecoder.h; sourceTree = "<group>"; };
@@ -294,6 +279,12 @@
 		6341931A16D0DC0B0069B528 /* EmailAddressFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EmailAddressFormatter.m; sourceTree = "<group>"; };
 		6341931C16D0DDE30069B528 /* SizeFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SizeFormatter.h; sourceTree = "<group>"; };
 		6341931D16D0DDE30069B528 /* SizeFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SizeFormatter.m; sourceTree = "<group>"; };
+		63529AA216FDB31C0089E65E /* AssemblePartsOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AssemblePartsOperation.h; sourceTree = "<group>"; };
+		63529AA316FDB31C0089E65E /* AssemblePartsOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AssemblePartsOperation.m; sourceTree = "<group>"; };
+		63529AA516FEB5320089E65E /* PostArticleOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PostArticleOperation.h; sourceTree = "<group>"; };
+		63529AA616FEB5320089E65E /* PostArticleOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PostArticleOperation.m; sourceTree = "<group>"; };
+		63529AA816FEC7A60089E65E /* UIApplication+NewsAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIApplication+NewsAdditions.h"; sourceTree = "<group>"; };
+		63529AA916FEC7A60089E65E /* UIApplication+NewsAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIApplication+NewsAdditions.m"; sourceTree = "<group>"; };
 		6398525616D0FBEA009303E2 /* LineIterator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LineIterator.h; sourceTree = "<group>"; };
 		6398525716D0FBEA009303E2 /* LineIterator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LineIterator.m; sourceTree = "<group>"; };
 		63A6063A16F2D2080089CF4A /* ArticleRange.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ArticleRange.h; sourceTree = "<group>"; };
@@ -391,7 +382,6 @@
 			children = (
 				638F78D616D42E640085B896 /* NewsKit */,
 				63E3A77016EABF4800BD3D13 /* Operations */,
-				638F78D716D42EF90085B896 /* Tasks */,
 				638F78D816D42F940085B896 /* Model */,
 				638F78D916D430010085B896 /* UI */,
 				638F78DA16D431520085B896 /* Decoders */,
@@ -472,8 +462,6 @@
 				634192CB16D0DAED0069B528 /* NewsKit.h */,
 				634192CC16D0DAED0069B528 /* NNArticleFormatter.h */,
 				634192CD16D0DAED0069B528 /* NNArticleFormatter.m */,
-				634192D016D0DAED0069B528 /* NNConnection.h */,
-				634192D116D0DAED0069B528 /* NNConnection.m */,
 				634192D216D0DAED0069B528 /* NNHeaderEntry.h */,
 				634192D316D0DAED0069B528 /* NNHeaderEntry.m */,
 				634192D416D0DAED0069B528 /* NNHeaderParser.h */,
@@ -482,8 +470,6 @@
 				634192D716D0DAED0069B528 /* NNQuoteLevel.m */,
 				634192D816D0DAED0069B528 /* NNQuoteLevelParser.h */,
 				634192D916D0DAED0069B528 /* NNQuoteLevelParser.m */,
-				634192DA16D0DAED0069B528 /* NNServer.h */,
-				634192DB16D0DAED0069B528 /* NNServer.m */,
 				634192DC16D0DAED0069B528 /* NNServerDelegate.h */,
 				63E3A76A16E99BD300BD3D13 /* NewsConnection.h */,
 				63E3A76B16E99BD300BD3D13 /* NewsConnection.m */,
@@ -491,23 +477,10 @@
 				63E3A76E16EA10C200BD3D13 /* NewsResponse.m */,
 				63E3A77416EB6FF800BD3D13 /* NewsConnectionPool.h */,
 				63E3A77516EB6FF800BD3D13 /* NewsConnectionPool.m */,
-			);
-			name = NewsKit;
-			sourceTree = "<group>";
-		};
-		638F78D716D42EF90085B896 /* Tasks */ = {
-			isa = PBXGroup;
-			children = (
 				6398525616D0FBEA009303E2 /* LineIterator.h */,
 				6398525716D0FBEA009303E2 /* LineIterator.m */,
-				634192E916D0DAEE0069B528 /* Task.h */,
-				634192EA16D0DAEE0069B528 /* Task.m */,
-				634192BC16D0DAED0069B528 /* DownloadArticlesTask.h */,
-				634192BD16D0DAED0069B528 /* DownloadArticlesTask.m */,
-				634192E516D0DAEE0069B528 /* PostArticleTask.h */,
-				634192E616D0DAEE0069B528 /* PostArticleTask.m */,
 			);
-			name = Tasks;
+			name = NewsKit;
 			sourceTree = "<group>";
 		};
 		638F78D816D42F940085B896 /* Model */ = {
@@ -586,8 +559,6 @@
 				6341921816D0D8800069B528 /* WelcomeView.xib */,
 				6341921A16D0D8800069B528 /* ExtendedDateFormatter.h */,
 				6341921B16D0D8800069B528 /* ExtendedDateFormatter.m */,
-				6341921C16D0D8800069B528 /* ExtendedTextView.h */,
-				6341921D16D0D8800069B528 /* ExtendedTextView.m */,
 				6341921E16D0D8800069B528 /* FavouriteGroupsViewController.h */,
 				6341921F16D0D8800069B528 /* FavouriteGroupsViewController.m */,
 				6341922016D0D8800069B528 /* FieldView.h */,
@@ -628,6 +599,8 @@
 				634192E016D0DAEE0069B528 /* NSData+NewsAdditions.m */,
 				634192E316D0DAEE0069B528 /* NSString+NewsAdditions.h */,
 				634192E416D0DAEE0069B528 /* NSString+NewsAdditions.m */,
+				63529AA816FEC7A60089E65E /* UIApplication+NewsAdditions.h */,
+				63529AA916FEC7A60089E65E /* UIApplication+NewsAdditions.m */,
 			);
 			name = Categories;
 			sourceTree = "<group>";
@@ -652,6 +625,10 @@
 				63E3A77816ECAFF900BD3D13 /* ArticleOverviewsOperation.m */,
 				63A7205016F32B6B000AC69C /* FetchArticleOperation.h */,
 				63A7205116F32B6B000AC69C /* FetchArticleOperation.m */,
+				63529AA216FDB31C0089E65E /* AssemblePartsOperation.h */,
+				63529AA316FDB31C0089E65E /* AssemblePartsOperation.m */,
+				63529AA516FEB5320089E65E /* PostArticleOperation.h */,
+				63529AA616FEB5320089E65E /* PostArticleOperation.m */,
 			);
 			name = Operations;
 			sourceTree = "<group>";
@@ -804,7 +781,6 @@
 				6341926016D0D8800069B528 /* ArticleViewController.m in Sources */,
 				6341926616D0D8800069B528 /* EditableTableViewCell.m in Sources */,
 				6341927616D0D8800069B528 /* ExtendedDateFormatter.m in Sources */,
-				6341927716D0D8800069B528 /* ExtendedTextView.m in Sources */,
 				6341927816D0D8800069B528 /* FavouriteGroupsViewController.m in Sources */,
 				6341927916D0D8800069B528 /* FieldView.m in Sources */,
 				6341928016D0D8800069B528 /* GroupInfoViewController.m in Sources */,
@@ -829,24 +805,19 @@
 				634192F816D0DAEE0069B528 /* ConnectionVerifier.m in Sources */,
 				634192F916D0DAEE0069B528 /* ContentType.m in Sources */,
 				634192FA16D0DAEE0069B528 /* CoreDataStore.m in Sources */,
-				634192FC16D0DAEE0069B528 /* DownloadArticlesTask.m in Sources */,
 				634192FD16D0DAEE0069B528 /* EncodedWordDecoder.m in Sources */,
 				634192FE16D0DAEE0069B528 /* GroupListing.m in Sources */,
 				634192FF16D0DAEE0069B528 /* GroupStore.m in Sources */,
 				6341930416D0DAEE0069B528 /* NNArticleFormatter.m in Sources */,
 				6341930516D0DAEE0069B528 /* NNBase64Decoder.m in Sources */,
-				6341930616D0DAEE0069B528 /* NNConnection.m in Sources */,
 				6341930716D0DAEE0069B528 /* NNHeaderEntry.m in Sources */,
 				6341930816D0DAEE0069B528 /* NNHeaderParser.m in Sources */,
 				6341930916D0DAEE0069B528 /* NNQuoteLevel.m in Sources */,
 				6341930A16D0DAEE0069B528 /* NNQuoteLevelParser.m in Sources */,
-				6341930B16D0DAEE0069B528 /* NNServer.m in Sources */,
 				6341930C16D0DAEE0069B528 /* NSArray+NewsAdditions.m in Sources */,
 				6341930D16D0DAEE0069B528 /* NSData+NewsAdditions.m in Sources */,
 				6341930F16D0DAEE0069B528 /* NSString+NewsAdditions.m in Sources */,
-				6341931016D0DAEE0069B528 /* PostArticleTask.m in Sources */,
 				6341931116D0DAEE0069B528 /* QuotedPrintableDecoder.m in Sources */,
-				6341931216D0DAEE0069B528 /* Task.m in Sources */,
 				6341931316D0DAEE0069B528 /* Thread.m in Sources */,
 				6341931416D0DAEE0069B528 /* UUDecoder.m in Sources */,
 				6341931516D0DAEE0069B528 /* YEncDecoder.m in Sources */,
@@ -861,6 +832,9 @@
 				63E3A77916ECAFF900BD3D13 /* ArticleOverviewsOperation.m in Sources */,
 				63E3A77C16EE89C400BD3D13 /* News.xcdatamodeld in Sources */,
 				63A7205216F32B6B000AC69C /* FetchArticleOperation.m in Sources */,
+				63529AA416FDB31C0089E65E /* AssemblePartsOperation.m in Sources */,
+				63529AA716FEB5320089E65E /* PostArticleOperation.m in Sources */,
+				63529AAA16FEC7A60089E65E /* UIApplication+NewsAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

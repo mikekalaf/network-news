@@ -8,8 +8,11 @@
 
 #import <UIKit/UIKit.h>
 
+@class NewsConnectionPool;
+
 @interface ThreadViewController : UITableViewController
 
+@property (nonatomic) NewsConnectionPool *connectionPool;
 @property (nonatomic) NSArray *articles;
 @property (nonatomic) NSString *threadTitle;
 @property (nonatomic) NSDate *threadDate;

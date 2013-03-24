@@ -10,6 +10,15 @@
 
 extern NSString *FetchArticleCompletedNotification;
 
+@class NewsConnectionPool;
+
 @interface FetchArticleOperation : NSOperation
+
+- (id)initWithConnectionPool:(NewsConnectionPool *)connectionPool
+                   messageID:(NSString *)messageID
+                  partNumber:(NSUInteger)partNumber
+              totalPartCount:(NSUInteger)totalPartCount
+                    cacheURL:(NSURL *)cacheURL
+                    progress:(void (^)(NSUInteger bytesReceived))progressBlock;
 
 @end

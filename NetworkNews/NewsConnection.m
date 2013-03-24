@@ -27,6 +27,8 @@
 #define AUTHINFO_COMMAND        @"AUTHINFO"
 #define MODE_READER_COMMAND     @"MODE READER"
 
+NSString *const NewsConnectionBytesReceivedNotification = @"NewsConnectionBytesReceivedNotification";
+
 @interface NewsConnection () <NSStreamDelegate>
 {
     NSInputStream *_inputStream;
@@ -62,9 +64,9 @@
         _secure = secure;
         if (_secure)
         {
-            [_inputStream setProperty:NSStreamSocketSecurityLevelSSLv2
+            [_inputStream setProperty:NSStreamSocketSecurityLevelTLSv1
                                forKey:NSStreamSocketSecurityLevelKey];
-            [_outputStream setProperty:NSStreamSocketSecurityLevelSSLv2
+            [_outputStream setProperty:NSStreamSocketSecurityLevelTLSv1
                                 forKey:NSStreamSocketSecurityLevelKey];
         }
         
@@ -81,6 +83,7 @@
         else
         {
             NSLog(@"FAILED to connect");
+            return nil;
         }
     }
     return self;
@@ -215,6 +218,25 @@
     }
 }
 
+- (void)writeData:(NSData *)data
+{
+    // TODO We need to scan through the buffer and escape any lines that
+    // contain a single period ('.') as the only line
+    NSInteger bytesWritten = [_outputStream write:[data bytes] maxLength:[data length]];
+
+    if (bytesWritten < 0)
+    {
+        NSLog(@"WRITE ERROR: bytesWritten < 0");
+    }
+    else if (bytesWritten != [data length])
+    {
+        NSLog(@"WRITE ERROR: bytesWritten != [data length]");
+    }
+
+    // Terminate the stream
+    bytesWritten = [_outputStream write:(const UInt8 *)"\r\n.\r\n" maxLength:5];
+}
+
 - (NewsResponse *)readResponse
 {
     return [self readResponseWithCode:0];
@@ -222,22 +244,27 @@
 
 - (NewsResponse *)readResponseWithCode:(NSInteger)terminatingStatusCode
 {
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     NSMutableData *responseData = [[NSMutableData alloc] init];
     NSInteger statusCode = 0;
     const int BUFSIZE = 65535;
     uint8_t buffer[BUFSIZE];
     while (YES)
     {
-        unsigned int bytesRead = [_inputStream read:buffer maxLength:BUFSIZE];
+        NSInteger bytesRead = [_inputStream read:buffer maxLength:BUFSIZE];
         if (bytesRead > 0)
         {
             NSLog(@"%d bytes read", bytesRead);
 
+            [nc postNotificationName:NewsConnectionBytesReceivedNotification
+                              object:self
+                            userInfo:@{@"byteCount": @(bytesRead)}];
+
             if (statusCode == 0 && isdigit(buffer[0]) && isdigit(buffer[1]) && isdigit(buffer[2]))
                 statusCode = 100 * (buffer[0] - '0') + 10 * (buffer[1] - '0') + (buffer[2] - '0');
 
-            NSString *str = [[NSString alloc] initWithBytes:buffer length:bytesRead encoding:NSUTF8StringEncoding];
-            NSLog(@"handleBytes: %@", str);
+//            NSString *str = [[NSString alloc] initWithBytes:buffer length:bytesRead encoding:NSUTF8StringEncoding];
+//            NSLog(@"handleBytes: %@", str);
 
             [responseData appendBytes:buffer length:bytesRead];
 
@@ -289,7 +316,7 @@
 
 #pragma mark - Public Methods
 
-- (void)loginWithUser:(NSString *)user password:(NSString *)password
+- (NSUInteger)loginWithUser:(NSString *)user password:(NSString *)password
 {
     [self sendCommandString:AUTHINFO_USER_COMMAND withParameterString:user];
     NewsResponse *response = [self readResponse];
@@ -310,6 +337,7 @@
             NSLog(@"Failed to log in");
         }
     }
+    return [response statusCode];
 }
 
 - (NewsResponse *)listActiveWithWildmat:(NSString *)wildmat
@@ -385,6 +413,26 @@
         [response setDictionary:dict];
     }
 
+    return response;
+}
+
+- (NewsResponse *)help
+{
+    [self sendCommandString:HELP_COMMAND];
+    NewsResponse *response = [self readResponseWithCode:100];
+    return response;
+}
+
+- (NewsResponse *)postData:(NSData *)data
+{
+    [self sendCommandString:POST_COMMAND];
+    NewsResponse *response = [self readResponse];
+
+    if ([response statusCode] == 340)
+    {
+        [self writeData:data];
+        response = [self readResponse];
+    }
     return response;
 }
 

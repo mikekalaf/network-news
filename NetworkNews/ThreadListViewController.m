@@ -17,13 +17,15 @@
 #import "ExtendedDateFormatter.h"
 #import "EmailAddressFormatter.h"
 #import "NSString+NewsAdditions.h"
-#import "NNConnection.h"
+//#import "NNConnection.h"
 #import "AppDelegate.h"
 #import "ThreadListTableViewCell.h"
 //#import "ProgressView.h"
 #import "ThreadIterator.h"
 #import "NetworkNews.h"
-#import "NNServer.h"
+//#import "NNServer.h"
+#import "NewsConnectionPool.h"
+#import "NewsAccount.h"
 #import "GroupInfoViewController.h"
 #import "NewArticleViewController.h"
 
@@ -85,19 +87,12 @@
 - (void)setGroupName:(NSString *)aGroupName
 {
     _groupName = [aGroupName copy];
-    
-    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-
-    _store = [[GroupStore alloc] initWithGroupName:_groupName
-                                       inDirectory:[[appDelegate server] hostName]];
-
-    [appDelegate setActiveCoreDataStack:_store];
-    
+    _store = [[GroupStore alloc] initWithStoreName:_groupName
+                                       inDirectory:[[_connectionPool account] hostName]];
     [self setTitle:[_groupName shortGroupName]];
 }
 
-#pragma mark -
-#pragma mark View lifecycle
+#pragma mark - View lifecycle
 
 - (void)viewDidLoad
 {
@@ -149,12 +144,11 @@
 
     [self updateThreads];
 
-    if (threads == nil)
+//    if (threads == nil)
     {
         // Download the latest articles (this will also do a fetch request)
         silentlyFailConnection = YES;
-        //[self downloadWithMode:DownloadArticleOverviewsTaskLatest];
-        [self downloadLatestArticles];
+        [self downloadArticlesWithMode:ArticleOverviewsLatest];
     }
 }
 
@@ -192,9 +186,6 @@
 
 - (void)dealloc
 {
-    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    appDelegate.activeCoreDataStack = nil;
-    
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc removeObserver:self];
 }
@@ -374,8 +365,7 @@
         // Was "Load More" selected?
         if ([indexPath row] >= [[self activeThreads] count])
         {
-            //[self downloadWithMode:DownloadArticleOverviewsTaskMore];
-            [self downloadMoreArticles];
+            [self downloadArticlesWithMode:ArticleOverviewsMore];
             return;
         }
 
@@ -384,6 +374,7 @@
         {
             ThreadViewController *threadViewController = [[ThreadViewController alloc] initWithNibName:@"ThreadView"
                                                                                                 bundle:nil];
+            [threadViewController setConnectionPool:_connectionPool];
             [threadViewController setArticles:[thread sortedArticles]];
             [threadViewController setThreadTitle:[thread subject]];
             [threadViewController setGroupName:_groupName];
@@ -396,6 +387,7 @@
 
             ArticleViewController *articleViewController = [[ArticleViewController alloc] initWithNibName:@"ArticleView"
                                                                                                    bundle:nil];
+            [articleViewController setConnectionPool:_connectionPool];
             [articleViewController setArticleSource:threadIterator];
             [articleViewController setArticleIndex:[threadIterator articleIndexOfThreadIndex:[indexPath row]]];
             [articleViewController setGroupName:_groupName];
@@ -562,8 +554,7 @@
 
 - (void)refresh:(id)sender
 {
-    //[self downloadWithMode:DownloadArticleOverviewsTaskLatest];
-    [self downloadLatestArticles];
+    [self downloadArticlesWithMode:ArticleOverviewsLatest];
     //[self toolbarEnabled:NO];
 }
 
@@ -593,6 +584,7 @@
                                                                                            subject:nil
                                                                                         references:nil
                                                                                           bodyText:nil];
+    [viewController setConnectionPool:_connectionPool];
     viewController.delegate = self;
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
 
@@ -683,10 +675,10 @@
     // Update the thread iterator
     threadIterator = [[ThreadIterator alloc] initWithThreads:[self activeThreads]];
 
-    // Cache the results
-    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    NSString *path = [appDelegate.cacheRootDir stringByAppendingPathComponent:@"threads.archive"];
-    [NSKeyedArchiver archiveRootObject:threads toFile:path];
+//    // Cache the results
+//    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+//    NSString *path = [appDelegate.cacheRootDir stringByAppendingPathComponent:@"threads.archive"];
+//    [NSKeyedArchiver archiveRootObject:threads toFile:path];
 
     // Show the results
     [self.tableView reloadData];
@@ -700,7 +692,7 @@
 
     //    progressView.updatedDate = stack.group.lastUpdate;
     //    progressView.status = ProgressViewStatusUpdated;
-    [self setStatusUpdatedDate:[_store lastSaveDate]];
+    [self setStatusUpdatedDate:[_store lastUpdate]];
     silentlyFailConnection = NO;
 }
 
@@ -851,7 +843,7 @@
     }
 }
 
-- (void)downloadLatestArticles
+- (void)downloadArticlesWithMode:(ArticleOverviewsMode)mode
 {
     [self setStatusMessage:@"Checking for News..."];
     [[self refreshControl] beginRefreshing];
@@ -863,14 +855,10 @@
 
     NSLog(@"Max Article Count: %d", maxCount);
 
-    // TESTING
-    [_store persistentStoreCoordinator];
-
     // Issue an OVER/XOVER command
-    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    ArticleOverviewsOperation *operation = [[ArticleOverviewsOperation alloc] initWithConnectionPool:[appDelegate connectionPool]
+    ArticleOverviewsOperation *operation = [[ArticleOverviewsOperation alloc] initWithConnectionPool:_connectionPool
                                                                                           groupStore:_store
-                                                                                                mode:ArticleOverviewsLatest
+                                                                                                mode:mode
                                                                                      maxArticleCount:maxCount];
     [operation setCompletionBlock:^{
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -880,129 +868,6 @@
     }];
     [_operationQueue addOperation:operation];
 }
-
-- (void)downloadMoreArticles
-{
-    // TODO: Implement based on above
-}
-
-//- (void)downloadWithMode:(DownloadArticleOverviewsTaskMode)mode
-//{
-//    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-//    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-//
-//    // Remove old articles
-//    // (Is this really the best place to do this?)
-//    NSInteger maxAgeInDays = [userDefaults integerForKey:DELETE_AFTER_DAYS_KEY];
-//    if (maxAgeInDays == 0)
-//        maxAgeInDays = 7;
-//
-////    NSDate *cutoffDate = [NSDate dateWithTimeIntervalSinceNow:-(maxAgeInDays * ONE_DAY_IN_SECONDS)];
-////    [self removeArticlesEarlierThanDate:cutoffDate];
-//
-//    //progressView.status = ProgressViewStatusChecking;
-//    [self setStatusMessage:@"Checking for News..."];
-//    
-//    NSUInteger maxCount = [userDefaults integerForKey:MAX_ARTICLE_COUNT_KEY];
-//    if (maxCount == 0)
-//        maxCount = 1000;
-//    
-//    NSLog(@"Max Article Count: %d", maxCount);
-//    
-//    // Issue an OVER/XOVER command
-//    currentTask = [[DownloadArticleOverviewsTask alloc] initWithConnection:appDelegate.connection
-//                                                      managedObjectContext:_store.managedObjectContext
-//                                                                     group:_store.group
-//                                                                      mode:mode
-//                                                           maxArticleCount:maxCount];
-//    
-//    // Notifications we're interested in
-//    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-//    [nc addObserver:self
-//           selector:@selector(articleOverviewsLoaded:)
-//               name:ArticleOverviewsDownloadedNotification
-//             object:currentTask];
-//    [nc addObserver:self
-//           selector:@selector(noSuchGroup:)
-//               name:NoSuchGroupNotification
-//             object:currentTask];
-//    [nc addObserver:self
-//           selector:@selector(articleOverviewsError:)
-//               name:TaskErrorNotification
-//             object:currentTask];
-//    
-//    [currentTask start];
-//}
-
-//- (void)removeArticlesEarlierThanDate:(NSDate *)date
-//{
-//    NSFileManager *fileManager = [NSFileManager defaultManager];
-//    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-//    NSString *groupCachePath = [appDelegate.cacheRootDir stringByAppendingPathComponent:_groupName];
-//
-//    // Delete article parts, and articles, from the database
-//    NSManagedObjectContext *context = _store.managedObjectContext;
-//    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-//    NSEntityDescription *entity = [NSEntityDescription entityForName:@"ArticlePart"
-//                                              inManagedObjectContext:context];
-//    [fetchRequest setEntity:entity];
-//
-//    fetchRequest.predicate = [NSPredicate predicateWithFormat:@"date < %@", date];
-//    
-//    NSError *error;
-//    NSArray *fetchedArticleParts = [context executeFetchRequest:fetchRequest
-//                                                          error:&error];
-//    if (fetchedArticleParts)
-//    {
-//        long long highestRemovedArticleNumber = 0;
-//
-//        for (ArticlePart *articlePart in fetchedArticleParts)
-//        {
-//            NSLog(@"Removing part: %@ (%@)", articlePart.articleNumber, articlePart.date);
-//            
-//            Article *article = articlePart.article;
-//            [article removePartsObject:articlePart];
-//            [context deleteObject:articlePart];
-//            
-//            long long articleNumber = articlePart.articleNumber.longLongValue;
-//            if (highestRemovedArticleNumber < articleNumber)
-//                highestRemovedArticleNumber = articleNumber;
-//            
-//            // If this article has no parts left, then remove the article also
-//            if (article.parts.count == 0)
-//            {
-////                NSLog(@"Removing: %@ (%@) %@", article.subject, article.from);
-//                [context deleteObject:article];
-//            }
-//
-//            // If this is the first part, then delete any cached files
-//            if (articlePart.partNumber.integerValue == 1)
-//            {
-//                NSString *mIDFileName = [articlePart.messageId messageIDFileName];
-//                NSString *basePath = [groupCachePath stringByAppendingPathComponent:mIDFileName];
-//
-//                NSString *path = [basePath stringByAppendingPathExtension:@"head.txt"];
-//                [fileManager removeItemAtPath:path error:NULL];
-//                
-//                path = [basePath stringByAppendingPathExtension:@"top.txt"];
-//                [fileManager removeItemAtPath:path error:NULL];
-//                
-//                NSString *ext = article.attachmentFileName.pathExtension;
-//                if (ext)
-//                {
-//                    path = [basePath stringByAppendingPathExtension:ext];
-//                    [fileManager removeItemAtPath:path error:NULL];
-//                }
-//
-//                path = [basePath stringByAppendingPathExtension:@"bottom.txt"];
-//                [fileManager removeItemAtPath:path error:NULL];
-//            }
-//        }
-//
-//        // Adjust the lowest article number of the group
-//        _store.group.lowestArticle = highestRemovedArticleNumber + 1;
-//    }
-//}
 
 - (void)toolbarEnabled:(BOOL)enabled
 {
@@ -1058,6 +923,12 @@
 
 - (void)setStatusUpdatedDate:(NSDate *)date
 {
+    if (date == nil)
+    {
+        [_statusLabel setText:nil];
+        return;
+    }
+
     NSString *str = [NSDateFormatter localizedStringFromDate:date
                                                    dateStyle:NSDateFormatterShortStyle
                                                    timeStyle:NSDateFormatterShortStyle];

@@ -13,14 +13,15 @@
 
 @property(nonatomic, readonly) NSString *storeName;
 @property(nonatomic, readonly) NSString *dirPath;
-@property(nonatomic, readonly) NSDate *lastSaveDate;
-@property(nonatomic) NSPersistentStoreCoordinator *persistentStoreCoordinator;
-@property(nonatomic) NSManagedObjectModel *managedObjectModel;
-@property(nonatomic) NSManagedObjectContext *managedObjectContext;
+@property(nonatomic, readonly) NSPersistentStoreCoordinator *persistentStoreCoordinator;
+@property(nonatomic, readonly) NSManagedObjectModel *managedObjectModel;
+@property(nonatomic, readonly) NSManagedObjectContext *managedObjectContext;
 
 - (id)initWithStoreName:(NSString *)aStoreName inDirectory:(NSString *)aDirPath;
 
-//- (CoreDataStore *)concurrentStore;
+-        (id)initWithStoreName:(NSString *)aStoreName
+                   inDirectory:(NSString *)aDirPath
+withPersistentStoreCoordinator:(NSPersistentStoreCoordinator *)persistentStoreCoordinator;
 
 - (void)save;
 

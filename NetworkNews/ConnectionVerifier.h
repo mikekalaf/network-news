@@ -12,7 +12,7 @@
 
 @interface ConnectionVerifier : NSObject
 
-- (void)verifyWithAccount:(NewsAccount *)account
++ (void)verifyWithAccount:(NewsAccount *)account
                completion:(void (^)(BOOL connected, BOOL authenticated, BOOL verified))completion;
 
 @end

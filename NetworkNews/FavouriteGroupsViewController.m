@@ -10,10 +10,17 @@
 #import "ThreadListViewController.h"
 #import "AppDelegate.h"
 #import "SearchGroupsViewController.h"
-#import "NNServer.h"
+#import "NewsAccount.h"
+#import "NewsConnectionPool.h"
 #import "NetworkNews.h"
 
 //static NSString *MostRecentGroupName = @"MostRecentGroupName";
+
+@interface FavouriteGroupsViewController ()
+{
+}
+
+@end
 
 @implementation FavouriteGroupsViewController
 
@@ -33,9 +40,7 @@
 //    self.navigationItem.leftBarButtonItem = self.editButtonItem;
     
     // Load the subscribed groups
-    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    NSString *path = [[appDelegate cacheRootDir] stringByAppendingPathComponent:@"groups.plist"];
-    _groupNames = [[NSMutableArray alloc] initWithContentsOfFile:path];
+    _groupNames = [[NSMutableArray alloc] initWithContentsOfURL:[self groupNamesFileURL]];
     if (!_groupNames)
         _groupNames = [[NSMutableArray alloc] initWithCapacity:1];
 }
@@ -52,8 +57,8 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    
-    modified = NO;
+
+    [self saveGroupNamesIfNeeded];
 
     // Remove any saved search results
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
@@ -63,15 +68,6 @@
 - (void)viewWillDisappear:(BOOL)animated
 {
 	[super viewWillDisappear:animated];
-    
-    // Save the group list if it has changed
-    if (modified)
-    {
-        AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-        NSString *path = [[appDelegate cacheRootDir] stringByAppendingPathComponent:@"groups.plist"];
-        [_groupNames writeToFile:path atomically:YES];
-        modified = NO;
-    }
 }
 
 - (void)didReceiveMemoryWarning {
@@ -85,8 +81,7 @@
 {
 }
 
-#pragma mark -
-#pragma mark Public Methods
+#pragma mark - Public Methods
 
 - (void)restoreLevelWithSelectionArray:(NSArray *)aSelectionArray
 {
@@ -123,8 +118,7 @@
 //    }
 }
 
-#pragma mark -
-#pragma mark UITableViewDataSource Methods
+#pragma mark - UITableViewDataSource Methods
 
 - (NSInteger)tableView:(UITableView *)tableView
  numberOfRowsInSection:(NSInteger)section
@@ -152,8 +146,7 @@
     return cell;
 }
 
-#pragma mark -
-#pragma mark UITableViewDelegate Methods
+#pragma mark - UITableViewDelegate Methods
 
 -       (void)tableView:(UITableView *)tableView
 didSelectRowAtIndexPath:(NSIndexPath *)indexPath
@@ -162,6 +155,7 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 
     ThreadListViewController *viewController = [[ThreadListViewController alloc] initWithNibName:@"ThreadListView"
                                                                                           bundle:nil];
+    [viewController setConnectionPool:_connectionPool];
     [viewController setGroupName:name];
     [[self navigationController] pushViewController:viewController animated:YES];
 }
@@ -175,18 +169,17 @@ commitEditingStyle:(UITableViewCellEditingStyle)editingStyle
         // Delete the cache
         NSFileManager *fileManager = [NSFileManager defaultManager];
         NSString *name = [_groupNames objectAtIndex:[indexPath row]];
-        AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-        NSString *path = [[appDelegate cacheRootDir] stringByAppendingPathComponent:name];
-        [fileManager removeItemAtPath:path error:NULL];
+        NSURL *cacheURL = [[[_connectionPool account] cacheURL] URLByAppendingPathComponent:name];
+        [fileManager removeItemAtURL:cacheURL error:NULL];
         
         // Delete the database
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,
                                                              NSUserDomainMask,
                                                              YES);
         NSString *documentDir = [paths lastObject];
-        NSString *serverDir = [documentDir stringByAppendingPathComponent:[[appDelegate server] hostName]];
+        NSString *serverDir = [documentDir stringByAppendingPathComponent:[[_connectionPool account] hostName]];
         NSString *storeNameWithExt = [name stringByAppendingPathExtension:@"sqlite"];
-        path = [serverDir stringByAppendingPathComponent:storeNameWithExt];
+        NSString *path = [serverDir stringByAppendingPathComponent:storeNameWithExt];
         NSLog(@"Removing path: %@", path);
         [fileManager removeItemAtPath:path error:NULL];
 
@@ -201,8 +194,6 @@ commitEditingStyle:(UITableViewCellEditingStyle)editingStyle
     {
         // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
     }   
-    
-    modified = YES;
 }
 
 - (void)tableView:(UITableView *)tableView
@@ -212,20 +203,34 @@ moveRowAtIndexPath:(NSIndexPath *)fromIndexPath
     NSString *groupName = [_groupNames objectAtIndex:[fromIndexPath row]];
     [_groupNames removeObjectAtIndex:[fromIndexPath row]];
     [_groupNames insertObject:groupName atIndex:[toIndexPath row]];
-    modified = YES;
 }
 
-#pragma mark -
-#pragma mark Actions
+#pragma mark - Actions
 
 - (IBAction)searchButtonPressed:(id)sender
 {
     // Load the SearchGroupsViewController
     SearchGroupsViewController *viewController = [[SearchGroupsViewController alloc] initWithNibName:@"SearchGroupsView"
                                                                                               bundle:nil];
+    [viewController setConnectionPool:_connectionPool];
     [viewController setCheckedGroups:_groupNames];
     [[self navigationController] pushViewController:viewController
                                            animated:YES];
+}
+
+#pragma mark - Private Methods
+
+- (NSURL *)groupNamesFileURL
+{
+    return [[[_connectionPool account] cacheURL] URLByAppendingPathComponent:@"groups.plist"];
+}
+
+- (void)saveGroupNamesIfNeeded
+{
+    NSURL *groupNamesURL = [self groupNamesFileURL];
+    NSArray *existingGroupNames = [[NSArray alloc] initWithContentsOfURL:groupNamesURL];
+    if ([existingGroupNames isEqualToArray:_groupNames] == NO)
+        [_groupNames writeToURL:groupNamesURL atomically:YES];
 }
 
 @end

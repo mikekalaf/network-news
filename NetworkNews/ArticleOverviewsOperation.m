@@ -124,12 +124,19 @@ static BOOL PartNumber(NSString *subject,
 {
     @try
     {
+        _status = ArticleOverviewsUndefined;
+
         // We need a managed object context specifically for this thread
         GroupStore *concurrentGroupStore = [_groupStore concurrentGroupStore];
-        //Group *group = [concurrentGroupStore group];
+
+        NewsConnection *newsConnection = [_connectionPool dequeueConnection];
+        if (newsConnection == nil)
+        {
+            _status = ArticleOverviewsFailed;
+            return;
+        }
 
         // Select the newsgroup
-        NewsConnection *newsConnection = [_connectionPool dequeueConnection];
         NewsResponse *response = [newsConnection groupWithName:[_groupStore groupName]];
 
         if ([response statusCode] == 211)
@@ -193,6 +200,7 @@ static BOOL PartNumber(NSString *subject,
         else if ([response statusCode] == 503)
         {
             // Time out
+            _status = ArticleOverviewsFailed;
             return;
         }
 

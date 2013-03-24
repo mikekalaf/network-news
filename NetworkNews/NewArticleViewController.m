@@ -8,8 +8,9 @@
 
 #import "NewArticleViewController.h"
 #import "NNArticleFormatter.h"
-#import "NNConnection.h"
-#import "PostArticleTask.h"
+#import "NewsConnectionPool.h"
+#import "NewsConnection.h"
+#import "PostArticleOperation.h"
 #import "AppDelegate.h"
 #import "NetworkNews.h"
 #import "NSString+NewsAdditions.h"
@@ -31,14 +32,31 @@
 
 #define CACHE_FILE_NAME         @"new_post.txt"
 
-@implementation NewArticleViewController
+@interface NewArticleViewController () <UITextFieldDelegate, UITextViewDelegate>
+{
+    UIBarButtonItem *cancelButtonItem;
+    UIBarButtonItem *sendButtonItem;
+    UIActivityIndicatorView *activityIndicatorView;
+    NSString *groupName;
+    NSString *subject;
+    NSString *references;
+    NSString *bodyText;
+    BOOL keyboardShown;
+    BOOL restoringText;
+    NSRange restoredSelectedRange;
+    NSOperationQueue *_operationQueue;
+}
 
-@synthesize textView;
-@synthesize toView;
-@synthesize subjectView;
-@synthesize toLabel;
-@synthesize subjectTextField;
-@synthesize delegate;
+@property(nonatomic, weak) IBOutlet UITextView *textView;
+@property(nonatomic, weak) IBOutlet UIView *toView;
+@property(nonatomic, weak) IBOutlet UIView *subjectView;
+@property(nonatomic, weak) IBOutlet UILabel *toLabel;
+@property(nonatomic, weak) IBOutlet UITextField *subjectTextField;
+
+@end
+
+
+@implementation NewArticleViewController
 
 - (id)initWithGroupName:(NSString *)aGroupName
                 subject:(NSString *)aSubject
@@ -70,6 +88,8 @@
     [super viewDidLoad];
 
     self.title = @"New Article";
+
+    _operationQueue = [[NSOperationQueue alloc] init];
     
     // Cancel and Send buttons
     cancelButtonItem =
@@ -92,21 +112,21 @@
     activityIndicatorView.center = self.view.center;
     
     // Set up the text view
-    [textView addSubview:toView];
-    [textView addSubview:subjectView];
+    [_textView addSubview:_toView];
+    [_textView addSubview:_subjectView];
     
-    CGRect frame = toView.frame;
-    frame.size.width = textView.frame.size.width;
-    toView.frame = frame;
+    CGRect frame = _toView.frame;
+    frame.size.width = _textView.frame.size.width;
+    _toView.frame = frame;
     
-    frame = subjectView.frame;
-    frame.origin.y = toView.frame.size.height;
-    frame.size.width = textView.frame.size.width;
-    subjectView.frame = frame;
+    frame = _subjectView.frame;
+    frame.origin.y = _toView.frame.size.height;
+    frame.size.width = _textView.frame.size.width;
+    _subjectView.frame = frame;
     
-    toLabel.text = groupName;
-    subjectTextField.text = subject;
-    textView.text = @"\n\n\n";
+    _toLabel.text = groupName;
+    _subjectTextField.text = subject;
+    _textView.text = @"\n\n\n";
     
     // Do we have body text to load?
     if (bodyText)
@@ -119,7 +139,7 @@
                                                              withString:EMPTY_STR];
         text = [text stringByReplacingOccurrencesOfString:LF_STR
                                                withString:PARAGRAPH_SIGN_LF_STR];
-        textView.text = [hackyPrefix stringByAppendingString:text];
+        _textView.text = [hackyPrefix stringByAppendingString:text];
     }
 
 //    textView.text = @"\n\n\nAndnowasinglelinewithoutwordbreaksandwehavetohandlethissituationalsoespeciallywhenitcomestolinks.  This is a whole load of test text so we can test the word wrapping function.  Lets add a whole lot more to test things out.\n\nThis is a new paragraph.\nAndnowasinglelinewithoutwordbreaksandwehavetohandlethissituationalsoespeciallywhenitcomestolinks.\n";
@@ -135,7 +155,7 @@
             NSString *signature = [NSString stringWithFormat:@"\n-- \n%@", sigText];
             signature = [signature stringByReplacingOccurrencesOfString:LF_STR
                                                              withString:PARAGRAPH_SIGN_LF_STR];
-            textView.text = [textView.text stringByAppendingString:signature];
+            _textView.text = [_textView.text stringByAppendingString:signature];
         }
     }
 //    else
@@ -149,7 +169,7 @@
     [nc addObserver:self
            selector:@selector(subjectDidChange:)
                name:UITextFieldTextDidChangeNotification
-             object:subjectTextField];
+             object:_subjectTextField];
     [nc addObserver:self
            selector:@selector(keyboardDidShow:)
                name:UIKeyboardDidShowNotification
@@ -159,16 +179,16 @@
                name:UIKeyboardDidHideNotification
              object:nil];
     
-    if (subjectTextField.text == nil)
+    if (_subjectTextField.text == nil)
         sendButtonItem.enabled = NO;
 
 //    if (restoringText == NO)
 //    {
         // Set the subject field as the first responder
         if (subject == nil || [subject isEqualToString:EMPTY_STR])
-            [subjectTextField becomeFirstResponder];
+            [_subjectTextField becomeFirstResponder];
         else
-            [textView becomeFirstResponder];
+            [_textView becomeFirstResponder];
 //    }
 }
 
@@ -176,32 +196,27 @@
 {
     [super viewWillDisappear:animated];
 
-    // Cancel any live task/connection
-    if (currentTask)
-    {
-        [currentTask cancel];
-        currentTask = nil;
-    }
-    
-    // Cache any text
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    [userDefaults setObject:subjectTextField.text
-                     forKey:@"MostRecentNewArticleSubject"];
-    [userDefaults setInteger:textView.selectedRange.location
-                      forKey:@"MostRecentNewArticleSelectedRangeLocation"];
-    
-    // Chop off the hacky three CRs at the beginning of the text
-    NSString *articleText = [textView.text substringFromIndex:3];
+    [_operationQueue cancelAllOperations];
 
-    // Strip-out instances of paragraph sign
-    articleText = [articleText stringByReplacingOccurrencesOfString:PARAGRAPH_SIGN_STR
-                                                         withString:EMPTY_STR];
-
-    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    NSString *path = [appDelegate.cacheRootDir stringByAppendingPathComponent:CACHE_FILE_NAME];
-    [articleText writeToFile:path atomically:NO
-                    encoding:NSUTF8StringEncoding
-                       error:NULL];
+//    // Cache any text
+//    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+//    [userDefaults setObject:subjectTextField.text
+//                     forKey:@"MostRecentNewArticleSubject"];
+//    [userDefaults setInteger:textView.selectedRange.location
+//                      forKey:@"MostRecentNewArticleSelectedRangeLocation"];
+//    
+//    // Chop off the hacky three CRs at the beginning of the text
+//    NSString *articleText = [textView.text substringFromIndex:3];
+//
+//    // Strip-out instances of paragraph sign
+//    articleText = [articleText stringByReplacingOccurrencesOfString:PARAGRAPH_SIGN_STR
+//                                                         withString:EMPTY_STR];
+//
+//    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+//    NSString *path = [appDelegate.cacheRootDir stringByAppendingPathComponent:CACHE_FILE_NAME];
+//    [articleText writeToFile:path atomically:NO
+//                    encoding:NSUTF8StringEncoding
+//                       error:NULL];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -214,23 +229,23 @@
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
 {
     // Resize the field views
-    float textViewWidth = textView.frame.size.width;
-    CGRect frame = toView.frame;
+    float textViewWidth = _textView.frame.size.width;
+    CGRect frame = _toView.frame;
     frame.size.width = textViewWidth;
-    toView.frame = frame;
+    _toView.frame = frame;
 
-    frame = toLabel.frame;
+    frame = _toLabel.frame;
     frame.size.width = textViewWidth - frame.origin.x - 8;
-    toLabel.frame = frame;
+    _toLabel.frame = frame;
     
-    frame = subjectView.frame;
-    frame.origin.y = toView.frame.size.height;
+    frame = _subjectView.frame;
+    frame.origin.y = _toView.frame.size.height;
     frame.size.width = textViewWidth;
-    subjectView.frame = frame;
+    _subjectView.frame = frame;
     
-    frame = subjectTextField.frame;
+    frame = _subjectTextField.frame;
     frame.size.width = textViewWidth - frame.origin.x - 8;
-    subjectTextField.frame = frame;
+    _subjectTextField.frame = frame;
 }
 
 - (void)viewDidUnload {
@@ -242,21 +257,21 @@
 #pragma mark -
 #pragma mark Public Methods
 
-- (void)restoreLevel
-{
-    // Restore any text from the cache
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    subject = [userDefaults objectForKey:@"MostRecentNewArticleSubject"];
-    restoredSelectedRange.location = [userDefaults integerForKey:@"MostRecentNewArticleSelectedRangeLocation"];
-    restoredSelectedRange.length = 0;
-
-    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    NSString *path = [appDelegate.cacheRootDir stringByAppendingPathComponent:CACHE_FILE_NAME];
-    bodyText = [NSString stringWithContentsOfFile:path
-                                         encoding:NSUTF8StringEncoding
-                                            error:NULL];
-    restoringText = YES;
-}
+//- (void)restoreLevel
+//{
+//    // Restore any text from the cache
+//    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+//    subject = [userDefaults objectForKey:@"MostRecentNewArticleSubject"];
+//    restoredSelectedRange.location = [userDefaults integerForKey:@"MostRecentNewArticleSelectedRangeLocation"];
+//    restoredSelectedRange.length = 0;
+//
+//    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+//    NSString *path = [appDelegate.cacheRootDir stringByAppendingPathComponent:CACHE_FILE_NAME];
+//    bodyText = [NSString stringWithContentsOfFile:path
+//                                         encoding:NSUTF8StringEncoding
+//                                            error:NULL];
+//    restoringText = YES;
+//}
 
 #pragma mark -
 #pragma mark UITextViewDelegate Methods
@@ -270,7 +285,7 @@
     if (restoringText)
     {
         restoringText = NO;
-        textView.selectedRange = restoredSelectedRange;
+        _textView.selectedRange = restoredSelectedRange;
         return;
     }
 
@@ -404,8 +419,8 @@ shouldChangeTextInRange:(NSRange)range
 {
     // Make the text view the first responder and position the cursor at
     // the top
-    [textView becomeFirstResponder];
-    textView.selectedRange = NSMakeRange(3, 0);
+    [_textView becomeFirstResponder];
+    _textView.selectedRange = NSMakeRange(3, 0);
     
     return NO;
 }
@@ -415,13 +430,13 @@ shouldChangeTextInRange:(NSRange)range
 
 - (IBAction)cancelButtonPressed:(id)sender
 {
-    [delegate newArticleViewController:self didSend:NO];
+    [_delegate newArticleViewController:self didSend:NO];
 }
 
 - (IBAction)sendButtonPressed:(id)sender
 {
     sendButtonItem.enabled = NO;
-    [textView resignFirstResponder];
+    [_textView resignFirstResponder];
     [activityIndicatorView startAnimating];
 
     NNArticleFormatter *formatter = [[NNArticleFormatter alloc] init];
@@ -444,8 +459,8 @@ shouldChangeTextInRange:(NSRange)range
     
     NSString *organization = [userDefaults stringForKey:@"Organization"];
     
-    NSString *newsgroups = toLabel.text;
-    NSString *newSubject = subjectTextField.text;
+    NSString *newsgroups = _toLabel.text;
+    NSString *newSubject = _subjectTextField.text;
     
     NSArray *headers = [NNArticleFormatter headerArrayWithDate:[NSDate date]
                                                           from:emailAddress
@@ -457,7 +472,7 @@ shouldChangeTextInRange:(NSRange)range
                                                        subject:newSubject];
     
     // Chop off the hacky three CRs at the beginning of the text
-    NSString *articleText = [textView.text substringFromIndex:3];
+    NSString *articleText = [_textView.text substringFromIndex:3];
     
     // Strip-out instances of paragraph sign
     articleText = [articleText stringByReplacingOccurrencesOfString:PARAGRAPH_SIGN_STR
@@ -470,85 +485,59 @@ shouldChangeTextInRange:(NSRange)range
                                                        text:articleText
                                                formatFlowed:YES];
     
-//    // TESTING
-//    const char *bytes = articleData.bytes;
-//    NSUInteger length = articleData.length;
-    
-    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    currentTask = [[PostArticleTask alloc] initWithConnection:appDelegate.connection
-                                                         data:articleData];
-    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc addObserver:self
-           selector:@selector(articlePosted:)
-               name:ArticlePostedNotification
-             object:currentTask];
-    [nc addObserver:self
-           selector:@selector(articleNotPosted:)
-               name:ArticleNotPostedNotification
-             object:currentTask];
-    [nc addObserver:self
-           selector:@selector(articlePostError:)
-               name:TaskErrorNotification
-             object:currentTask];
-
-    [currentTask start];
+    PostArticleOperation *operation = [[PostArticleOperation alloc] initWithConnectionPool:_connectionPool
+                                                                                      data:articleData];
+    [operation setCompletionBlock:^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [activityIndicatorView stopAnimating];
+            [_delegate newArticleViewController:self didSend:YES];
+        });
+    }];
+    [_operationQueue addOperation:operation];
 }
 
 #pragma mark -
 #pragma mark Notifications
 
-- (void)articlePosted:(NSNotification *)notification
-{
-    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc removeObserver:self name:nil object:currentTask];
-
-    [activityIndicatorView stopAnimating];
-
-    [delegate newArticleViewController:self didSend:YES];
-
-    // We've finished our task
-    currentTask = nil;
-}
-
-- (void)articleNotPosted:(NSNotification *)notification
-{
-    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc removeObserver:self name:nil object:currentTask];
-    
-    [activityIndicatorView stopAnimating];
-    sendButtonItem.enabled = YES;
-    
-    NSString *errorString = [NSString stringWithFormat:
-                             @"Posting articles to the server \"%@\" is not allowed.",
-                             currentTask.connection.hostName];
-    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Cannot Post"
-                                                        message:errorString
-                                                       delegate:nil
-                                              cancelButtonTitle:@"OK"
-                                              otherButtonTitles:nil];
-    [alertView show];
-
-    // We've finished our task
-    currentTask = nil;
-}
-
-- (void)articlePostError:(NSNotification *)notification
-{
-    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc removeObserver:self name:nil object:currentTask];
-
-    [activityIndicatorView stopAnimating];
-    sendButtonItem.enabled = YES;
-
-    AlertViewFailedConnection(currentTask.connection.hostName);
-
-    // We've finished our task
-    currentTask = nil;
-}
+//- (void)articleNotPosted:(NSNotification *)notification
+//{
+//    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+//    [nc removeObserver:self name:nil object:currentTask];
+//    
+//    [activityIndicatorView stopAnimating];
+//    sendButtonItem.enabled = YES;
+//    
+//    NSString *errorString = [NSString stringWithFormat:
+//                             @"Posting articles to the server \"%@\" is not allowed.",
+//                             currentTask.connection.hostName];
+//    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Cannot Post"
+//                                                        message:errorString
+//                                                       delegate:nil
+//                                              cancelButtonTitle:@"OK"
+//                                              otherButtonTitles:nil];
+//    [alertView show];
+//
+//    // We've finished our task
+//    currentTask = nil;
+//}
+//
+//- (void)articlePostError:(NSNotification *)notification
+//{
+//    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+//    [nc removeObserver:self name:nil object:currentTask];
+//
+//    [activityIndicatorView stopAnimating];
+//    sendButtonItem.enabled = YES;
+//
+//    AlertViewFailedConnection(currentTask.connection.hostName);
+//
+//    // We've finished our task
+//    currentTask = nil;
+//}
 
 - (void)subjectDidChange:(NSNotification *)notification
 {
-    if (subjectTextField.text.length > 0)
+    if (_subjectTextField.text.length > 0)
         sendButtonItem.enabled = YES;
     else
         sendButtonItem.enabled = NO;

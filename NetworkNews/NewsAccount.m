@@ -8,6 +8,14 @@
 
 #import "NewsAccount.h"
 
+@interface NewsAccount ()
+{
+    NSURL *_cacheURL;
+}
+
+@end
+
+
 @implementation NewsAccount
 
 + (id)accountWithTemplate:(AccountTemplate)accountTemplate
@@ -64,6 +72,25 @@
     [encoder encodeBool:_secure forKey:@"secure"];
     [encoder encodeObject:_userName forKey:@"userName"];
     [encoder encodeObject:_password forKey:@"password"];
+}
+
+- (NSURL *)cacheURL
+{
+    if (_cacheURL == nil)
+    {
+        NSFileManager *fileManager = [[NSFileManager alloc] init];
+        
+        NSURL *rootCacheURL = [[fileManager URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] lastObject];
+        _cacheURL = [rootCacheURL URLByAppendingPathComponent:_hostName];
+
+        NSLog(@"Cache root: %@", _cacheURL);
+
+        [fileManager createDirectoryAtURL:_cacheURL
+              withIntermediateDirectories:YES
+                               attributes:nil
+                                    error:NULL];
+    }
+    return _cacheURL;
 }
 
 @end

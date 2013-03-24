@@ -13,9 +13,10 @@
 
 @protocol AccountSettingsDelegate
 
-- (void)newAccountViewController:(AccountSettingsViewController *)controller
-                  createdAccount:(NewsAccount *)account;
-- (void)newAccountViewControllerCancelled:(AccountSettingsViewController *)controller;
+- (void)accountSettingsViewController:(AccountSettingsViewController *)controller
+                      modifiedAccount:(NewsAccount *)account;
+- (void)accountSettingsViewControllerCancelled:(AccountSettingsViewController *)controller;
+- (BOOL)accountSettingsViewController:(AccountSettingsViewController *)controller verifyAccountName:(NSString *)accountName;
 
 @end
 

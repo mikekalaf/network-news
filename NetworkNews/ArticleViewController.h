@@ -13,6 +13,7 @@
 @protocol ArticleSource;
 
 @class Article;
+@class NewsConnectionPool;
 
 @interface ArticleViewController : UIViewController <
     NewArticleDelegate,
@@ -22,6 +23,8 @@
     MFMailComposeViewControllerDelegate,
     UIWebViewDelegate
 >
+
+@property (nonatomic) NewsConnectionPool *connectionPool;
 
 @property(nonatomic, weak) id <ArticleSource> articleSource;
 

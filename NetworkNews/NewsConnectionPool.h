@@ -13,6 +13,8 @@
 
 @interface NewsConnectionPool : NSObject
 
+@property (nonatomic, readonly) NewsAccount *account;
+
 - (id)initWithAccount:(NewsAccount *)account;
 
 - (NewsConnection *)dequeueConnection;

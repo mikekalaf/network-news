@@ -9,11 +9,12 @@
 #import "NewsConnectionPool.h"
 #import "NewsConnection.h"
 #import "NewsAccount.h"
+#import "UIApplication+NewsAdditions.h"
 
 @interface NewsConnectionPool ()
 {
     NSMutableArray *_connections;
-    NewsAccount *_account;
+//    NewsAccount *_account;
 }
 
 @end
@@ -34,6 +35,8 @@
 
 - (NewsConnection *)dequeueConnection
 {
+    [[UIApplication sharedApplication] showNetworkActivityIndicator];
+
     NewsConnection *newsConnection = nil;
 
     if ([_connections count] == 0)
@@ -51,6 +54,10 @@
             [_connections removeLastObject];
         }
     }
+
+    if (newsConnection == nil)
+        [[UIApplication sharedApplication] hideNetworkActivityIndicator];
+
     return newsConnection;
 }
 
@@ -60,6 +67,7 @@
     {
         [_connections addObject:connection];
     }
+    [[UIApplication sharedApplication] hideNetworkActivityIndicator];
 }
 
 @end

@@ -11,10 +11,11 @@
 #import "FavouriteGroupsViewController.h"
 #import "AccountSettingsViewController.h"
 #import "NewsAccount.h"
+#import "NewsConnectionPool.h"
 #import "AppDelegate.h"
 #import "NetworkNews.h"
 
-@interface AccountsViewController ()
+@interface AccountsViewController () <AccountSettingsDelegate>
 {
     NSMutableArray *_accounts;
 }
@@ -33,42 +34,48 @@
 {
     [super viewDidLoad];
 
+    // Navigation Bar
     [self setTitle:@"Accounts"];
 
-    [[self navigationItem] setLeftBarButtonItem:[self editButtonItem]];
+    [[self navigationItem] setRightBarButtonItem:[self editButtonItem]];
 
-    UIBarButtonItem *addButtonItem =
-    [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
-                                                  target:self
-                                                  action:@selector(addButtonPressed:)];
-    [[self navigationItem] setRightBarButtonItem:addButtonItem];
+//    UIBarButtonItem *addButtonItem =
+//    [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
+//                                                  target:self
+//                                                  action:@selector(addButtonPressed:)];
+//    [[self navigationItem] setRightBarButtonItem:addButtonItem];
+
+//    // Toolbar
+//    UIBarButtonItem *flexibleSpaceButtonItem =
+//    [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+//                                                  target:nil
+//                                                  action:nil];
+//    UIBarButtonItem *addButtonItem =
+//    [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
+//                                                  target:self
+//                                                  action:@selector(addButtonPressed:)];
+//    [self setToolbarItems:@[flexibleSpaceButtonItem, addButtonItem]];
 
     // Load the accounts data, if we have any
     // (New accounts are written to the archive in WelcomeViewController)
-    NSFileManager *fileMananger = [[NSFileManager alloc] init];
-    NSArray *urls = [fileMananger URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask];
-    NSURL *accountsURL = [[urls lastObject] URLByAppendingPathComponent:NetworkNewsAccountsFileName];
-    NSData *accountsData = [NSData dataWithContentsOfURL:accountsURL];
-    if (accountsData)
-        _accounts = [NSKeyedUnarchiver unarchiveObjectWithData:accountsData];
-    else
-        _accounts = [NSMutableArray array];
+    _accounts = [self accountsFromArchive];
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
 
-    // If there are no accounts, we will prompt the user to create one
-    if ([_accounts count] == 0)
-        [self addButtonPressed:nil];
-    else
-        [[self tableView] reloadData];
+//    // If there are no accounts, we will prompt the user to create one
+//    if ([_accounts count] == 0)
+//        [self addButtonPressed:nil];
+//    else
+//        [[self tableView] reloadData];
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
+    [[self tableView] reloadData];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -79,17 +86,34 @@
 - (void)viewDidDisappear:(BOOL)animated
 {
     [super viewDidDisappear:animated];
+
+    [self saveAccountsIfNeeded];
+}
+
+- (void)setEditing:(BOOL)editing animated:(BOOL)animated
+{
+    [super setEditing:editing animated:animated];
+
+    // Add/remove the add account cell
+    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:[_accounts count] inSection:0];
+    if (editing)
+        [[self tableView] insertRowsAtIndexPaths:@[indexPath]
+                                withRowAnimation:UITableViewRowAnimationFade];
+    else
+        [[self tableView] deleteRowsAtIndexPaths:@[indexPath]
+                                withRowAnimation:UITableViewRowAnimationFade];
 }
 
 #pragma mark - UITableViewDataSource Methods
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return [_accounts count];
+    if ([self isEditing])
+        return [_accounts count] + 1;
+    else
+        return [_accounts count];
 }
 
-
-// Customize the appearance of table view cells.
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     static NSString *CellIdentifier = @"Cell";
@@ -99,81 +123,99 @@
     {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
                                        reuseIdentifier:CellIdentifier];
-        [cell setAccessoryType:UITableViewCellAccessoryDetailDisclosureButton];
+        [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
     }
 
-    NewsAccount *account = [_accounts objectAtIndex:[indexPath row]];
-    [[cell textLabel] setText:[account hostName]];
+    if ([indexPath row] < [_accounts count])
+    {
+        NewsAccount *account = [_accounts objectAtIndex:[indexPath row]];
+        [[cell textLabel] setText:[account serviceName]];
+    }
+    else
+    {
+        [[cell textLabel] setText:@"Add Account"];
+    }
     
     return cell;
 }
 
-
-/*
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
-}
-*/
-
-
-/*
-// Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source.
-        [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    }   
-    else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view.
+-  (void)tableView:(UITableView *)tableView
+commitEditingStyle:(UITableViewCellEditingStyle)editingStyle
+ forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (editingStyle == UITableViewCellEditingStyleDelete)
+    {
+        [_accounts removeObjectAtIndex:[indexPath row]];
+        [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath]
+                         withRowAnimation:UITableViewRowAnimationFade];
+    }
+    else if (editingStyle == UITableViewCellEditingStyleInsert)
+    {
     }   
 }
-*/
 
-
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
+-  (void)tableView:(UITableView *)tableView
+moveRowAtIndexPath:(NSIndexPath *)fromIndexPath
+       toIndexPath:(NSIndexPath *)toIndexPath
+{
+    NewsAccount *account = [_accounts objectAtIndex:[fromIndexPath row]];
+    [_accounts removeObjectAtIndex:[fromIndexPath row]];
+    [_accounts insertObject:account atIndex:[toIndexPath row]];
 }
-*/
 
-
-/*
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
+- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return ([indexPath row] < [_accounts count]);
 }
-*/
-
 
 #pragma mark - UITableViewDelegate Methods
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NewsAccount *account = _accounts[indexPath.row];
-    
-    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    [appDelegate setUpConnectionWithAccount:account];
+    if ([indexPath row] < [_accounts count])
+    {
+        // Select an existing account
+        NewsAccount *account = _accounts[indexPath.row];
 
-    FavouriteGroupsViewController *viewController = [[FavouriteGroupsViewController alloc] initWithNibName:@"FavouriteGroupsView"
-                                                                                                    bundle:nil];
-    [[self navigationController] pushViewController:viewController animated:YES];
+        if ([self isEditing] == NO)
+        {
+            FavouriteGroupsViewController *viewController = [[FavouriteGroupsViewController alloc] initWithNibName:@"FavouriteGroupsView"
+                                                                                                            bundle:nil];
+            [viewController setConnectionPool:[[NewsConnectionPool alloc] initWithAccount:account]];
+            [[self navigationController] pushViewController:viewController animated:YES];
+        }
+        else
+        {
+            AccountSettingsViewController *viewController = [[AccountSettingsViewController alloc] initWithNibName:@"AccountSettingsView"
+                                                                                                            bundle:nil];
+            [viewController setAccount:account];
+            [viewController setDelegate:self];
+
+            [[self navigationController] pushViewController:viewController animated:YES];
+
+//            UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
+//            [self presentViewController:navigationController animated:YES completion:NULL];
+        }
+    }
+    else
+    {
+        // Add a new account
+
+        // Bring up the welcome view
+        WelcomeViewController *viewController = [[WelcomeViewController alloc] initWithNibName:@"WelcomeView"
+                                                                                        bundle:nil];
+        [viewController setAccounts:_accounts];
+        [viewController setTitle:@"Add News Server"];
+        [[self navigationController] pushViewController:viewController animated:YES];
+    }
 }
 
-- (void)tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath
+- (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NewsAccount *account = _accounts[indexPath.row];
-
-    AccountSettingsViewController *viewController = [[AccountSettingsViewController alloc] initWithNibName:@"AccountSettingsView"
-                                                                                                    bundle:nil];
-//    [viewController setTitle:title];
-//    [[viewController navigationItem] setHidesBackButton:hideBackButton];
-    [viewController setAccount:account];
-
-    [[self navigationController] pushViewController:viewController animated:YES];
+    if ([indexPath row] < [_accounts count])
+        return UITableViewCellEditingStyleDelete;
+    else
+        return UITableViewCellEditingStyleInsert;
 }
 
 - (void)didReceiveMemoryWarning
@@ -182,6 +224,35 @@
     [super didReceiveMemoryWarning];
     
     // Relinquish ownership any cached data, images, etc. that aren't in use.
+}
+
+#pragma mark - AccountSettingsDelegate Methods
+
+- (void)accountSettingsViewController:(AccountSettingsViewController *)controller
+                  modifiedAccount:(NewsAccount *)account
+{
+    [self saveAccountsIfNeeded];
+    [self dismissViewControllerAnimated:YES completion:NULL];
+}
+
+- (void)accountSettingsViewControllerCancelled:(AccountSettingsViewController *)controller
+{
+    [self dismissViewControllerAnimated:YES completion:NULL];
+}
+
+- (BOOL)accountSettingsViewController:(AccountSettingsViewController *)controller
+                    verifyAccountName:(NSString *)accountName
+{
+    // Is the account name unique?
+    for (NewsAccount *account in _accounts)
+    {
+        if ([[controller account] isEqual:account] == NO &&
+            [[account serviceName] caseInsensitiveCompare:accountName] == NSOrderedSame)
+        {
+            return NO;
+        }
+    }
+    return YES;
 }
 
 #pragma mark - Actions
@@ -208,6 +279,49 @@
         animated = NO;
     }
     [[self navigationController] pushViewController:viewController animated:animated];
+
+//    UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
+//    [self presentViewController:navigationController animated:animated completion:NULL];
+}
+
+#pragma mark - Private Methods
+
+- (NSURL *)accountsFileURL
+{
+    NSFileManager *fileMananger = [[NSFileManager alloc] init];
+    NSArray *urls = [fileMananger URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask];
+    return [[urls lastObject] URLByAppendingPathComponent:NetworkNewsAccountsFileName];
+}
+
+- (NSMutableArray *)accountsFromArchive
+{
+    NSData *accountsData = [NSData dataWithContentsOfURL:[self accountsFileURL]];
+    if (accountsData)
+        return [NSKeyedUnarchiver unarchiveObjectWithData:accountsData];
+    else
+        return [NSMutableArray array];
+}
+
+- (void)saveAccountsIfNeeded
+{
+    NSURL *accountsURL = [self accountsFileURL];
+    NSData *accountsData = [NSKeyedArchiver archivedDataWithRootObject:_accounts];
+    NSData *existingAccountsData = [NSData dataWithContentsOfURL:accountsURL];
+    if ([existingAccountsData isEqualToData:accountsData] == NO)
+        [accountsData writeToURL:accountsURL atomically:YES];
+}
+
+- (BOOL)isUniqueAccountName:(NSString *)accountName excludingAccount:(NewsAccount *)excludedAccount
+{
+    for (NewsAccount *account in _accounts)
+    {
+        if ([excludedAccount isEqual:account] == NO &&
+            [[account serviceName] caseInsensitiveCompare:accountName] == NSOrderedSame)
+        {
+            return NO;
+        }
+    }
+    return YES;
 }
 
 @end

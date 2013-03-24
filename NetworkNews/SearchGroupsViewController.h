@@ -8,10 +8,11 @@
 
 #import <UIKit/UIKit.h>
 
-@class Task;
+@class NewsConnectionPool;
 
 @interface SearchGroupsViewController : UITableViewController
 
+@property (nonatomic) NewsConnectionPool *connectionPool;
 @property(nonatomic, retain) NSMutableArray *checkedGroups;
 
 @end

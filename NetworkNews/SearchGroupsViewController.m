@@ -10,7 +10,6 @@
 #import "GroupListSearchOperation.h"
 #import "GroupListing.h"
 #import "AppDelegate.h"
-#import "NNConnection.h"
 #import "NetworkNews.h"
 
 @interface SearchGroupsViewController () <UISearchBarDelegate>
@@ -18,8 +17,7 @@
     UIActivityIndicatorView *activityIndicatorView;
     NSString *searchText;
     NSInteger searchScope;
-    NSArray *foundGroupList;
-    BOOL modified;
+    NSArray *_foundGroupList;
     NSOperationQueue *_operationQueue;
 }
 
@@ -55,8 +53,6 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    
-    modified = NO;
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -66,14 +62,14 @@
     // Cancel any live task/connection
     [_operationQueue cancelAllOperations];
 
-    // Save the group list if it has changed
-    if (modified)
-    {
-        AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-        NSString *path = [[appDelegate cacheRootDir] stringByAppendingPathComponent:@"groups.plist"];
-        [_checkedGroups writeToFile:path atomically:YES];
-        modified = NO;
-    }
+//    // Save the group list if it has changed
+//    if (modified)
+//    {
+//        AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+//        NSString *path = [[appDelegate cacheRootDir] stringByAppendingPathComponent:@"groups.plist"];
+//        [_checkedGroups writeToFile:path atomically:YES];
+//        modified = NO;
+//    }
 }
 
 #pragma mark - UITableViewDataSource Methods
@@ -86,8 +82,8 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    if (foundGroupList)
-        return foundGroupList.count;
+    if (_foundGroupList)
+        return [_foundGroupList count];
     else
         return 0;
 }
@@ -106,7 +102,7 @@
         cell.textLabel.lineBreakMode = NSLineBreakByTruncatingMiddle;
     }
     
-    GroupListing *listing = [foundGroupList objectAtIndex:indexPath.row];
+    GroupListing *listing = [_foundGroupList objectAtIndex:indexPath.row];
     NSString *groupName = listing.name;
 //    long long articleCount = listInfo.high - listInfo.low + 1;
     long long articleCount = [listing count];
@@ -145,7 +141,7 @@
                              animated:NO];
     
     // Add to or remove from favourites, adding or removing a checkmark also
-    NSString *groupName = [[foundGroupList objectAtIndex:indexPath.row] name];
+    NSString *groupName = [[_foundGroupList objectAtIndex:indexPath.row] name];
     UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
     if ([_checkedGroups containsObject:groupName])
     {
@@ -157,7 +153,6 @@
         [cell setAccessoryType:UITableViewCellAccessoryCheckmark];
         [_checkedGroups addObject:groupName];
     }
-    modified = YES;
 }
 
 
@@ -214,8 +209,7 @@
             break;
     }
 
-    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    GroupListSearchOperation *operation = [[GroupListSearchOperation alloc] initWithConnectionPool:[appDelegate connectionPool]
+    GroupListSearchOperation *operation = [[GroupListSearchOperation alloc] initWithConnectionPool:_connectionPool
                                                                                            wildmat:wildmat];
     GroupListSearchOperation __weak* weakRef = operation;
     [operation setCompletionBlock:^{
@@ -235,7 +229,7 @@
     //[activityIndicatorView stopAnimating];  // This shouldn't be needed
 
     // Clear the results list
-    foundGroupList = nil;
+    _foundGroupList = nil;
     [[self tableView] reloadData];
 }
 
@@ -245,12 +239,12 @@
 {
     NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"count"
                                                                    ascending:NO];
-    foundGroupList = [groupList sortedArrayUsingDescriptors:@[sortDescriptor]];
+    _foundGroupList = [groupList sortedArrayUsingDescriptors:@[sortDescriptor]];
 
-    // Cache the results
-    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    NSString *path = [appDelegate.cacheRootDir stringByAppendingPathComponent:@"search_results.archive"];
-    [NSKeyedArchiver archiveRootObject:foundGroupList toFile:path];
+//    // Cache the results
+//    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+//    NSString *path = [appDelegate.cacheRootDir stringByAppendingPathComponent:@"search_results.archive"];
+//    [NSKeyedArchiver archiveRootObject:foundGroupList toFile:path];
 }
 
 @end

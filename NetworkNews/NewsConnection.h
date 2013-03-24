@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "ArticleRange.h"
 
+extern NSString *const NewsConnectionBytesReceivedNotification;
+
 @class NewsResponse;
 
 @interface NewsConnection : NSObject
@@ -17,7 +19,7 @@
 
 - (id)initWithHost:(NSString *)host port:(NSUInteger)port isSecure:(BOOL)secure;
 
-- (void)loginWithUser:(NSString *)user password:(NSString *)password;
+- (NSUInteger)loginWithUser:(NSString *)user password:(NSString *)password;
 - (NewsResponse *)listActiveWithWildmat:(NSString *)wildmat;
 - (NewsResponse *)articleWithMessageID:(NSString *)messageID;
 - (NewsResponse *)bodyWithMessageID:(NSString *)messageID;
@@ -25,5 +27,7 @@
 - (NewsResponse *)overWithRange:(ArticleRange)articleRange;
 - (NewsResponse *)quit;
 - (NewsResponse *)capabilities;
+- (NewsResponse *)help;
+- (NewsResponse *)postData:(NSData *)data;
 
 @end

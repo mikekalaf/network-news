@@ -27,6 +27,8 @@ typedef enum
 @property (nonatomic) NSString *userName;
 @property (nonatomic) NSString *password;
 
+@property (nonatomic, readonly) NSURL *cacheURL;
+
 + (id)accountWithTemplate:(AccountTemplate)accountTemplate;
 
 @end

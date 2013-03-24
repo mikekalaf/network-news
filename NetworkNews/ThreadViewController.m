@@ -237,6 +237,7 @@
     {
         ArticleViewController *viewController = [[ArticleViewController alloc] initWithNibName:@"ArticleView"
                                                                                         bundle:nil];
+        [viewController setConnectionPool:_connectionPool];
         viewController.articleSource = self;
         viewController.articleIndex = indexPath.row;
         viewController.groupName = _groupName;

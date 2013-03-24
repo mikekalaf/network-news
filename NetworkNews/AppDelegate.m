@@ -9,17 +9,11 @@
 #import "AppDelegate.h"
 #import "AccountsViewController.h"
 #import "NewsAccount.h"
-#import "NNServerDelegate.h"
-#import "NNServer.h"
-#import "NNConnection.h"
-#import "NewsConnectionPool.h"
 #import "NSArray+NewsAdditions.h"
 #import "NetworkNews.h"
 
-@interface AppDelegate () <NNServerDelegate>
+@interface AppDelegate ()
 {
-    NSString *_userName;
-    NSString *_password;
 }
 
 @end
@@ -66,89 +60,6 @@
 - (void)applicationWillTerminate:(UIApplication *)application
 {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
-}
-#pragma mark -
-#pragma mark Public Methods
-
-- (BOOL)isServerSetUp
-{
-    if (_server.hostName == nil || [_server.hostName isEqualToString:@""])
-        return NO;
-    else
-        return YES;
-}
-
-- (void)setUpConnectionWithAccount:(NewsAccount *)account
-{
-    _userName = [[account userName] copy];
-    _password = [[account password] copy];
-    NSString *hostName = [account hostName];
-    BOOL secure = [account isSecure];
-    NSUInteger port = [account port];
-    if (port == 0)
-        port = 119;
-
-    if (hostName)
-    {
-        _server = [[NNServer alloc] initWithHostName:hostName port:port];
-        [_server setSecure:secure];
-        [_server setDelegate:self];
-
-        _connection = [[NNConnection alloc] initWithServer:_server];
-    }
-
-    [self configureCacheForHostName:hostName];
-
-    _connectionPool = [[NewsConnectionPool alloc] initWithAccount:account];
-}
-
-#pragma mark - Private Methods
-
-- (void)configureCacheForHostName:(NSString *)hostName
-{
-    // Create the folders we want to work with
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory,
-                                                         NSUserDomainMask,
-                                                         YES);
-
-    // We're setting up the cache root directory without the host name, so that
-    // caches are only per group, and not per server.  This is so when a cache is
-    // deleted, it is deleted for all servers.
-    //    cacheRootDir = [paths objectAtIndex:0];
-
-    _cacheRootDir = [[paths lastObject] stringByAppendingPathComponent:hostName];
-
-    NSLog(@"Cache root: %@", _cacheRootDir);
-
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    [fileManager createDirectoryAtPath:_cacheRootDir
-           withIntermediateDirectories:YES
-                            attributes:nil
-                                 error:NULL];
-}
-
-#pragma mark - NNServerDelegate Methods
-
-- (NSString *)userNameForServer:(NNServer *)aServer
-{
-    return _userName;
-}
-
-- (NSString *)passwordForServer:(NNServer *)aServer
-{
-    return _password;
-}
-
-- (void)beginNetworkAccessForServer:(NNServer *)aServer
-{
-    UIApplication *app = [UIApplication sharedApplication];
-    [app setNetworkActivityIndicatorVisible:YES];
-}
-
-- (void)endNetworkAccessForServer:(NNServer *)aServer
-{
-    UIApplication *app = [UIApplication sharedApplication];
-    [app setNetworkActivityIndicatorVisible:NO];
 }
 
 @end

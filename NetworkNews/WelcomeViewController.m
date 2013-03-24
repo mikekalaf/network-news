@@ -7,6 +7,7 @@
 //
 
 #import "WelcomeViewController.h"
+#import "AccountSettingsViewController.h"
 #import "LogoTableViewCell.h"
 #import "NewsAccount.h"
 #import "NetworkNews.h"
@@ -17,7 +18,7 @@
 //#define NEW_ACCOUNT_USENET_DOT_NET  3
 #define NEW_ACCOUNT_OTHER           1
 
-@interface WelcomeViewController ()
+@interface WelcomeViewController () <AccountSettingsDelegate>
 {
     NSArray *_templateAccounts;
 }
@@ -107,10 +108,10 @@
     // Relinquish ownership any cached data, images, etc that aren't in use.
 }
 
-#pragma mark - NewAccountDelegate Methods
+#pragma mark - AccountSettingsDelegate Methods
 
-- (void)newAccountViewController:(AccountSettingsViewController *)controller
-                  createdAccount:(NewsAccount *)account
+- (void)accountSettingsViewController:(AccountSettingsViewController *)controller
+                  modifiedAccount:(NewsAccount *)account
 {
     [_accounts addObject:account];
 
@@ -125,9 +126,24 @@
     [[self navigationController] popViewControllerAnimated:NO];
 }
 
-- (void)newAccountViewControllerCancelled:(AccountSettingsViewController *)controller
+- (void)accountSettingsViewControllerCancelled:(AccountSettingsViewController *)controller
 {
     [self dismissViewControllerAnimated:YES completion:NULL];
+}
+
+- (BOOL)accountSettingsViewController:(AccountSettingsViewController *)controller
+                    verifyAccountName:(NSString *)accountName
+{
+    // Is the account name unique?
+    for (NewsAccount *account in _accounts)
+    {
+        if ([[controller account] isEqual:account] == NO &&
+            [[account serviceName] caseInsensitiveCompare:accountName] == NSOrderedSame)
+        {
+            return NO;
+        }
+    }
+    return YES;
 }
 
 @end

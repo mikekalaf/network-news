@@ -8,8 +8,11 @@
 
 #import <UIKit/UIKit.h>
 
+@class NewsConnectionPool;
+
 @interface ThreadListViewController : UITableViewController
 
+@property (nonatomic) NewsConnectionPool *connectionPool;
 @property(nonatomic, copy) NSString *groupName;
 
 - (void)returningFromArticleIndex:(NSUInteger)articleIndex;

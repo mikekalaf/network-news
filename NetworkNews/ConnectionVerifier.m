@@ -7,121 +7,46 @@
 //
 
 #import "ConnectionVerifier.h"
-#import "NNServer.h"
-#import "NNConnection.h"
-#import "NNServerDelegate.h"
 #import "NewsAccount.h"
-
-@interface ConnectionVerifier () <NNServerDelegate>
-{
-    NNServer *_server;
-    NNConnection *_connection;
-    NewsAccount *_account;
-    void (^_completion)(BOOL connected, BOOL authenticated, BOOL verified);
-}
-
-@end
-
+#import "NewsConnection.h"
+#import "NewsResponse.h"
 
 @implementation ConnectionVerifier
 
-- (id)init
++ (void)verifyWithAccount:(NewsAccount *)account completion:(void (^)(BOOL, BOOL, BOOL))completion
 {
-    self = [super init];
-    if (self)
-    {
-    }
-    return self;
-}
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        BOOL connected = NO;
+        BOOL authenticated = NO;
+        BOOL verified = NO;
+        NewsConnection *connection = [[NewsConnection alloc] initWithHost:[account hostName]
+                                                                     port:[account port]
+                                                                 isSecure:[account isSecure]];
+        if (connection)
+        {
+            connected = YES;
 
-- (void)dealloc
-{
-    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc removeObserver:self];
+            if ([account userName])
+            {
+                NSUInteger statusCode = [connection loginWithUser:[account userName]
+                                                         password:[account password]];
+                if (statusCode == 281)
+                    authenticated = YES;
+            }
+            else
+            {
+                authenticated = YES;
+            }
 
-    [_connection disconnect];
+            NewsResponse *response = [connection help];
+            if ([response statusCode] == 100)
+                verified = YES;
+        }
 
-    _completion = nil;
-    _server = nil;
-}
-
-- (void)verifyWithAccount:(NewsAccount *)account completion:(void (^)(BOOL, BOOL, BOOL))completion
-{
-    _account = account;
-    _completion = completion;
-
-    _server = [[NNServer alloc] initWithHostName:[account hostName] port:[account port]];
-    [_server setSecure:[account isSecure]];
-    [_server setDelegate:self];
-
-    _connection = [[NNConnection alloc] initWithServer:_server];
-
-    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc addObserver:self
-           selector:@selector(commandResponded:)
-               name:ServerCommandRespondedNotification
-             object:_connection];
-    [nc addObserver:self
-           selector:@selector(connectionError:)
-               name:ServerReadErrorNotification
-             object:_connection];
-    [nc addObserver:self
-           selector:@selector(authenticationFailed:)
-               name:ServerAuthenticationFailedNotification
-             object:_connection];
-
-    // TODO This isn't so good.  The server may well return help prior to
-    // any verification.  So we either need to explictly start any authentication,
-    // or use some other command that will verify our connection
-    [_connection help];
-}
-
-#pragma mark -
-#pragma mark NNServerDelegate Methods
-
-- (NSString *)userNameForServer:(NNServer *)aServer
-{
-    return [_account userName];
-}
-
-- (NSString *)passwordForServer:(NNServer *)aServer
-{
-    return [_account password];
-}
-
-- (void)beginNetworkAccessForServer:(NNServer *)aServer
-{
-//    UIApplication *app = [UIApplication sharedApplication];
-//    app.networkActivityIndicatorVisible = YES;
-}
-
-- (void)endNetworkAccessForServer:(NNServer *)aServer
-{
-//    UIApplication *app = [UIApplication sharedApplication];
-//    app.networkActivityIndicatorVisible = NO;
-}
-
-#pragma mark - Notifications
-
-// TODO: Once we've reworked the NNTP connection to use blocks, create a more
-// sensible scheme for passing info on the verification stages
-
-- (void)commandResponded:(NSNotification *)notification
-{
-    if ([_connection responseCode] == 100)
-        _completion(YES, YES, YES);
-    else
-        _completion(YES, NO, NO);
-}
-
-- (void)connectionError:(NSNotification *)notification
-{
-    _completion(NO, NO, NO);
-}
-
-- (void)authenticationFailed:(NSNotification *)notification
-{
-    _completion(YES, NO, NO);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completion(connected, authenticated, verified);
+        });
+    });
 }
 
 @end

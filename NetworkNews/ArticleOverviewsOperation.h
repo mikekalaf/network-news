@@ -19,6 +19,7 @@ typedef enum
 
 typedef enum {
     ArticleOverviewsUndefined,
+    ArticleOverviewsFailed,
     ArticleOverviewsComplete,
     ArticleOverviewsNoSuchGroup
 } ArticleOverviewsStatus;
