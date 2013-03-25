@@ -188,6 +188,7 @@ static BOOL PartNumber(NSString *subject,
 
                 // Nothing to do, so we're done
                 _status = ArticleOverviewsComplete;
+                [_connectionPool enqueueConnection:newsConnection];
                 return;
             }
         }
@@ -195,12 +196,14 @@ static BOOL PartNumber(NSString *subject,
         {
             // No such newsgroup
             _status = ArticleOverviewsNoSuchGroup;
+            [_connectionPool enqueueConnection:newsConnection];
             return;
         }
         else if ([response statusCode] == 503)
         {
             // Time out
             _status = ArticleOverviewsFailed;
+            [_connectionPool enqueueConnection:newsConnection];
             return;
         }
 

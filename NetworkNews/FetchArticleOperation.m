@@ -80,9 +80,7 @@ NSString *FetchArticleCompletedNotification = @"FetchArticleCompletedNotificatio
 
         if ([response statusCode] == 220 || [response statusCode] == 222)
         {
-            // Truncate the data, removing the terminating '.'
             // TODO Properly escape the data, removing escaped '.'
-            //articlePartContent.data.length = articlePartContent.data.length - 3;
 
             [self processHead:[response data]];
 
@@ -148,10 +146,13 @@ NSString *FetchArticleCompletedNotification = @"FetchArticleCompletedNotificatio
 
 - (void)processHead:(NSData *)data
 {
+    // Truncate the body data, removing the terminating '.', by subtracting 3
+    // from the body length
+
     if (_partNumber > 1)
     {
         _headRange = NSMakeRange(0, 0);
-        _bodyRange = NSMakeRange(0, [data length]);
+        _bodyRange = NSMakeRange(0, [data length] - 3);
     }
     else
     {
@@ -160,19 +161,12 @@ NSString *FetchArticleCompletedNotification = @"FetchArticleCompletedNotificatio
         _headEntries = hp.entries;
 
         _headRange = NSMakeRange(0, hp.length);
-        _bodyRange = NSMakeRange(hp.length, data.length - hp.length);
+        _bodyRange = NSMakeRange(hp.length, data.length - hp.length - 3);
     }
 }
 
 - (void)processBody:(NSData *)data
 {
-//    ++partCount;
-//
-//    NSUInteger completePartCount = [[_article completePartCount] integerValue];
-//
-//    DownloadArticlesTask *task = notification.object;
-//    NSUInteger partNumber = task.articlePart.partNumber.integerValue;
-
     NSData *bodyData = [data subdataWithRange:_bodyRange];
 
     NSString *contentTransferEncoding = [self headerValueWithName:@"Content-Transfer-Encoding"];
@@ -255,8 +249,6 @@ NSString *FetchArticleCompletedNotification = @"FetchArticleCompletedNotificatio
             {
                 NSLog(@"Error in caching file: %@", [error description]);
             }
-//            else
-//                bytesCached = task.articlePartContent.data.length;
         }
         else
         {
@@ -265,8 +257,6 @@ NSString *FetchArticleCompletedNotification = @"FetchArticleCompletedNotificatio
             [fileHandle seekToEndOfFile];
             [fileHandle writeData:[attachment data]];
             [fileHandle closeFile];
-
-//            bytesCached += task.articlePartContent.data.length;
         }
     }
     else
