@@ -15,39 +15,38 @@
 #import "NetworkNews.h"
 #import "NSString+NewsAdditions.h"
 
-#define RETURN_SYMBOL_CHAR      L'\u23ce'
-#define RETURN_SYMBOL_STR       @"\u23ce"
-#define RETURN_SYMBOL_LF_STR    @"\u23ce\n"
-
-#define PILCROW_SIGN_CHAR       L'\u00b6'
-#define PILCROW_SIGN_STR        @"\u00b6"
-#define PILCROW_SIGN_LF_STR     @"\u00b6\n"
-
-#define PARAGRAPH_SIGN_CHAR     PILCROW_SIGN_CHAR
-#define PARAGRAPH_SIGN_STR      PILCROW_SIGN_STR
-#define PARAGRAPH_SIGN_LF_STR   PILCROW_SIGN_LF_STR
+//#define RETURN_SYMBOL_CHAR      L'\u23ce'
+//#define RETURN_SYMBOL_STR       @"\u23ce"
+//#define RETURN_SYMBOL_LF_STR    @"\u23ce\n"
+//
+//#define PILCROW_SIGN_CHAR       L'\u00b6'
+//#define PILCROW_SIGN_STR        @"\u00b6"
+//#define PILCROW_SIGN_LF_STR     @"\u00b6\n"
+//
+//#define PARAGRAPH_SIGN_CHAR     PILCROW_SIGN_CHAR
+//#define PARAGRAPH_SIGN_STR      PILCROW_SIGN_STR
+//#define PARAGRAPH_SIGN_LF_STR   PILCROW_SIGN_LF_STR
 #define EMPTY_STR               @""
-#define LF_STR                  @"\n"
-#define CR_STR                  @"\r"
-
-#define CACHE_FILE_NAME         @"new_post.txt"
+//#define LF_STR                  @"\n"
+//#define CR_STR                  @"\r"
+//
+//#define CACHE_FILE_NAME         @"new_post.txt"
 
 @interface NewArticleViewController () <UITextFieldDelegate, UITextViewDelegate>
 {
     UIBarButtonItem *cancelButtonItem;
     UIBarButtonItem *sendButtonItem;
     UIActivityIndicatorView *activityIndicatorView;
-    NSString *groupName;
-    NSString *subject;
-    NSString *references;
-    NSString *bodyText;
+    NSString *_groupName;
+    NSString *_subject;
+    NSString *_references;
+    NSString *_messageBody;
     BOOL keyboardShown;
     BOOL restoringText;
     NSRange restoredSelectedRange;
     NSOperationQueue *_operationQueue;
 }
 
-@property(nonatomic, weak) IBOutlet UITextView *textView;
 @property(nonatomic, weak) IBOutlet UIView *toView;
 @property(nonatomic, weak) IBOutlet UIView *subjectView;
 @property(nonatomic, weak) IBOutlet UILabel *toLabel;
@@ -58,29 +57,35 @@
 
 @implementation NewArticleViewController
 
-- (id)initWithGroupName:(NSString *)aGroupName
-                subject:(NSString *)aSubject
-             references:(NSString *)aReferences
-               bodyText:(NSString *)aBodyText
-{
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-        self = [super initWithNibName:@"NewArticleView-iPad" bundle:nil];
-    else
-        self = [super initWithNibName:@"NewArticleView" bundle:nil];
-    if (self)
-    {
-        groupName = [aGroupName copy];
-        subject = [aSubject copy];
-        references = [aReferences copy];
-        bodyText = aBodyText;
-    }
-    return self;
-}
-
 - (void)dealloc
 {
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc removeObserver:self];
+}
+
+- (UITextView *)textView
+{
+    return (UITextView *)[self view];
+}
+
+- (void)setGroupName:(NSString *)groupName
+{
+    _groupName = [groupName copy];
+}
+
+- (void)setSubject:(NSString *)subject
+{
+    _subject = [subject copy];
+}
+
+- (void)setReferences:(NSString *)references
+{
+    _references = [references copy];
+}
+
+- (void)setMessageBody:(NSString *)messageBody
+{
+    _messageBody = [messageBody copy];
 }
 
 - (void)viewDidLoad
@@ -112,34 +117,37 @@
     activityIndicatorView.center = self.view.center;
     
     // Set up the text view
-    [_textView addSubview:_toView];
-    [_textView addSubview:_subjectView];
-    
-    CGRect frame = _toView.frame;
-    frame.size.width = _textView.frame.size.width;
-    _toView.frame = frame;
-    
-    frame = _subjectView.frame;
-    frame.origin.y = _toView.frame.size.height;
-    frame.size.width = _textView.frame.size.width;
-    _subjectView.frame = frame;
-    
-    _toLabel.text = groupName;
-    _subjectTextField.text = subject;
-    _textView.text = @"\n\n\n";
+    [[self view] addSubview:_toView];
+    [[self view] addSubview:_subjectView];
+
+    CGRect frame = [_toView frame];
+    frame.origin.y = -100;
+    frame.size.width = [[self view] frame].size.width;
+    [_toView setFrame:frame];
+    [_toView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
+
+    frame = [_subjectView frame];
+    frame.origin.y = -100 + [_toView frame].size.height;
+    frame.size.width = [[self view] frame].size.width;
+    [_subjectView setFrame:frame];
+    [_subjectView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
+
+    [_toLabel setText:_groupName];
+    [_subjectTextField setText:_subject];
+
+    [[self textView] setContentInset:UIEdgeInsetsMake(100, 0, 0, 0)];
     
     // Do we have body text to load?
-    if (bodyText)
+    if (_messageBody)
     {
-        // Add the paragraph signs to the supplied body text (not forgetting
-        // to add the cursed hacky prefix of 3 line feeds).  The supplied text
-        // is also likely to have CRFL pairs, so normalise this also.
-        NSString *hackyPrefix = @"\n\n\n";
-        NSString *text = [bodyText stringByReplacingOccurrencesOfString:CR_STR
-                                                             withString:EMPTY_STR];
-        text = [text stringByReplacingOccurrencesOfString:LF_STR
-                                               withString:PARAGRAPH_SIGN_LF_STR];
-        _textView.text = [hackyPrefix stringByAppendingString:text];
+//        // Add the paragraph signs to the supplied body text.  The supplied text
+//        // is also likely to have CRFL pairs, so normalise this also.
+//        NSString *text = [_messageBody stringByReplacingOccurrencesOfString:CR_STR
+//                                                                 withString:EMPTY_STR];
+//        text = [text stringByReplacingOccurrencesOfString:LF_STR
+//                                               withString:PARAGRAPH_SIGN_LF_STR];
+//        [[self textView] setText:text];
+        [[self textView] setText:_messageBody];
     }
 
 //    textView.text = @"\n\n\nAndnowasinglelinewithoutwordbreaksandwehavetohandlethissituationalsoespeciallywhenitcomestolinks.  This is a whole load of test text so we can test the word wrapping function.  Lets add a whole lot more to test things out.\n\nThis is a new paragraph.\nAndnowasinglelinewithoutwordbreaksandwehavetohandlethissituationalsoespeciallywhenitcomestolinks.\n";
@@ -153,9 +161,9 @@
         if (sigText && [sigText isEqualToString:EMPTY_STR] == NO)
         {
             NSString *signature = [NSString stringWithFormat:@"\n-- \n%@", sigText];
-            signature = [signature stringByReplacingOccurrencesOfString:LF_STR
-                                                             withString:PARAGRAPH_SIGN_LF_STR];
-            _textView.text = [_textView.text stringByAppendingString:signature];
+//            signature = [signature stringByReplacingOccurrencesOfString:LF_STR
+//                                                             withString:PARAGRAPH_SIGN_LF_STR];
+            [[self textView] setText:[[[self textView] text] stringByAppendingString:signature]];
         }
     }
 //    else
@@ -178,18 +186,20 @@
            selector:@selector(keyboardDidHide:)
                name:UIKeyboardDidHideNotification
              object:nil];
-    
+
     if (_subjectTextField.text == nil)
         sendButtonItem.enabled = NO;
+}
 
-//    if (restoringText == NO)
-//    {
-        // Set the subject field as the first responder
-        if (subject == nil || [subject isEqualToString:EMPTY_STR])
-            [_subjectTextField becomeFirstResponder];
-        else
-            [_textView becomeFirstResponder];
-//    }
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+
+    // Set the subject field as the first responder
+//    if (_subject == nil || [_subject isEqualToString:EMPTY_STR])
+//        [_subjectTextField becomeFirstResponder];
+//    else
+//        [[self view] becomeFirstResponder];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -226,191 +236,144 @@
     // Release any cached data, images, etc that aren't in use.
 }
 
-- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
-{
-    // Resize the field views
-    float textViewWidth = _textView.frame.size.width;
-    CGRect frame = _toView.frame;
-    frame.size.width = textViewWidth;
-    _toView.frame = frame;
-
-    frame = _toLabel.frame;
-    frame.size.width = textViewWidth - frame.origin.x - 8;
-    _toLabel.frame = frame;
-    
-    frame = _subjectView.frame;
-    frame.origin.y = _toView.frame.size.height;
-    frame.size.width = textViewWidth;
-    _subjectView.frame = frame;
-    
-    frame = _subjectTextField.frame;
-    frame.size.width = textViewWidth - frame.origin.x - 8;
-    _subjectTextField.frame = frame;
-}
-
-- (void)viewDidUnload {
-    [super viewDidUnload];
-    // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
-}
-
-#pragma mark -
-#pragma mark Public Methods
-
-//- (void)restoreLevel
-//{
-//    // Restore any text from the cache
-//    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-//    subject = [userDefaults objectForKey:@"MostRecentNewArticleSubject"];
-//    restoredSelectedRange.location = [userDefaults integerForKey:@"MostRecentNewArticleSelectedRangeLocation"];
-//    restoredSelectedRange.length = 0;
-//
-//    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-//    NSString *path = [appDelegate.cacheRootDir stringByAppendingPathComponent:CACHE_FILE_NAME];
-//    bodyText = [NSString stringWithContentsOfFile:path
-//                                         encoding:NSUTF8StringEncoding
-//                                            error:NULL];
-//    restoringText = YES;
-//}
-
 #pragma mark -
 #pragma mark UITextViewDelegate Methods
 
-- (void)textViewDidChangeSelection:(UITextView *)aTextView
-{
-    NSRange range = aTextView.selectedRange;
-    if (range.location == 0x7fffffff)
-        return;
-    
-    if (restoringText)
-    {
-        restoringText = NO;
-        _textView.selectedRange = restoredSelectedRange;
-        return;
-    }
-
-    // Make sure the selection does not start to the right of a paragraph sign
-    if (range.location > 0
-        && [aTextView.text characterAtIndex:range.location - 1] == PARAGRAPH_SIGN_CHAR)
-    {
-        // Adjust the range to the left
-        --range.location;
-        if (range.length > 0)
-            ++range.length;
-        
-        aTextView.selectedRange = range;
-    }
-}
-
-- (BOOL)textView:(UITextView *)aTextView
-shouldChangeTextInRange:(NSRange)range
- replacementText:(NSString *)text
-{
-    // Refuse to allow the first three characters to be edited
-    NSRange headerRange = NSMakeRange(0, 3);
-    if (NSLocationInRange(range.location, headerRange))
-        return NO;
-    
-    if ([text isEqualToString:LF_STR])
-    {
-        // Include a paragraph sign for hard line breaks
-        NSMutableString *mutableText = [aTextView.text mutableCopy];
-        [mutableText replaceCharactersInRange:range withString:PARAGRAPH_SIGN_LF_STR];
-
-        // Lock the scroller as when we set the text, the selection point is
-        // moved to the end of the text.  We may need to bring it back, so we
-        // want to prevent the scroll-to-end occuring.
-        aTextView.scrollEnabled = NO;
-        aTextView.text = mutableText;
-        
-        // If text has been inserted, we need to restore the selectedRange
-        if (aTextView.selectedRange.location != range.location + 2)
-            aTextView.selectedRange = NSMakeRange(range.location + 2, 0);
-        
-        // Now re-enable the scroller, and manually scroll to the selection point
-        aTextView.scrollEnabled = YES;
-        [aTextView scrollRangeToVisible:NSMakeRange(aTextView.selectedRange.location, 1)];
-
-        return NO;
-    }
-    else if ([text isEqualToString:EMPTY_STR])
-    {
-        // This is a deletion, so we must check if the first character in the
-        // range is a new-line.  If so, we must also delete the corresponding
-        // paragraph sign
-        if ([aTextView.text characterAtIndex:range.location] == L'\n')
-        {
-            NSMutableString *mutableText = [aTextView.text mutableCopy];
-            range.location -= 1;
-            range.length += 1;
-            [mutableText deleteCharactersInRange:range];
-
-            aTextView.scrollEnabled = NO;
-            aTextView.text = mutableText;
-
-            // Do we need to restore the selectedRange?
-            if (aTextView.selectedRange.location != range.location)
-                aTextView.selectedRange = NSMakeRange(range.location, 0);
-
-            aTextView.scrollEnabled = YES;
-            [aTextView scrollRangeToVisible:NSMakeRange(aTextView.selectedRange.location, 1)];
-
-            return NO;
-        }
-        else if ([aTextView.text characterAtIndex:range.location] == PARAGRAPH_SIGN_CHAR)
-        {
-            NSMutableString *mutableText = [aTextView.text mutableCopy];
-            range.length += 1;
-            [mutableText deleteCharactersInRange:range];
-
-            aTextView.scrollEnabled = NO;
-            aTextView.text = mutableText;
-
-            // Do we need to restore the selectedRange?
-            if (aTextView.selectedRange.location != range.location)
-            {
-                NSLog(@"YIPPEE!");
-                aTextView.selectedRange = NSMakeRange(range.location, 0);
-            }
-
-            aTextView.scrollEnabled = YES;
-            [aTextView scrollRangeToVisible:NSMakeRange(aTextView.selectedRange.location, 1)];
-
-            return NO;
-        }
-    }
-    else if (text.length > 1)
-    {
-        // Pasting text -- insert paragraph signs (if needed) into the supplied text
-        // (This is also called when autocorrecting)
-
-        // If we're pasting text that we've copied from a NewArticleView, then
-        // we'll need to strip out the paragraph signs first... before putting
-        // them back in.
-        NSString *replacementText = [text stringByReplacingOccurrencesOfString:PARAGRAPH_SIGN_STR
-                                                                    withString:EMPTY_STR];
-
-        replacementText = [replacementText stringByReplacingOccurrencesOfString:LF_STR
-                                                                     withString:PARAGRAPH_SIGN_LF_STR];
-
-        NSMutableString *mutableText = [aTextView.text mutableCopy];
-        [mutableText replaceCharactersInRange:range withString:replacementText];
-
-        aTextView.scrollEnabled = NO;
-        aTextView.text = mutableText;
-
-        // Do we need to restore the selectedRange?
-        if (aTextView.selectedRange.location != range.location + replacementText.length)
-            aTextView.selectedRange = NSMakeRange(range.location + replacementText.length, 0);
-
-        aTextView.scrollEnabled = YES;
-        [aTextView scrollRangeToVisible:NSMakeRange(aTextView.selectedRange.location, 1)];
-
-        return NO;
-    }
-    
-    return YES;
-}
+//- (void)textViewDidChangeSelection:(UITextView *)aTextView
+//{
+//    NSRange range = aTextView.selectedRange;
+//    if (range.location == 0x7fffffff)
+//        return;
+//    
+//    if (restoringText)
+//    {
+//        restoringText = NO;
+//        _textView.selectedRange = restoredSelectedRange;
+//        return;
+//    }
+//
+//    // Make sure the selection does not start to the right of a paragraph sign
+//    if (range.location > 0
+//        && [aTextView.text characterAtIndex:range.location - 1] == PARAGRAPH_SIGN_CHAR)
+//    {
+//        // Adjust the range to the left
+//        --range.location;
+//        if (range.length > 0)
+//            ++range.length;
+//        
+//        aTextView.selectedRange = range;
+//    }
+//}
+//
+//- (BOOL)textView:(UITextView *)aTextView
+//shouldChangeTextInRange:(NSRange)range
+// replacementText:(NSString *)text
+//{
+//    // Refuse to allow the first three characters to be edited
+//    NSRange headerRange = NSMakeRange(0, 3);
+//    if (NSLocationInRange(range.location, headerRange))
+//        return NO;
+//    
+//    if ([text isEqualToString:LF_STR])
+//    {
+//        // Include a paragraph sign for hard line breaks
+//        NSMutableString *mutableText = [aTextView.text mutableCopy];
+//        [mutableText replaceCharactersInRange:range withString:PARAGRAPH_SIGN_LF_STR];
+//
+//        // Lock the scroller as when we set the text, the selection point is
+//        // moved to the end of the text.  We may need to bring it back, so we
+//        // want to prevent the scroll-to-end occuring.
+//        aTextView.scrollEnabled = NO;
+//        aTextView.text = mutableText;
+//        
+//        // If text has been inserted, we need to restore the selectedRange
+//        if (aTextView.selectedRange.location != range.location + 2)
+//            aTextView.selectedRange = NSMakeRange(range.location + 2, 0);
+//        
+//        // Now re-enable the scroller, and manually scroll to the selection point
+//        aTextView.scrollEnabled = YES;
+//        [aTextView scrollRangeToVisible:NSMakeRange(aTextView.selectedRange.location, 1)];
+//
+//        return NO;
+//    }
+//    else if ([text isEqualToString:EMPTY_STR])
+//    {
+//        // This is a deletion, so we must check if the first character in the
+//        // range is a new-line.  If so, we must also delete the corresponding
+//        // paragraph sign
+//        if ([aTextView.text characterAtIndex:range.location] == L'\n')
+//        {
+//            NSMutableString *mutableText = [aTextView.text mutableCopy];
+//            range.location -= 1;
+//            range.length += 1;
+//            [mutableText deleteCharactersInRange:range];
+//
+//            aTextView.scrollEnabled = NO;
+//            aTextView.text = mutableText;
+//
+//            // Do we need to restore the selectedRange?
+//            if (aTextView.selectedRange.location != range.location)
+//                aTextView.selectedRange = NSMakeRange(range.location, 0);
+//
+//            aTextView.scrollEnabled = YES;
+//            [aTextView scrollRangeToVisible:NSMakeRange(aTextView.selectedRange.location, 1)];
+//
+//            return NO;
+//        }
+//        else if ([aTextView.text characterAtIndex:range.location] == PARAGRAPH_SIGN_CHAR)
+//        {
+//            NSMutableString *mutableText = [aTextView.text mutableCopy];
+//            range.length += 1;
+//            [mutableText deleteCharactersInRange:range];
+//
+//            aTextView.scrollEnabled = NO;
+//            aTextView.text = mutableText;
+//
+//            // Do we need to restore the selectedRange?
+//            if (aTextView.selectedRange.location != range.location)
+//            {
+//                NSLog(@"YIPPEE!");
+//                aTextView.selectedRange = NSMakeRange(range.location, 0);
+//            }
+//
+//            aTextView.scrollEnabled = YES;
+//            [aTextView scrollRangeToVisible:NSMakeRange(aTextView.selectedRange.location, 1)];
+//
+//            return NO;
+//        }
+//    }
+//    else if (text.length > 1)
+//    {
+//        // Pasting text -- insert paragraph signs (if needed) into the supplied text
+//        // (This is also called when autocorrecting)
+//
+//        // If we're pasting text that we've copied from a NewArticleView, then
+//        // we'll need to strip out the paragraph signs first... before putting
+//        // them back in.
+//        NSString *replacementText = [text stringByReplacingOccurrencesOfString:PARAGRAPH_SIGN_STR
+//                                                                    withString:EMPTY_STR];
+//
+//        replacementText = [replacementText stringByReplacingOccurrencesOfString:LF_STR
+//                                                                     withString:PARAGRAPH_SIGN_LF_STR];
+//
+//        NSMutableString *mutableText = [aTextView.text mutableCopy];
+//        [mutableText replaceCharactersInRange:range withString:replacementText];
+//
+//        aTextView.scrollEnabled = NO;
+//        aTextView.text = mutableText;
+//
+//        // Do we need to restore the selectedRange?
+//        if (aTextView.selectedRange.location != range.location + replacementText.length)
+//            aTextView.selectedRange = NSMakeRange(range.location + replacementText.length, 0);
+//
+//        aTextView.scrollEnabled = YES;
+//        [aTextView scrollRangeToVisible:NSMakeRange(aTextView.selectedRange.location, 1)];
+//
+//        return NO;
+//    }
+//    
+//    return YES;
+//}
 
 #pragma mark -
 #pragma mark UITextFieldDelegate Methods
@@ -419,8 +382,8 @@ shouldChangeTextInRange:(NSRange)range
 {
     // Make the text view the first responder and position the cursor at
     // the top
-    [_textView becomeFirstResponder];
-    _textView.selectedRange = NSMakeRange(3, 0);
+    [[self textView] becomeFirstResponder];
+    [[self textView] setSelectedRange:NSMakeRange(0, 0)];
     
     return NO;
 }
@@ -436,7 +399,7 @@ shouldChangeTextInRange:(NSRange)range
 - (IBAction)sendButtonPressed:(id)sender
 {
     sendButtonItem.enabled = NO;
-    [_textView resignFirstResponder];
+    [[self textView] resignFirstResponder];
     [activityIndicatorView startAnimating];
 
     NNArticleFormatter *formatter = [[NNArticleFormatter alloc] init];
@@ -467,17 +430,17 @@ shouldChangeTextInRange:(NSRange)range
                                                        replyTo:replyToAddress
                                                   organization:organization
                                                      messageId:EMPTY_STR
-                                                    references:references
+                                                    references:_references
                                                     newsgroups:newsgroups
                                                        subject:newSubject];
     
     // Chop off the hacky three CRs at the beginning of the text
-    NSString *articleText = [_textView.text substringFromIndex:3];
+    NSString *articleText = [[self textView] text];
     
     // Strip-out instances of paragraph sign
-    articleText = [articleText stringByReplacingOccurrencesOfString:PARAGRAPH_SIGN_STR
-                                                         withString:EMPTY_STR];
-    
+//    articleText = [articleText stringByReplacingOccurrencesOfString:PARAGRAPH_SIGN_STR
+//                                                         withString:EMPTY_STR];
+
     // Word-wrap the text at column 78
     articleText = [articleText stringByWrappingWordsAtColumn:78];
 

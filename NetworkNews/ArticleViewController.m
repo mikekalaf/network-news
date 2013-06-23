@@ -35,26 +35,26 @@
 {
     UIPopoverController *_popoverController;
 
-    UISegmentedControl *_navigationSegmentedControl;
+    //UISegmentedControl *_navigationSegmentedControl;
     UIProgressView *_progressView;
 
     Article *_article;
     NSMutableString *htmlString;
     NSOperationQueue *_operationQueue;
     NSURL *_cacheURL;
-    NSUInteger partCount;
     NSURL *_attachmentURL;
     NSArray *_headEntries;
     NSData *_bodyTextDataTop;
     NSData *_bodyTextDataBottom;
-    NSUInteger bytesCached;
-    BOOL toolbarSetForPortrait;
+    //BOOL toolbarSetForPortrait;
 }
 
 @property(nonatomic, weak) IBOutlet UIToolbar *toolbar;
 @property(nonatomic, weak) IBOutlet UIWebView *webView;
 @property(nonatomic, weak) IBOutlet UIBarButtonItem *replyButtonItem;
 @property(nonatomic, weak) IBOutlet UIBarButtonItem *composeButtonItem;
+@property(nonatomic, weak) IBOutlet UISegmentedControl *navigationSegmentedControl;
+//@property(nonatomic, weak) IBOutlet UIProgressView *progressView;
 
 - (NSURL *)cacheURLForMessageId:(NSString *)messageId extension:(NSString *)extension;
 - (NSString *)bodyTextForFollowUp;
@@ -70,9 +70,10 @@
 - (void)updateTitle;
 - (void)updateNavigationControls;
 - (void)disableNavigationControls;
-- (void)showProgressToolbar;
-- (void)showArticleToolbar;
+//- (void)showProgressToolbar;
+//- (void)showArticleToolbar;
 
+//- (IBAction)articleNavigation:(id)sender;
 - (IBAction)replyButtonPressed:(id)sender;
 - (IBAction)composeButtonPressed:(id)sender;
 
@@ -96,26 +97,36 @@
     
     htmlString = [NSMutableString string];
 
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
     {
-        // Navigation up and down buttons for the right-hand side
-        NSArray *itemArray = [NSArray arrayWithObjects:
-                              [UIImage imageNamed:@"icon-triangle-up.png"],
-                              [UIImage imageNamed:@"icon-triangle-down.png"],
-                              nil];
-        _navigationSegmentedControl = [[UISegmentedControl alloc] initWithItems:itemArray];
-        [_navigationSegmentedControl setMomentary:YES];
-        _navigationSegmentedControl.segmentedControlStyle = UISegmentedControlStyleBar;
-        [_navigationSegmentedControl setWidth:44 forSegmentAtIndex:0];
-        [_navigationSegmentedControl setWidth:44 forSegmentAtIndex:1];
-        [_navigationSegmentedControl addTarget:self
-                                       action:@selector(articleNavigation:)
-                             forControlEvents:UIControlEventValueChanged];
-        
-        UIBarButtonItem *segmentBarItem = [[UIBarButtonItem alloc] initWithCustomView:_navigationSegmentedControl];
-        self.navigationItem.rightBarButtonItem = segmentBarItem;
+        UIBarButtonItem *nextButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"button-down-arrow"]
+                                                                       style:UIBarButtonItemStylePlain
+                                                                      target:self
+                                                                      action:@selector(nextArticlePressed:)];
+        UIBarButtonItem *previousButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"button-up-arrow"]
+                                                                           style:UIBarButtonItemStylePlain
+                                                                          target:self
+                                                                          action:@selector(previousArticlePressed:)];
+        [[self navigationItem] setRightBarButtonItems:@[nextButton, previousButton]];
+
+//        // Navigation up and down buttons for the right-hand side
+//        NSArray *itemArray = [NSArray arrayWithObjects:
+//                              [UIImage imageNamed:@"icon-triangle-up.png"],
+//                              [UIImage imageNamed:@"icon-triangle-down.png"],
+//                              nil];
+//        _navigationSegmentedControl = [[UISegmentedControl alloc] initWithItems:itemArray];
+//        [_navigationSegmentedControl setMomentary:YES];
+//        _navigationSegmentedControl.segmentedControlStyle = UISegmentedControlStyleBar;
+//        [_navigationSegmentedControl setWidth:44 forSegmentAtIndex:0];
+//        [_navigationSegmentedControl setWidth:44 forSegmentAtIndex:1];
+//        [_navigationSegmentedControl addTarget:self
+//                                       action:@selector(articleNavigation:)
+//                             forControlEvents:UIControlEventValueChanged];
+//        
+//        UIBarButtonItem *segmentBarItem = [[UIBarButtonItem alloc] initWithCustomView:_navigationSegmentedControl];
+//        self.navigationItem.rightBarButtonItem = segmentBarItem;
     }
-    
+
     [self updateTitle];
 //    [self updateNavigationControls];
     [self disableNavigationControls];
@@ -123,15 +134,6 @@
     // Create a progress view to use with the toolbar
     _progressView = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleBar];
     _progressView.hidden = YES;
-
-    // Determine the cache directory, and make sure it exists
-    _cacheURL = [[[_connectionPool account] cacheURL] URLByAppendingPathComponent:_groupName];
-    
-    NSFileManager *fileManager = [[NSFileManager alloc] init];
-    [fileManager createDirectoryAtURL:_cacheURL
-          withIntermediateDirectories:YES
-                           attributes:nil
-                                error:NULL];
 
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc addObserver:self
@@ -172,6 +174,23 @@
     [super didReceiveMemoryWarning];
 	
 	// Release any cached data, images, etc that aren't in use.
+}
+
+- (void)setGroupName:(NSString *)groupName
+{
+    _groupName = groupName;
+
+    // Determine the cache directory, and make sure it exists
+    if (_groupName)
+    {
+        _cacheURL = [[[_connectionPool account] cacheURL] URLByAppendingPathComponent:_groupName];
+
+        NSFileManager *fileManager = [[NSFileManager alloc] init];
+        [fileManager createDirectoryAtURL:_cacheURL
+              withIntermediateDirectories:YES
+                               attributes:nil
+                                    error:NULL];
+    }
 }
 
 #pragma mark - Public Methods
@@ -267,39 +286,43 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
           withBarButtonItem:(UIBarButtonItem *)barButtonItem
        forPopoverController:(UIPopoverController *)pc
 {
-    barButtonItem.title = @"Articles";
-
-    _popoverController = pc;
-
-    if (toolbarSetForPortrait)
-        return;
-
-    // Navigation up and down buttons
-    NSArray *itemArray = [NSArray arrayWithObjects:
-                          [UIImage imageNamed:@"icon-triangle-up.png"],
-                          [UIImage imageNamed:@"icon-triangle-down.png"],
-                          nil];
-    _navigationSegmentedControl = [[UISegmentedControl alloc] initWithItems:itemArray];
-    _navigationSegmentedControl.tintColor = [UIColor colorWithWhite:0.66 alpha:1.0];
-    [_navigationSegmentedControl setMomentary:YES];
-    _navigationSegmentedControl.segmentedControlStyle = UISegmentedControlStyleBar;
-    [_navigationSegmentedControl setWidth:44 forSegmentAtIndex:0];
-    [_navigationSegmentedControl setWidth:44 forSegmentAtIndex:1];
-    [_navigationSegmentedControl addTarget:self
-                                   action:@selector(articleNavigation:)
-                         forControlEvents:UIControlEventValueChanged];
-    
-    UIBarButtonItem *segmentBarItem = [[UIBarButtonItem alloc] initWithCustomView:_navigationSegmentedControl];
-    self.navigationItem.rightBarButtonItem = segmentBarItem;
-
-    // Insert the split view controller's bar button item, and the navigation
-    // segmented control, at the beginning of the toolbar
-    NSMutableArray *items = [NSMutableArray arrayWithArray:_toolbar.items];
-    [items insertObject:barButtonItem atIndex:0];
-    [items insertObject:segmentBarItem atIndex:1];
-    [_toolbar setItems:items animated:YES];
-    
-    toolbarSetForPortrait = YES;
+//    barButtonItem.title = @"Articles";
+//
+//    _popoverController = pc;
+//
+////    if (toolbarSetForPortrait)
+////        return;
+////
+//    // Navigation up and down buttons
+//    NSArray *itemArray = [NSArray arrayWithObjects:
+//                          [UIImage imageNamed:@"icon-triangle-up.png"],
+//                          [UIImage imageNamed:@"icon-triangle-down.png"],
+//                          nil];
+//    _navigationSegmentedControl = [[UISegmentedControl alloc] initWithItems:itemArray];
+//    _navigationSegmentedControl.tintColor = [UIColor colorWithWhite:0.66 alpha:1.0];
+//    [_navigationSegmentedControl setMomentary:YES];
+//    _navigationSegmentedControl.segmentedControlStyle = UISegmentedControlStyleBar;
+//    [_navigationSegmentedControl setWidth:44 forSegmentAtIndex:0];
+//    [_navigationSegmentedControl setWidth:44 forSegmentAtIndex:1];
+//    [_navigationSegmentedControl addTarget:self
+//                                   action:@selector(articleNavigation:)
+//                         forControlEvents:UIControlEventValueChanged];
+//    
+//    UIBarButtonItem *segmentBarItem = [[UIBarButtonItem alloc] initWithCustomView:_navigationSegmentedControl];
+////    self.navigationItem.rightBarButtonItem = segmentBarItem;
+//
+//    [barButtonItem setWidth:110];
+//
+//    // Insert the split view controller's bar button item, and the navigation
+//    // segmented control, at the beginning of the toolbar
+//    NSMutableArray *items = [NSMutableArray arrayWithArray:[_toolbar items]];
+//    [items insertObject:barButtonItem atIndex:0];
+//    [items insertObject:segmentBarItem atIndex:1];
+//    [_toolbar setItems:items animated:YES];
+//    
+////    toolbarSetForPortrait = YES;
+//
+////    [[self navigationItem] setLeftBarButtonItems:@[barButtonItem, segmentBarItem] animated:YES];
 }
 
 - (void)splitViewController:(UISplitViewController *)svc
@@ -308,41 +331,68 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 {
     // Remove the split view controller's bar button item, and the navigation
     // segmented controller, from the toolbar
-    NSMutableArray *items = [NSMutableArray arrayWithArray:_toolbar.items];
+    NSMutableArray *items = [NSMutableArray arrayWithArray:[_toolbar items]];
     [items removeObjectAtIndex:0];
     [items removeObjectAtIndex:0];
     [_toolbar setItems:items animated:YES];
-    
+
+    //[self.navigationItem setLeftBarButtonItem:nil animated:YES];
+
+//    NSArray *leftBarButtonItems = [[self navigationItem] leftBarButtonItems];
+//    [[self navigationItem] setLeftBarButtonItems:@[leftBarButtonItems[1]] animated:YES];
+
+//    [[self navigationItem] setLeftBarButtonItems:nil animated:YES];
+
     _popoverController = nil;
 
-    toolbarSetForPortrait = NO;
+    //toolbarSetForPortrait = NO;
 }
 
 #pragma mark - Actions
 
-- (void)articleNavigation:(id)sender
-{
-    NSUInteger index = _navigationSegmentedControl.selectedSegmentIndex;
-    if (index == 0)
-    {
-        // Up Article
-        if (_articleIndex > 0)
-        {
-            --_articleIndex;
-            [self loadArticle];
-        }
-    }
-    else if (index == 1)
-    {
-        // Down Article
-        if (_articleIndex < [_articleSource articleCount] - 1)
-        {
-            ++_articleIndex;
-            [self loadArticle];
-        }
-    }
+//- (IBAction)articleNavigation:(id)sender
+//{
+//    NSUInteger index = _navigationSegmentedControl.selectedSegmentIndex;
+//    if (index == 0)
+//    {
+//        // Up Article
+//        if (_articleIndex > 0)
+//        {
+//            --_articleIndex;
+//            [self loadArticle];
+//        }
+//    }
+//    else if (index == 1)
+//    {
+//        // Down Article
+//        if (_articleIndex < [_articleSource articleCount] - 1)
+//        {
+//            ++_articleIndex;
+//            [self loadArticle];
+//        }
+//    }
+//
+//    [self updateTitle];
+//}
 
-    [self updateTitle];
+- (IBAction)nextArticlePressed:(id)sender
+{
+    if (_articleIndex < [_articleSource articleCount] - 1)
+    {
+        ++_articleIndex;
+        [self loadArticle];
+        [self updateTitle];
+    }
+}
+
+- (IBAction)previousArticlePressed:(id)sender
+{
+    if (_articleIndex > 0)
+    {
+        --_articleIndex;
+        [self loadArticle];
+        [self updateTitle];
+    }
 }
 
 - (IBAction)replyButtonPressed:(id)sender
@@ -369,13 +419,15 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 
 - (IBAction)composeButtonPressed:(id)sender
 {
-    NewArticleViewController *viewController = [[NewArticleViewController alloc] initWithGroupName:_groupName
-                                                                                           subject:nil
-                                                                                        references:nil
-                                                                                          bodyText:nil];
+    NewArticleViewController *viewController;
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
+        viewController = [[NewArticleViewController alloc] initWithNibName:@"NewArticleView" bundle:nil];
+    else
+        viewController = [[NewArticleViewController alloc] initWithNibName:@"NewArticleView" bundle:nil];
     [viewController setConnectionPool:_connectionPool];
-    viewController.delegate = self;
-    
+    [viewController setDelegate:self];
+    [viewController setGroupName:_groupName];
+
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
     navigationController.modalPresentationStyle = UIModalPresentationPageSheet;
     [self presentViewController:navigationController animated:YES completion:NULL];
@@ -526,15 +578,20 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     NSString *followupTo = [self headerValueWithName:@"Followup-To"];
     if (!followupTo)
         followupTo = _groupName;
-    
-    NewArticleViewController *viewController = [[NewArticleViewController alloc] initWithGroupName:followupTo
-                                                                                           subject:[_article reSubject]
-                                                                                        references:references
-                                                                                          bodyText:[self bodyTextForFollowUp]];
-    [viewController setConnectionPool:_connectionPool];
-    viewController.delegate = self;
-    UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
 
+    NewArticleViewController *viewController;
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
+        viewController = [[NewArticleViewController alloc] initWithNibName:@"NewArticleView" bundle:nil];
+    else
+        viewController = [[NewArticleViewController alloc] initWithNibName:@"NewArticleView" bundle:nil];
+    [viewController setConnectionPool:_connectionPool];
+    [viewController setDelegate:self];
+    [viewController setGroupName:followupTo];
+    [viewController setSubject:[_article reSubject]];
+    [viewController setReferences:references];
+    [viewController setMessageBody:[self bodyTextForFollowUp]];
+
+    UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
     navigationController.modalPresentationStyle = UIModalPresentationPageSheet;
     [self presentViewController:navigationController animated:YES completion:NULL];
 }
@@ -919,15 +976,17 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 
 - (void)loadArticle
 {
-    partCount = 0;
     _attachmentURL = nil;
     _headEntries = nil;
     _bodyTextDataTop = nil;
     _bodyTextDataBottom = nil;
-    bytesCached = 0;
 
     // Reference the current article
     _article = [_articleSource articleAtIndex:_articleIndex];
+
+    // TODO: Display some appropriate message
+    if (_article == nil)
+        return;
     
     // Clear the body
     [self beginHTML];
@@ -965,8 +1024,6 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     NSArray *URLs = [self cachedURLsForMessageID:messageID];
     if ([URLs count])
     {
-        NSLog(@"Found cached content");
-
         for (NSURL *cacheURL in URLs)
         {
             NSString *lastPathComponent = [cacheURL lastPathComponent];
@@ -998,18 +1055,22 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
         [self updateContent];
         [_webView loadHTMLString:htmlString baseURL:nil];
         [self updateNavigationControls];
-        [self showArticleToolbar];
+        //[self showArticleToolbar];
     }
     else
     {
         // Download from the server
         [self disableNavigationControls];
-        [self showProgressToolbar];
+        //[self showProgressToolbar];
         _progressView.progress = 0;
         _progressView.hidden = NO;
         
         NSLog(@"Downloading %d part(s)", [sortedParts count]);
 
+        // "Common info" carries the attachment filename from the first part
+        // to all the following parts - it relies on the operations being done
+        // sequentially and in order. See if this process can be improved.
+        NSMutableDictionary *commonInfo = [[NSMutableDictionary alloc] initWithCapacity:1];
         NSUInteger totalBytes = [[_article totalByteCount] integerValue];
         __block NSUInteger bytesFetchedSoFar = 0;
 
@@ -1021,6 +1082,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
                                                        partNumber:[[part partNumber] integerValue]
                                                    totalPartCount:[sortedParts count]
                                                          cacheURL:_cacheURL
+                                                       commonInfo:commonInfo
                                                          progress:^(NSUInteger bytesReceived) {
                                                              bytesFetchedSoFar += bytesReceived;
                                                              dispatch_async(dispatch_get_main_queue(), ^{
@@ -1042,59 +1104,65 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 - (void)updateNavigationControls
 {
     // Enable/disable the navigation controls
-    [_navigationSegmentedControl setEnabled:(_articleIndex > 0)
-                         forSegmentAtIndex:0];
-    [_navigationSegmentedControl setEnabled:(_articleIndex < [_articleSource articleCount] - 1)
-                         forSegmentAtIndex:1];
+//    [_navigationSegmentedControl setEnabled:(_articleIndex > 0)
+//                         forSegmentAtIndex:0];
+//    [_navigationSegmentedControl setEnabled:(_articleIndex < [_articleSource articleCount] - 1)
+//                         forSegmentAtIndex:1];
+
+    [[[self navigationItem] rightBarButtonItems][0] setEnabled:(_articleIndex < [_articleSource articleCount] - 1)];
+    [[[self navigationItem] rightBarButtonItems][1] setEnabled:(_articleIndex > 0)];
 }
 
 - (void)disableNavigationControls
 {
     // Enable/disable the navigation controls
-    [_navigationSegmentedControl setEnabled:NO forSegmentAtIndex:0];
-    [_navigationSegmentedControl setEnabled:NO forSegmentAtIndex:1];
+//    [_navigationSegmentedControl setEnabled:NO forSegmentAtIndex:0];
+//    [_navigationSegmentedControl setEnabled:NO forSegmentAtIndex:1];
+
+    [[[self navigationItem] rightBarButtonItems][0] setEnabled:NO];
+    [[[self navigationItem] rightBarButtonItems][1] setEnabled:NO];
 }
 
-- (void)showProgressToolbar
-{
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-        return;
-
-    // Set up iPhone toolbar
-    UIBarButtonItem *flexibleSpaceButtonItem =
-    [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
-                                                  target:nil
-                                                  action:nil];
-    
-    UIBarButtonItem *progressItem = [[UIBarButtonItem alloc] initWithCustomView:_progressView];
-    
-    self.toolbarItems = [NSArray arrayWithObjects:
-                         flexibleSpaceButtonItem,
-                         progressItem,
-                         flexibleSpaceButtonItem,
-                         nil];
-}
-
-- (void)showArticleToolbar
-{
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-        return;
-
-    // Set up iPhone toolbar
-    UIBarButtonItem *flexibleSpaceButtonItem =
-    [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
-                                                  target:nil
-                                                  action:nil];
-    
-    UIBarButtonItem *aReplyButtonItem =
-    [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemReply
-                                                  target:self
-                                                  action:@selector(replyButtonPressed:)];
-    
-    self.toolbarItems = [NSArray arrayWithObjects:
-                         flexibleSpaceButtonItem,
-                         aReplyButtonItem,
-                         nil];
-}
+//- (void)showProgressToolbar
+//{
+//    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
+//        return;
+//
+//    // Set up iPhone toolbar
+//    UIBarButtonItem *flexibleSpaceButtonItem =
+//    [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+//                                                  target:nil
+//                                                  action:nil];
+//    
+//    UIBarButtonItem *progressItem = [[UIBarButtonItem alloc] initWithCustomView:_progressView];
+//    
+//    self.toolbarItems = [NSArray arrayWithObjects:
+//                         flexibleSpaceButtonItem,
+//                         progressItem,
+//                         flexibleSpaceButtonItem,
+//                         nil];
+//}
+//
+//- (void)showArticleToolbar
+//{
+//    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
+//        return;
+//
+//    // Set up iPhone toolbar
+//    UIBarButtonItem *flexibleSpaceButtonItem =
+//    [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+//                                                  target:nil
+//                                                  action:nil];
+//    
+//    UIBarButtonItem *aReplyButtonItem =
+//    [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemReply
+//                                                  target:self
+//                                                  action:@selector(replyButtonPressed:)];
+//    
+//    self.toolbarItems = [NSArray arrayWithObjects:
+//                         flexibleSpaceButtonItem,
+//                         aReplyButtonItem,
+//                         nil];
+//}
 
 @end

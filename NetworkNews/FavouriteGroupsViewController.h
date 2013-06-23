@@ -15,6 +15,4 @@
 @property (nonatomic) NewsConnectionPool *connectionPool;
 @property (nonatomic, copy) NSMutableArray *groupNames;
 
-- (void)restoreLevelWithSelectionArray:(NSArray *)aSelectionArray;
-
 @end

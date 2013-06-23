@@ -42,7 +42,6 @@
 @protocol ArticleSource
 
 - (NSUInteger)articleCount;
-
 - (Article *)articleAtIndex:(NSUInteger)index;
 
 @end

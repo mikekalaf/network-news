@@ -2,6 +2,11 @@
 CHANGES
 =======
 
+Version 1.0 Build 7:
+--------------------
+* Transitioned to iOS 7
+* Moved from XIBs to a Storyboard
+
 Version 1.0 Build 6:
 --------------------
 * iPad support disabled (again) with a focus on publishing the iPhone version

@@ -30,6 +30,7 @@ NSString *FetchArticleCompletedNotification = @"FetchArticleCompletedNotificatio
     NSRange _headRange;
     NSRange _bodyRange;
     NSURL *_cacheURL;
+    NSMutableDictionary *_commonInfo;
     BOOL _final;
     //Article *_article;
     void (^_progressBlock)(NSUInteger bytesReceived);
@@ -44,6 +45,7 @@ NSString *FetchArticleCompletedNotification = @"FetchArticleCompletedNotificatio
                   partNumber:(NSUInteger)partNumber
               totalPartCount:(NSUInteger)totalPartCount
                     cacheURL:(NSURL *)cacheURL
+                  commonInfo:(NSMutableDictionary *)commonInfo
                     progress:(void (^)(NSUInteger bytesReceived))progressBlock
 {
     self = [super init];
@@ -54,6 +56,7 @@ NSString *FetchArticleCompletedNotification = @"FetchArticleCompletedNotificatio
         _partNumber = partNumber;
         _totalPartCount = totalPartCount;
         _cacheURL = cacheURL;
+        _commonInfo = commonInfo;
         _progressBlock = progressBlock;
     }
     return self;
@@ -63,48 +66,84 @@ NSString *FetchArticleCompletedNotification = @"FetchArticleCompletedNotificatio
 {
     @try
     {
-        // Fetch the article from the article store
-        NewsConnection *newsConnection = [_connectionPool dequeueConnection];
-
-        NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-        [nc addObserver:self
-               selector:@selector(bytesReceived:)
-                   name:NewsConnectionBytesReceivedNotification
-                 object:newsConnection];
-
-        NewsResponse *response;
-        if (_partNumber > 1)
-            response = [newsConnection bodyWithMessageID:_messageID];
-        else
-            response = [newsConnection articleWithMessageID:_messageID];
-
-        if ([response statusCode] == 220 || [response statusCode] == 222)
+        BOOL retry = NO;
+        do
         {
-            // TODO Properly escape the data, removing escaped '.'
-
-            [self processHead:[response data]];
-
-            [self processBody:[response data]];
+            // Fetch the article from the article store
+            NewsConnection *newsConnection = [_connectionPool dequeueConnection];
 
             NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-            [nc postNotificationName:FetchArticleCompletedNotification
-                              object:self
-                            userInfo:@{
-             @"statusCode": @([response statusCode]),
-             @"messageID": _messageID,
-             @"partNumber": @(_partNumber),
-             @"totalPartCount": @(_totalPartCount)}];
-        }
-        else if ([response statusCode] == 430)
-        {
-            NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-            [nc postNotificationName:FetchArticleCompletedNotification
-                              object:self
-                            userInfo:@{@"statusCode": @([response statusCode])}];
-        }
+            [nc addObserver:self
+                   selector:@selector(bytesReceived:)
+                       name:NewsConnectionBytesReceivedNotification
+                     object:newsConnection];
 
-        [nc removeObserver:self];
-        [_connectionPool enqueueConnection:newsConnection];
+            NewsResponse *response;
+            if (_partNumber > 1)
+                response = [newsConnection bodyWithMessageID:_messageID];
+            else
+                response = [newsConnection articleWithMessageID:_messageID];
+
+            if ([response statusCode] == 220 || [response statusCode] == 222)
+            {
+                // TODO Properly escape the data, removing escaped '.'
+
+                [self processHead:[response data]];
+
+                [self processBody:[response data]];
+
+                NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+                [nc postNotificationName:FetchArticleCompletedNotification
+                                  object:self
+                                userInfo:@{
+                 @"statusCode": @([response statusCode]),
+                 @"messageID": _messageID,
+                 @"partNumber": @(_partNumber),
+                 @"totalPartCount": @(_totalPartCount)}];
+
+                retry = NO;
+            }
+            else if ([response statusCode] == 430)
+            {
+                NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+                [nc postNotificationName:FetchArticleCompletedNotification
+                                  object:self
+                                userInfo:@{@"statusCode": @([response statusCode])}];
+                retry = NO;
+            }
+            else if ([response statusCode] == 503)
+            {
+                // Connection has probably timed-out, so retry with a
+                // new connection (if we haven't retried already)
+                newsConnection = nil;
+                retry = !retry;
+            }
+            else if ([response statusCode] == 0)
+            {
+                // TODO: If we are here, it is probably because an error was
+                // encountered when trying to send the command - we should
+                // respond to such errors earlier than here. Additionally,
+                // the error that caused this may cause all the connections in
+                // the pool to be bad (such as a network change or disconnection).
+                // Only retrying once is not good enough in this case - we should
+                // probably flush the pool and create new, good connections.
+
+                // Connection is dead, so get a new one
+                newsConnection = nil;
+                retry = !retry;
+            }
+            else
+            {
+                NSLog(@"STATUS CODE: %d", [response statusCode]);
+                NSLog(@"%@", [[NSString alloc] initWithData:[response data] encoding:NSUTF8StringEncoding]);
+
+                retry = NO;
+            }
+
+            [nc removeObserver:self];
+            [_connectionPool enqueueConnection:newsConnection];
+
+        } while (retry);
     }
     @catch (NSException *exception)
     {
@@ -201,17 +240,16 @@ NSString *FetchArticleCompletedNotification = @"FetchArticleCompletedNotificatio
                 [bodyTextDataTop writeToURL:mIdURL atomically:NO];
             }
 
-            // Do we really need to do the following? Surely we can determine
-            // what the attachment filename would be, especially if it incorporates
-            // the message ID
-
-//            // Note the attachment filename
-//            NSURL *attachmentURL = [self cacheURLForMessageID:_messageID
-//                                                    extension:[[attachment fileName] pathExtension]];
+            // Note the attachment filename
+            NSURL *attachmentURL = [self cacheURLForMessageID:_messageID
+                                                        order:2
+                                                    extension:[[attachment fileName] pathExtension]];
 //            [_article setAttachmentFileName:[attachment fileName]];
 //
 //            AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
 //            [appDelegate.activeCoreDataStack save];
+
+            _commonInfo[@"attachmentURL"] = attachmentURL;
         }
 
         if (_partNumber == _totalPartCount)
@@ -238,9 +276,11 @@ NSString *FetchArticleCompletedNotification = @"FetchArticleCompletedNotificatio
         // TODO: The following will fail when multi-part articles fail to specify
         // the filename
 
-        NSURL *attachmentURL = [self cacheURLForMessageID:_messageID
-                                                    order:2
-                                                extension:[[attachment fileName] pathExtension]];
+//        NSURL *attachmentURL = [self cacheURLForMessageID:_messageID
+//                                                    order:2
+//                                                extension:[[attachment fileName] pathExtension]];
+        NSURL *attachmentURL = _commonInfo[@"attachmentURL"];
+
         if (_partNumber == 1)
         {
             // Create the file

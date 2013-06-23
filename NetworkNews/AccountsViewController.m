@@ -21,7 +21,7 @@
 }
 
 
-- (void)addButtonPressed:(id)sender;
+//- (void)addButtonPressed:(id)sender;
 
 @end
 
@@ -34,27 +34,7 @@
 {
     [super viewDidLoad];
 
-    // Navigation Bar
-    [self setTitle:@"Accounts"];
-
     [[self navigationItem] setRightBarButtonItem:[self editButtonItem]];
-
-//    UIBarButtonItem *addButtonItem =
-//    [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
-//                                                  target:self
-//                                                  action:@selector(addButtonPressed:)];
-//    [[self navigationItem] setRightBarButtonItem:addButtonItem];
-
-//    // Toolbar
-//    UIBarButtonItem *flexibleSpaceButtonItem =
-//    [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
-//                                                  target:nil
-//                                                  action:nil];
-//    UIBarButtonItem *addButtonItem =
-//    [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
-//                                                  target:self
-//                                                  action:@selector(addButtonPressed:)];
-//    [self setToolbarItems:@[flexibleSpaceButtonItem, addButtonItem]];
 
     // Load the accounts data, if we have any
     // (New accounts are written to the archive in WelcomeViewController)
@@ -65,11 +45,11 @@
 {
     [super viewWillAppear:animated];
 
-//    // If there are no accounts, we will prompt the user to create one
-//    if ([_accounts count] == 0)
-//        [self addButtonPressed:nil];
-//    else
-//        [[self tableView] reloadData];
+    // If there are no accounts, we will prompt the user to create one
+    if ([_accounts count] == 0)
+        [self performSegueWithIdentifier:@"AddAccount" sender:self];
+    else
+        [[self tableView] reloadData];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -78,10 +58,10 @@
     [[self tableView] reloadData];
 }
 
-- (void)viewWillDisappear:(BOOL)animated
-{
-    [super viewWillDisappear:animated];
-}
+//- (void)viewWillDisappear:(BOOL)animated
+//{
+//    [super viewWillDisappear:animated];
+//}
 
 - (void)viewDidDisappear:(BOOL)animated
 {
@@ -90,52 +70,46 @@
     [self saveAccountsIfNeeded];
 }
 
-- (void)setEditing:(BOOL)editing animated:(BOOL)animated
-{
-    [super setEditing:editing animated:animated];
-
-    // Add/remove the add account cell
-    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:[_accounts count] inSection:0];
-    if (editing)
-        [[self tableView] insertRowsAtIndexPaths:@[indexPath]
-                                withRowAnimation:UITableViewRowAnimationFade];
-    else
-        [[self tableView] deleteRowsAtIndexPaths:@[indexPath]
-                                withRowAnimation:UITableViewRowAnimationFade];
-}
+//- (void)setEditing:(BOOL)editing animated:(BOOL)animated
+//{
+//    [super setEditing:editing animated:animated];
+//
+//    // Add/remove the add account cell
+//    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:[_accounts count] inSection:0];
+//    if (editing)
+//        [[self tableView] insertRowsAtIndexPaths:@[indexPath]
+//                                withRowAnimation:UITableViewRowAnimationFade];
+//    else
+//        [[self tableView] deleteRowsAtIndexPaths:@[indexPath]
+//                                withRowAnimation:UITableViewRowAnimationFade];
+//}
 
 #pragma mark - UITableViewDataSource Methods
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    if ([self isEditing])
-        return [_accounts count] + 1;
-    else
+//    if ([self isEditing])
+//        return [_accounts count] + 1;
+//    else
         return [_accounts count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    static NSString *CellIdentifier = @"Cell";
-    
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-    if (cell == nil)
-    {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
-                                       reuseIdentifier:CellIdentifier];
-        [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
-    }
+    UITableViewCell *cell;
 
-    if ([indexPath row] < [_accounts count])
-    {
+//    if ([indexPath row] < [_accounts count])
+//    {
+        cell = [tableView dequeueReusableCellWithIdentifier:@"Cell"];
         NewsAccount *account = [_accounts objectAtIndex:[indexPath row]];
         [[cell textLabel] setText:[account serviceName]];
-    }
-    else
-    {
-        [[cell textLabel] setText:@"Add Account"];
-    }
-    
+//    }
+//    else
+//    {
+//        cell = [tableView dequeueReusableCellWithIdentifier:@"AddAccountCell"];
+////        [[cell textLabel] setText:@"Add Account"];
+//    }
+
     return cell;
 }
 
@@ -149,9 +123,9 @@ commitEditingStyle:(UITableViewCellEditingStyle)editingStyle
         [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath]
                          withRowAnimation:UITableViewRowAnimationFade];
     }
-    else if (editingStyle == UITableViewCellEditingStyleInsert)
-    {
-    }   
+//    else if (editingStyle == UITableViewCellEditingStyleInsert)
+//    {
+//    }   
 }
 
 -  (void)tableView:(UITableView *)tableView
@@ -168,54 +142,45 @@ moveRowAtIndexPath:(NSIndexPath *)fromIndexPath
     return ([indexPath row] < [_accounts count]);
 }
 
-#pragma mark - UITableViewDelegate Methods
-
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
-    if ([indexPath row] < [_accounts count])
+    if ([[segue identifier] isEqualToString:@"SelectAccount"])
     {
-        // Select an existing account
-        NewsAccount *account = _accounts[indexPath.row];
+        NewsAccount *account = _accounts[[[[self tableView] indexPathForSelectedRow] row]];
+        FavouriteGroupsViewController *viewController = [segue destinationViewController];
+        [viewController setConnectionPool:[[NewsConnectionPool alloc] initWithAccount:account]];
+    }
+    else if ([[segue identifier] isEqualToString:@"AddAccount"])
+    {
+        WelcomeViewController *viewController = [segue destinationViewController];
+        [viewController setAccounts:_accounts];
 
-        if ([self isEditing] == NO)
+        if ([_accounts count] == 0)
         {
-            FavouriteGroupsViewController *viewController = [[FavouriteGroupsViewController alloc] initWithNibName:@"FavouriteGroupsView"
-                                                                                                            bundle:nil];
-            [viewController setConnectionPool:[[NewsConnectionPool alloc] initWithAccount:account]];
-            [[self navigationController] pushViewController:viewController animated:YES];
-        }
-        else
-        {
-            AccountSettingsViewController *viewController = [[AccountSettingsViewController alloc] initWithNibName:@"AccountSettingsView"
-                                                                                                            bundle:nil];
-            [viewController setAccount:account];
-            [viewController setDelegate:self];
-
-            [[self navigationController] pushViewController:viewController animated:YES];
-
-//            UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
-//            [self presentViewController:navigationController animated:YES completion:NULL];
+            [viewController setTitle:@"Welcome to Network News"];
+            [[viewController navigationItem] setHidesBackButton:YES];
+            //animated = NO;
         }
     }
-    else
+    else if ([[segue identifier] isEqualToString:@"EditAccount"])
     {
-        // Add a new account
-
-        // Bring up the welcome view
-        WelcomeViewController *viewController = [[WelcomeViewController alloc] initWithNibName:@"WelcomeView"
-                                                                                        bundle:nil];
-        [viewController setAccounts:_accounts];
-        [viewController setTitle:@"Add News Server"];
-        [[self navigationController] pushViewController:viewController animated:YES];
+        // Configuration is done in tableView:accessoryButtonTappedForRowWithIndexPath:
     }
 }
 
+#pragma mark - UITableViewDelegate Methods
+
 - (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if ([indexPath row] < [_accounts count])
-        return UITableViewCellEditingStyleDelete;
-    else
-        return UITableViewCellEditingStyleInsert;
+    return UITableViewCellEditingStyleDelete;
+}
+
+- (void)tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath
+{
+    NewsAccount *account = _accounts[[indexPath row]];
+    AccountSettingsViewController *viewController = (AccountSettingsViewController *)[(UINavigationController *)[self presentedViewController] topViewController];
+    [viewController setAccount:account];
+    [viewController setDelegate:self];
 }
 
 - (void)didReceiveMemoryWarning
@@ -257,32 +222,32 @@ moveRowAtIndexPath:(NSIndexPath *)fromIndexPath
 
 #pragma mark - Actions
 
-- (void)addButtonPressed:(id)sender
-{
-    // Bring up the welcome view
-    WelcomeViewController *viewController = [[WelcomeViewController alloc] initWithNibName:@"WelcomeView"
-                                                                                    bundle:nil];
-    [viewController setAccounts:_accounts];
-
-    BOOL animated;
-
-    if ([_accounts count] > 0)
-    {
-        [viewController setTitle:@"Add News Server"];
-        [[viewController navigationItem] setHidesBackButton:NO];
-        animated = YES;
-    }
-    else
-    {
-        [viewController setTitle:@"Welcome to Network News"];
-        [[viewController navigationItem] setHidesBackButton:YES];
-        animated = NO;
-    }
-    [[self navigationController] pushViewController:viewController animated:animated];
-
-//    UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
-//    [self presentViewController:navigationController animated:animated completion:NULL];
-}
+//- (void)addButtonPressed:(id)sender
+//{
+//    // Bring up the welcome view
+//    WelcomeViewController *viewController = [[WelcomeViewController alloc] initWithNibName:@"WelcomeView"
+//                                                                                    bundle:nil];
+//    [viewController setAccounts:_accounts];
+//
+//    BOOL animated;
+//
+//    if ([_accounts count] > 0)
+//    {
+//        [viewController setTitle:@"Add News Server"];
+//        [[viewController navigationItem] setHidesBackButton:NO];
+//        animated = YES;
+//    }
+//    else
+//    {
+//        [viewController setTitle:@"Welcome to Network News"];
+//        [[viewController navigationItem] setHidesBackButton:YES];
+//        animated = NO;
+//    }
+//    [[self navigationController] pushViewController:viewController animated:animated];
+//
+////    UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
+////    [self presentViewController:navigationController animated:animated completion:NULL];
+//}
 
 #pragma mark - Private Methods
 

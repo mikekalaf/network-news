@@ -19,10 +19,10 @@
 @property(nonatomic) NewsConnectionPool *connectionPool;
 @property(nonatomic, weak) id <NewArticleDelegate> delegate;
 
-- (id)initWithGroupName:(NSString *)aGroupName
-                subject:(NSString *)aSubject
-             references:(NSString *)aReferences
-               bodyText:(NSString *)aBodyText;
+- (void)setGroupName:(NSString *)groupName;
+- (void)setSubject:(NSString *)subject;
+- (void)setReferences:(NSString *)references;
+- (void)setMessageBody:(NSString *)messageBody;
 
 - (IBAction)cancelButtonPressed:(id)sender;
 

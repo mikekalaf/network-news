@@ -38,42 +38,63 @@
 {
     @try
     {
-        NewsConnection *newsConnection = [_connectionPool dequeueConnection];
-        NewsResponse *response = [newsConnection listActiveWithWildmat:_wildmat];
-        [_connectionPool enqueueConnection:newsConnection];
-
-        if ([response statusCode] == 215)
+        BOOL retry = NO;
+        do
         {
-            NSMutableArray *groups = [[NSMutableArray alloc] initWithCapacity:1];
-            NSUInteger linesRead = 0;
+            NewsConnection *newsConnection = [_connectionPool dequeueConnection];
+            NewsResponse *response = [newsConnection listActiveWithWildmat:_wildmat];
 
-            LineIterator *lineIterator = [[LineIterator alloc] initWithData:[response data]];
-
-            while (!lineIterator.isAtEnd)
+            if ([response statusCode] == 215)
             {
-                NSString *line = [lineIterator nextLine];
+                NSMutableArray *groups = [[NSMutableArray alloc] initWithCapacity:1];
+                NSUInteger linesRead = 0;
 
-                // Is this the end of the list?
-                if (lineIterator.isAtEnd && [line isEqualToString:@".\r\n"])
-                    break;
+                LineIterator *lineIterator = [[LineIterator alloc] initWithData:[response data]];
 
-                // Extract the group name from the line
-                if (linesRead > 0)
+                while (!lineIterator.isAtEnd)
                 {
-                    NSArray *components = [line componentsSeparatedByCharactersInSet:
-                                           [NSCharacterSet whitespaceCharacterSet]];
+                    NSString *line = [lineIterator nextLine];
 
-                    GroupListing *group = [[GroupListing alloc] initWithName:components[0]
-                                                              highestArticle:[components[1] longLongValue]
-                                                               lowestArticle:[components[2] longLongValue]
-                                                               postingStatus:[components[3] characterAtIndex:0]];
-                    [groups addObject:group];
+                    // Is this the end of the list?
+                    if (lineIterator.isAtEnd && [line isEqualToString:@".\r\n"])
+                        break;
+
+                    // Extract the group name from the line
+                    if (linesRead > 0)
+                    {
+                        NSArray *components = [line componentsSeparatedByCharactersInSet:
+                                               [NSCharacterSet whitespaceCharacterSet]];
+
+                        GroupListing *group = [[GroupListing alloc] initWithName:components[0]
+                                                                  highestArticle:[components[1] longLongValue]
+                                                                   lowestArticle:[components[2] longLongValue]
+                                                                   postingStatus:[components[3] characterAtIndex:0]];
+                        [groups addObject:group];
+                    }
+
+                    ++linesRead;
                 }
+                _groups = groups;
 
-                ++linesRead;
+                retry = NO;
             }
-            _groups = groups;
-        }
+            else if ([response statusCode] == 503)
+            {
+                // Connection has probably timed-out, so retry with a
+                // new connection (if we haven't retried already)
+                newsConnection = nil;
+                retry = !retry;
+            }
+            else
+            {
+                NSLog(@"STATUS CODE: %d", [response statusCode]);
+                NSLog(@"%@", [[NSString alloc] initWithData:[response data] encoding:NSUTF8StringEncoding]);
+
+                retry = NO;
+            }
+
+            [_connectionPool enqueueConnection:newsConnection];
+        } while (retry);
     }
     @catch (NSException *exception)
     {

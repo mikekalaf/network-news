@@ -8,7 +8,6 @@
 
 #import "WelcomeViewController.h"
 #import "AccountSettingsViewController.h"
-#import "LogoTableViewCell.h"
 #import "NewsAccount.h"
 #import "NetworkNews.h"
 
@@ -56,24 +55,26 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView
          cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    static NSString *CellIdentifier = @"Cell";
+    static NSString *CellIdentifier = @"LogoCell";
     
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-    if (cell == nil)
-    {
-        cell = [[LogoTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
-                                        reuseIdentifier:CellIdentifier];
-    }
+//    if (cell == nil)
+//    {
+//        cell = [[LogoTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
+//                                        reuseIdentifier:CellIdentifier];
+//    }
 
     NewsAccount *account = _templateAccounts[indexPath.row];
     if ([account iconName])
     {
-        [[cell imageView] setImage:[UIImage imageNamed:[account iconName]]];
+        //[[cell imageView] setImage:[UIImage imageNamed:[account iconName]]];
+        UIImageView *imageView = (UIImageView *)[cell viewWithTag:1];
+        [imageView setImage:[UIImage imageNamed:[account iconName]]];
     }
     else
     {
         [[cell textLabel] setText:[account serviceName]];
-        [[cell textLabel] setFont:[UIFont boldSystemFontOfSize:24]];
+        //[[cell textLabel] setFont:[UIFont boldSystemFontOfSize:24]];
         [[cell textLabel] setTextAlignment:NSTextAlignmentCenter];
     }
     
@@ -82,22 +83,30 @@
 
 #pragma mark - UITableViewDelegate Methods
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+//- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+//{
+//    AccountSettingsViewController *viewController = [[AccountSettingsViewController alloc] initWithNibName:@"AccountSettingsView"
+//                                                                                                    bundle:nil];
+//    [viewController setAccount:_templateAccounts[indexPath.row]];
+//    [viewController setDelegate:self];
+//
+//    UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
+//
+//    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
+//        [navigationController setModalPresentationStyle:UIModalPresentationFormSheet];
+//
+//    [self presentViewController:navigationController animated:YES completion:NULL];
+//    
+//    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
+//        [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+//}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
-    AccountSettingsViewController *viewController = [[AccountSettingsViewController alloc] initWithNibName:@"AccountSettingsView"
-                                                                                                    bundle:nil];
-    [viewController setAccount:_templateAccounts[indexPath.row]];
+    AccountSettingsViewController *viewController = (AccountSettingsViewController *)[[segue destinationViewController] topViewController];
+    NSIndexPath *selectedRowIndexPath = [[self tableView] indexPathForSelectedRow];
+    [viewController setAccount:_templateAccounts[[selectedRowIndexPath row]]];
     [viewController setDelegate:self];
-
-    UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
-
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-        [navigationController setModalPresentationStyle:UIModalPresentationFormSheet];
-
-    [self presentViewController:navigationController animated:YES completion:NULL];
-    
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-        [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 - (void)didReceiveMemoryWarning

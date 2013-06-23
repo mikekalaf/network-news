@@ -8,6 +8,7 @@
 
 #import "AppDelegate.h"
 #import "AccountsViewController.h"
+#import "ArticleViewController.h"
 #import "NewsAccount.h"
 #import "NSArray+NewsAdditions.h"
 #import "NetworkNews.h"
@@ -22,16 +23,46 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+//    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+//
+//    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
+//    {
+//        UIViewController *viewController = [[AccountsViewController alloc] initWithNibName:@"AccountsView" bundle:nil];
+//        [self setNavigationController:[[UINavigationController alloc] initWithRootViewController:viewController]];
+//
+//        [[self navigationController] setToolbarHidden:NO];
+//        
+//        [[self window] setRootViewController:[self navigationController]];
+//    }
+//    else
+//    {
+//        UIViewController *masterViewController = [[AccountsViewController alloc] initWithNibName:@"AccountsView" bundle:nil];
+//        UINavigationController *masterNavigationController = [[UINavigationController alloc] initWithRootViewController:masterViewController];
+//
+//        [masterNavigationController setToolbarHidden:NO];
+//
+//        _articleViewController = [[ArticleViewController alloc] initWithNibName:@"ArticleView_iPad" bundle:nil];
+////        UINavigationController *detailNavigationController = [[UINavigationController alloc] initWithRootViewController:_articleViewController];
+//
+//        self.splitViewController = [[UISplitViewController alloc] init];
+//        self.splitViewController.delegate = _articleViewController;
+////        self.splitViewController.viewControllers = @[masterNavigationController, detailNavigationController];
+//        [[self splitViewController] setViewControllers:@[masterNavigationController, _articleViewController]];
+//
+////        // TESTING Try putting our own gesture recogniser in
+////        UISwipeGestureRecognizer *gestureRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipeLeft:)];
+////        [gestureRecognizer setDirection:UISwipeGestureRecognizerDirectionLeft];
+////        [[[self splitViewController] view] addGestureRecognizer:gestureRecognizer];
+////
+////        gestureRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipeRight:)];
+////        [gestureRecognizer setDirection:UISwipeGestureRecognizerDirectionRight];
+////        [[[self splitViewController] view] addGestureRecognizer:gestureRecognizer];
+//
+//        [[self window] setRootViewController:[self splitViewController]];
+//    }
+//
+//    [self.window makeKeyAndVisible];
 
-    // Override point for customization after application launch.
-    UIViewController *viewController = [[AccountsViewController alloc] initWithNibName:@"AccountsView" bundle:nil];
-    [self setNavigationController:[[UINavigationController alloc] initWithRootViewController:viewController]];
-
-    [[self navigationController] setToolbarHidden:NO];
-    
-    self.window.rootViewController = self.navigationController;
-    [self.window makeKeyAndVisible];
     return YES;
 }
 
@@ -60,6 +91,16 @@
 - (void)applicationWillTerminate:(UIApplication *)application
 {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+}
+
+- (void)swipeLeft:(UIGestureRecognizer *)gestureRecognizer
+{
+    NSLog(@"swipeLeft:");
+}
+
+- (void)swipeRight:(UIGestureRecognizer *)gestureRecognizer
+{
+    NSLog(@"swipeRight:");
 }
 
 @end

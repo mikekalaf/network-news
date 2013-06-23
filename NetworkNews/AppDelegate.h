@@ -8,11 +8,15 @@
 
 #import <UIKit/UIKit.h>
 
+@class ArticleViewController;
+
 @class ViewController;
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
 @property (strong, nonatomic) UINavigationController *navigationController;
+@property (strong, nonatomic) UISplitViewController *splitViewController;
+@property (strong, nonatomic) ArticleViewController *articleViewController;
 
 @end

@@ -124,90 +124,100 @@ static BOOL PartNumber(NSString *subject,
 {
     @try
     {
-        _status = ArticleOverviewsUndefined;
-
         // We need a managed object context specifically for this thread
         GroupStore *concurrentGroupStore = [_groupStore concurrentGroupStore];
 
-        NewsConnection *newsConnection = [_connectionPool dequeueConnection];
-        if (newsConnection == nil)
+        BOOL retry = NO;
+        do
         {
-            _status = ArticleOverviewsFailed;
-            return;
-        }
+            _status = ArticleOverviewsUndefined;
 
-        // Select the newsgroup
-        NewsResponse *response = [newsConnection groupWithName:[_groupStore groupName]];
-
-        if ([response statusCode] == 211)
-        {
-            // Group successfully selected
-
-            // Scan the response string for the article numbers
-            NSString *string = [[NSString alloc] initWithData:[response data]
-                                                     encoding:NSUTF8StringEncoding];
-            NSScanner *scanner = [[NSScanner alloc] initWithString:string];
-            NSInteger response;
-            long long number;
-            long long low;
-            long long high;
-            NSString *name;
-            [scanner scanInteger:&response];
-            [scanner scanLongLong:&number];
-            [scanner scanLongLong:&low];
-            [scanner scanLongLong:&high];
-            [scanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet]
-                                    intoString:&name];
-
-            ArticleRange storedRange = [_groupStore articleRange];
-
-            if (_mode == ArticleOverviewsLatest)
+            NewsConnection *newsConnection = [_connectionPool dequeueConnection];
+            if (newsConnection == nil)
             {
-                if (storedRange.length == 0)
-                {
-                    low = MAX(high - _maxArticleCount + 1, 0);
-                }
-                else
-                {
-                    low = MAX(ArticleRangeMax(storedRange), low);
-                    high = MIN(low + _maxArticleCount, high);
-                }
-            }
-            else if (_mode == ArticleOverviewsMore)
-            {
-                low = MAX(storedRange.location - _maxArticleCount, low);
-                high = MAX(storedRange.location, low);
+                _status = ArticleOverviewsFailed;
+                return;
             }
 
-            _articleRange = [self rangeOfArticleNumberLow:low ArticleNumberHigh:high];
+            // Select the newsgroup
+            NewsResponse *response = [newsConnection groupWithName:[_groupStore groupName]];
 
-            if (_articleRange.length == 0)
+            if ([response statusCode] == 211)
             {
-                // This should just bump the update date
-                [concurrentGroupStore save];
+                // Group successfully selected
 
-                // Nothing to do, so we're done
-                _status = ArticleOverviewsComplete;
+                // Scan the response string for the article numbers
+                NSString *string = [[NSString alloc] initWithData:[response data]
+                                                         encoding:NSUTF8StringEncoding];
+                NSScanner *scanner = [[NSScanner alloc] initWithString:string];
+                NSInteger response;
+                long long number;
+                long long low;
+                long long high;
+                NSString *name;
+                [scanner scanInteger:&response];
+                [scanner scanLongLong:&number];
+                [scanner scanLongLong:&low];
+                [scanner scanLongLong:&high];
+                [scanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet]
+                                        intoString:&name];
+
+                ArticleRange storedRange = [_groupStore articleRange];
+
+                if (_mode == ArticleOverviewsLatest)
+                {
+                    if (storedRange.length == 0)
+                    {
+                        low = MAX(high - _maxArticleCount + 1, 0);
+                    }
+                    else
+                    {
+                        low = MAX(ArticleRangeMax(storedRange), low);
+                        high = MIN(low + _maxArticleCount, high);
+                    }
+                }
+                else if (_mode == ArticleOverviewsMore)
+                {
+                    low = MAX(storedRange.location - _maxArticleCount, low);
+                    high = MAX(storedRange.location, low);
+                }
+
+                _articleRange = [self rangeOfArticleNumberLow:low ArticleNumberHigh:high];
+
+                if (_articleRange.length == 0)
+                {
+                    // This should just bump the update date
+                    [concurrentGroupStore save];
+
+                    // Nothing to do, so we're done
+                    _status = ArticleOverviewsComplete;
+                    [_connectionPool enqueueConnection:newsConnection];
+                    return;
+                }
+
+                retry = NO;
+            }
+            else if ([response statusCode] == 411)
+            {
+                // No such newsgroup
+                _status = ArticleOverviewsNoSuchGroup;
                 [_connectionPool enqueueConnection:newsConnection];
                 return;
             }
-        }
-        else if ([response statusCode] == 411)
-        {
-            // No such newsgroup
-            _status = ArticleOverviewsNoSuchGroup;
-            [_connectionPool enqueueConnection:newsConnection];
-            return;
-        }
-        else if ([response statusCode] == 503)
-        {
-            // Time out
-            _status = ArticleOverviewsFailed;
-            [_connectionPool enqueueConnection:newsConnection];
-            return;
-        }
+            else if ([response statusCode] == 503)
+            {
+                // Connection has probably timed-out, so retry with a
+                // new connection (if we haven't retried already)
+                newsConnection = nil;
+                retry = !retry;
+            }
 
-        response = [newsConnection overWithRange:_articleRange];
+            [_connectionPool enqueueConnection:newsConnection];
+
+        } while (retry);
+
+        NewsConnection *newsConnection = [_connectionPool dequeueConnection];
+        NewsResponse *response = [newsConnection overWithRange:_articleRange];
         [_connectionPool enqueueConnection:newsConnection];
 
         if ([response statusCode] == 224)

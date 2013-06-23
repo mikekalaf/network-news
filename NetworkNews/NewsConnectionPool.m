@@ -63,9 +63,12 @@
 
 - (void)enqueueConnection:(NewsConnection *)connection
 {
-    @synchronized(self)
+    if (connection != nil)
     {
-        [_connections addObject:connection];
+        @synchronized(self)
+        {
+            [_connections addObject:connection];
+        }
     }
     [[UIApplication sharedApplication] hideNetworkActivityIndicator];
 }

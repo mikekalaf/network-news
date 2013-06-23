@@ -19,6 +19,7 @@ extern NSString *FetchArticleCompletedNotification;
                   partNumber:(NSUInteger)partNumber
               totalPartCount:(NSUInteger)totalPartCount
                     cacheURL:(NSURL *)cacheURL
+                  commonInfo:(NSMutableDictionary *)commonInfo
                     progress:(void (^)(NSUInteger bytesReceived))progressBlock;
 
 @end

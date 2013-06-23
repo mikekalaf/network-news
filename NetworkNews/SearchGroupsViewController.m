@@ -32,7 +32,7 @@
 {
     [super viewDidLoad];
 
-    [self setTitle:@"Add Groups"];
+    //[self setTitle:@"Add Groups"];
     
     // Restore the search scope button
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
@@ -95,13 +95,13 @@
     static NSString *CellIdentifier = @"Cell";
     
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-    if (cell == nil)
-    {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle
-                                       reuseIdentifier:CellIdentifier];
-        cell.textLabel.lineBreakMode = NSLineBreakByTruncatingMiddle;
-    }
-    
+//    if (cell == nil)
+//    {
+//        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle
+//                                       reuseIdentifier:CellIdentifier];
+//        cell.textLabel.lineBreakMode = NSLineBreakByTruncatingMiddle;
+//    }
+
     GroupListing *listing = [_foundGroupList objectAtIndex:indexPath.row];
     NSString *groupName = listing.name;
 //    long long articleCount = listInfo.high - listInfo.low + 1;

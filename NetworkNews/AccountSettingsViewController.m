@@ -13,7 +13,7 @@
 #import "ConnectionVerifier.h"
 
 typedef enum {
-    AccountSettingsNameTag,
+    AccountSettingsServiceNameTag = 1,
     AccountSettingsHostTag,
     AccountSettingsUserNameTag,
     AccountSettingsPasswordTag,
@@ -27,7 +27,7 @@ typedef enum {
     UIBarButtonItem *saveButtonItem;
     BOOL isVerified;
     BOOL isModified;
-    BOOL _isNameValid;
+    BOOL _isServiceNameValid;
     NSMutableArray *_fields;
 }
 
@@ -106,20 +106,20 @@ typedef enum {
      @"textField.keyboardType": [NSNumber numberWithInteger:UIKeyboardTypeASCIICapable]}];
 
     [_fields addObject:@{
-     @"tag": [NSNumber numberWithInteger:AccountSettingsNameTag],
+     @"tag": [NSNumber numberWithInteger:AccountSettingsServiceNameTag],
      @"textLabel.text": @"Name",
      @"textField.text": [_account serviceName],
      @"textField.placeholder": @"required",
      @"textField.secureTextEntry": [NSNumber numberWithBool:NO],
      @"textField.keyboardType": [NSNumber numberWithInteger:UIKeyboardTypeDefault],
-     @"validation": [NSValue valueWithPointer:@selector(isNameValid)]}];
+     @"validation": [NSValue valueWithPointer:@selector(isServiceNameValid)]}];
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
 
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
     {
         // Set the first field ready for entry
         [self selectNextField];
@@ -165,6 +165,7 @@ typedef enum {
 
         NSDictionary *field = _fields[[indexPath row]];
         cell.tag = [field[@"tag"] integerValue];
+        cell.textField.tag = [field[@"tag"] integerValue];
         [[cell textLabel] setText:field[@"textLabel.text"]];
         [[cell textField] setText:field[@"textField.text"]];
         [[cell textField] setPlaceholder:field[@"textField.placeholder"]];
@@ -275,7 +276,7 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
     {
         NSString *alertMessage = @"This account may not be able to send or receive news articles. Are you sure you want to save?";
 
-        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
         {
             UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"New Account"
                                                                 message:alertMessage
@@ -358,8 +359,8 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 - (IBAction)textFieldValueChanged:(id)sender
 {
     UITextField *textField = sender;
-    NSUInteger tag = textField.superview.superview.tag;
-    
+    NSUInteger tag = [textField tag];
+
     if (tag == AccountSettingsHostTag)
     {
         [_account setHostName:[textField text]];
@@ -372,11 +373,11 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
     {
         [_account setPassword:[textField text]];
     }
-    else if (tag == AccountSettingsNameTag)
+    else if (tag == AccountSettingsServiceNameTag)
     {
         [_account setServiceName:[textField text]];
-        [self isNameValid];
-        if (_isNameValid)
+        [self isServiceNameValid];
+        if (_isServiceNameValid)
             [textField setTextColor:[UIColor blackColor]];
         else
             [textField setTextColor:[UIColor redColor]];
@@ -388,9 +389,9 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 
 
     // Is the name unique? If not, disable save and display the name in red
-    BOOL nameIsValid = [[self isNameValid] boolValue];
+    BOOL serviceNameIsValid = [[self isServiceNameValid] boolValue];
 
-    if (nameIsValid)
+    if (serviceNameIsValid)
     {
         if ([_account hostName] && [[_account hostName] length])
         {
@@ -470,14 +471,14 @@ didDismissWithButtonIndex:(NSInteger)buttonIndex
 
 #pragma mark - Private Methods
 
-- (NSNumber *)isNameValid
+- (NSNumber *)isServiceNameValid
 {
     if ([[_account serviceName] length] == 0 ||
         [_delegate accountSettingsViewController:self verifyAccountName:[_account serviceName]] == NO)
-        _isNameValid = NO;
+        _isServiceNameValid = NO;
     else
-        _isNameValid = YES;
-    return [NSNumber numberWithBool:_isNameValid];
+        _isServiceNameValid = YES;
+    return [NSNumber numberWithBool:_isServiceNameValid];
 }
 
 - (UIView *)createVerifyView
@@ -486,7 +487,7 @@ didDismissWithButtonIndex:(NSInteger)buttonIndex
 //    verifyView.backgroundColor = [UIColor grayColor];
 
     UIActivityIndicatorViewStyle style;
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
         style = UIActivityIndicatorViewStyleGray;
     else
         style = UIActivityIndicatorViewStyleWhite;
@@ -502,7 +503,7 @@ didDismissWithButtonIndex:(NSInteger)buttonIndex
     UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(28, 0, 90, 24)];
     label.text = @"Verifying";
     label.font = [UIFont boldSystemFontOfSize:20];
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
     {
         label.textColor = [UIColor grayColor];
         label.shadowColor = [UIColor whiteColor];

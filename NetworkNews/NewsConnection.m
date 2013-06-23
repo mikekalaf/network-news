@@ -234,7 +234,7 @@ NSString *const NewsConnectionBytesReceivedNotification = @"NewsConnectionBytesR
     }
 
     // Terminate the stream
-    bytesWritten = [_outputStream write:(const UInt8 *)"\r\n.\r\n" maxLength:5];
+    [_outputStream write:(const UInt8 *)"\r\n.\r\n" maxLength:5];
 }
 
 - (NewsResponse *)readResponse

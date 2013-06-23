@@ -12,8 +12,8 @@
 #import "ExtendedDateFormatter.h"
 #import "EmailAddressFormatter.h"
 #import "AppDelegate.h"
-#import "ThreadTableViewCell.h"
-#import "ThreadSectionHeaderView.h"
+#import "ThreadListTableViewCell.h"
+//#import "ThreadSectionHeaderView.h"
 #import "ArticleViewController.h"
 
 @interface ThreadViewController () <ArticleSource>
@@ -47,7 +47,7 @@
 
     dateFormatter = [[ExtendedDateFormatter alloc] init];
     emailAddressFormatter = [[EmailAddressFormatter alloc] init];
-    unreadIconImage = [UIImage imageNamed:@"icon-dot-unread.png"];
+    unreadIconImage = [UIImage imageNamed:@"unread-dot-blue"];
     readIconImage = [UIImage imageNamed:@"icon-blank.png"];
     incompleteIconImage = [UIImage imageNamed:@"icon-dot-incomplete.png"];
 
@@ -161,6 +161,15 @@
                             scrollPosition:scrollPosition];
 }
 
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
+    ArticleViewController *viewController = [segue destinationViewController];
+    [viewController setConnectionPool:_connectionPool];
+    viewController.articleSource = self;
+    viewController.articleIndex = [[[self tableView] indexPathForSelectedRow] row];
+    viewController.groupName = _groupName;
+}
+
 #pragma mark -
 #pragma mark UITableViewDataSource Methods
 
@@ -177,17 +186,7 @@
 // Customize the appearance of table view cells.
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    static NSString *CellIdentifier = @"Cell";
-    
-    ThreadTableViewCell *cell = (ThreadTableViewCell *)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-    if (cell == nil)
-    {
-        cell = [[ThreadTableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle
-                                           reuseIdentifier:CellIdentifier];
-        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
-            cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-    }
-    
+    ThreadListTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"ArticleCell"];
     Article *article = [_articles objectAtIndex:indexPath.row];
     cell.textLabel.text = [emailAddressFormatter stringForObjectValue:article.from];
     cell.detailTextLabel.text = article.subject;
@@ -231,41 +230,42 @@
 #pragma mark -
 #pragma mark UITableViewDelegate Methods
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
-    {
-        ArticleViewController *viewController = [[ArticleViewController alloc] initWithNibName:@"ArticleView"
-                                                                                        bundle:nil];
-        [viewController setConnectionPool:_connectionPool];
-        viewController.articleSource = self;
-        viewController.articleIndex = indexPath.row;
-        viewController.groupName = _groupName;
-
-        [self.navigationController pushViewController:viewController animated:YES];
-    }
-    else
-    {
-//        ArticleViewController *viewController = appDelegate.articleViewController;
-//        
+//- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+//{
+//    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
+//    {
+//        ArticleViewController *viewController = [[ArticleViewController alloc] initWithNibName:@"ArticleView"
+//                                                                                        bundle:nil];
+//        [viewController setConnectionPool:_connectionPool];
 //        viewController.articleSource = self;
 //        viewController.articleIndex = indexPath.row;
-//        viewController.groupName = groupName;
+//        viewController.groupName = _groupName;
+//
+//        [self.navigationController pushViewController:viewController animated:YES];
+//    }
+//    else
+//    {
+//        AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+//        ArticleViewController *viewController = [appDelegate articleViewController];
+//        
+//        [viewController setConnectionPool:_connectionPool];
+//        viewController.articleSource = self;
+//        viewController.articleIndex = indexPath.row;
+//        viewController.groupName = _groupName;
 //        
 //        [viewController updateArticle];
-    }
-}
+//    }
+//}
 
-- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
-{
-    ThreadSectionHeaderView *view = [[ThreadSectionHeaderView alloc] initWithFrame:CGRectZero];
-    [[view textLabel] setText:_threadTitle];
-    [[view dateLabel] setText:[dateFormatter stringFromDate:_threadDate]];
-    return view;
-}
+//- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+//{
+//    ThreadSectionHeaderView *view = [[ThreadSectionHeaderView alloc] initWithFrame:CGRectZero];
+//    [[view textLabel] setText:_threadTitle];
+//    [[view dateLabel] setText:[dateFormatter stringFromDate:_threadDate]];
+//    return view;
+//}
 
-#pragma mark -
-#pragma mark ArticleSource Methods
+#pragma mark - ArticleSource Methods
 
 - (NSUInteger)articleCount
 {

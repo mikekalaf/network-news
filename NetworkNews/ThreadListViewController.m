@@ -9,7 +9,6 @@
 #import "ThreadListViewController.h"
 #import "ThreadViewController.h"
 #import "GroupStore.h"
-//#import "Group.h"
 #import "Article.h"
 #import "ArticlePart.h"
 #import "Thread.h"
@@ -17,17 +16,15 @@
 #import "ExtendedDateFormatter.h"
 #import "EmailAddressFormatter.h"
 #import "NSString+NewsAdditions.h"
-//#import "NNConnection.h"
 #import "AppDelegate.h"
 #import "ThreadListTableViewCell.h"
-//#import "ProgressView.h"
 #import "ThreadIterator.h"
 #import "NetworkNews.h"
-//#import "NNServer.h"
 #import "NewsConnectionPool.h"
 #import "NewsAccount.h"
 #import "GroupInfoViewController.h"
 #import "NewArticleViewController.h"
+#import "UIColor+NewsAdditions.h"
 
 #define ONE_DAY_IN_SECONDS      86400
 #define ONE_WEEK_IN_SECONDS     7 * ONE_DAY_IN_SECONDS
@@ -49,7 +46,6 @@
 >
 {
     NSFetchedResultsController *searchFetchedResultsController;
-    //ProgressView *progressView;
     UILabel *_statusLabel;
     NSArray *threads;
     NSArray *fileThreads;
@@ -112,7 +108,7 @@
 
     dateFormatter = [[ExtendedDateFormatter alloc] init];
     emailAddressFormatter = [[EmailAddressFormatter alloc] init];
-    unreadIconImage = [UIImage imageNamed:@"icon-dot-unread.png"];
+    unreadIconImage = [UIImage imageNamed:@"unread-dot-blue"];
     partReadIconImage = [UIImage imageNamed:@"icon-dot-partread.png"];
     readIconImage = [UIImage imageNamed:@"icon-blank.png"];
     incompleteIconImage = [UIImage imageNamed:@"icon-dot-incomplete.png"];
@@ -261,38 +257,12 @@
     }
 }
 
-- (UITableViewCell *)loadMoreCellWithTableView:(UITableView *)aTableView
-{
-    static NSString *CellIdentifier = @"LoadMoreCell";
-
-    UITableViewCell *cell = [aTableView dequeueReusableCellWithIdentifier:CellIdentifier];
-    if (cell == nil)
-    {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle
-                                       reuseIdentifier:CellIdentifier];
-        [[cell imageView] setImage:readIconImage];
-    }
-    
-    [[cell textLabel] setText:@"Load More Articles"];
-    
-    return cell;
-}
-
 - (UITableViewCell *)tableView:(UITableView *)aTableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    // If this row is beyond the end of the list, show a "load more" cell
     if ([indexPath row] >= [[self activeThreads] count])
-        return [self loadMoreCellWithTableView:aTableView];
+        return [aTableView dequeueReusableCellWithIdentifier:@"LoadMoreCell"];
 
-    static NSString *CellIdentifier = @"Cell";
-    
-    ThreadListTableViewCell *cell = (ThreadListTableViewCell *)[aTableView dequeueReusableCellWithIdentifier:CellIdentifier];
-    if (cell == nil)
-    {
-        cell = [[ThreadListTableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle
-                                              reuseIdentifier:CellIdentifier];
-        [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
-    }
-    
     Thread *thread;
 
     if (aTableView == [[self searchDisplayController] searchResultsTableView])
@@ -303,101 +273,120 @@
     }
     else
         thread = [[self activeThreads] objectAtIndex:indexPath.row];
-    
-    [[cell textLabel] setText:[emailAddressFormatter stringForObjectValue:[thread initialAuthor]]];
-    [[cell detailTextLabel] setText:[thread subject]];
-    
+
+    ThreadListTableViewCell *cell;
     NSUInteger count = [[thread articles] count];
     if (count > 1)
-    {
-        [[cell threadCountLabel] setText:[NSString stringWithFormat:@"%d", count]];
-        [[cell threadCountLabel] setHidden:NO];
-    }
+        cell = [aTableView dequeueReusableCellWithIdentifier:@"ThreadCell"];
     else
-        [[cell threadCountLabel] setHidden:YES];
+        cell = [aTableView dequeueReusableCellWithIdentifier:@"ArticleCell"];
 
-    [[cell dateLabel] setText:[dateFormatter stringFromDate:[thread latestDate]]];
+    UILabel *dateLabel = [cell dateLabel];
+    UILabel *subjectLabel = [cell detailTextLabel];
+    UILabel *authorLabel = [cell textLabel];
+    UIImageView *imageView = [cell imageView];
+
+    [authorLabel setText:[emailAddressFormatter stringForObjectValue:[thread initialAuthor]]];
+    [subjectLabel setText:[thread subject]];
+    
+//    if (count > 1)
+//    {
+//        [[cell threadCountLabel] setText:[NSString stringWithFormat:@"%d", count]];
+//        [[cell threadCountLabel] setHidden:NO];
+//    }
+//    else
+//        [[cell threadCountLabel] setHidden:YES];
+
+    [dateLabel setText:[dateFormatter stringFromDate:[thread latestDate]]];
 
     if (count == 1 && [thread hasAllParts] == NO)
     {
-        [[cell imageView] setImage:incompleteIconImage];
-        [[cell imageView] setAlpha:1.0];
+        [imageView setImage:incompleteIconImage];
+        [imageView setAlpha:1.0];
     }
     else
     {
         ReadStatus readStatus = [thread readStatus];
         if (readStatus == ReadStatusUnread)
         {
-            [[cell imageView] setImage:unreadIconImage];
-            [[cell imageView] setAlpha:1.0];
+            [imageView setImage:unreadIconImage];
+            [imageView setAlpha:1.0];
         }
         else if (readStatus == ReadStatusPartiallyRead)
         {
     //        [[cell imageView] setImage:partReadIconImage];
-            [[cell imageView] setImage:unreadIconImage];
-            [[cell imageView] setAlpha:0.5];
+            [imageView setImage:unreadIconImage];
+            [imageView setAlpha:0.5];
         }
         else
-            [[cell imageView] setImage:readIconImage];
+            [imageView setImage:readIconImage];
     }
-	
+
     return cell;
 }
 
 #pragma mark - UITableViewDelegate Methods
 
-- (void)tableView:(UITableView *)aTableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    UIViewController *viewController;
-
-    if (aTableView == [[self searchDisplayController] searchResultsTableView])
-    {
-//        ArticleViewController *articleViewController = [[ArticleViewController alloc] initWithNibName:@"ArticleView"
-//                                                                                               bundle:nil];
-//        articleViewController.articles = [searchFetchedResultsController fetchedObjects];
-//        articleViewController.articleIndex = indexPath.row;
-//        articleViewController.groupName = groupName;
-//        
-//        viewController = articleViewController;
-    }
-    else
-    {
-        // Was "Load More" selected?
-        if ([indexPath row] >= [[self activeThreads] count])
-        {
-            [self downloadArticlesWithMode:ArticleOverviewsMore];
-            return;
-        }
-
-        Thread *thread = [[self activeThreads] objectAtIndex:[indexPath row]];
-        if ([[thread articles] count] > 1)
-        {
-            ThreadViewController *threadViewController = [[ThreadViewController alloc] initWithNibName:@"ThreadView"
-                                                                                                bundle:nil];
-            [threadViewController setConnectionPool:_connectionPool];
-            [threadViewController setArticles:[thread sortedArticles]];
-            [threadViewController setThreadTitle:[thread subject]];
-            [threadViewController setGroupName:_groupName];
-            [threadViewController setThreadDate:[thread latestDate]];
-
-            viewController = threadViewController;
-        }
-        else
-        {
-
-            ArticleViewController *articleViewController = [[ArticleViewController alloc] initWithNibName:@"ArticleView"
-                                                                                                   bundle:nil];
-            [articleViewController setConnectionPool:_connectionPool];
-            [articleViewController setArticleSource:threadIterator];
-            [articleViewController setArticleIndex:[threadIterator articleIndexOfThreadIndex:[indexPath row]]];
-            [articleViewController setGroupName:_groupName];
-
-            viewController = articleViewController;
-        }
-    }
-    
-    [self.navigationController pushViewController:viewController animated:YES];
-}
+//- (void)tableView:(UITableView *)aTableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+//{
+//    if (aTableView == [[self searchDisplayController] searchResultsTableView])
+//    {
+////        ArticleViewController *articleViewController = [[ArticleViewController alloc] initWithNibName:@"ArticleView"
+////                                                                                               bundle:nil];
+////        articleViewController.articles = [searchFetchedResultsController fetchedObjects];
+////        articleViewController.articleIndex = indexPath.row;
+////        articleViewController.groupName = _groupName;
+////        
+////        viewController = articleViewController;
+//    }
+//    else
+//    {
+//        // Was "Load More" selected?
+//        if ([indexPath row] >= [[self activeThreads] count])
+//        {
+//            [self downloadArticlesWithMode:ArticleOverviewsMore];
+//            return;
+//        }
+//
+//        // Was a thread or an individual article selected?
+//        Thread *thread = [[self activeThreads] objectAtIndex:[indexPath row]];
+//        if ([[thread articles] count] > 1)
+//        {
+//            ThreadViewController *viewController = [[ThreadViewController alloc] initWithNibName:@"ThreadView"
+//                                                                                          bundle:nil];
+//            [viewController setConnectionPool:_connectionPool];
+//            [viewController setArticles:[thread sortedArticles]];
+//            [viewController setThreadTitle:[thread subject]];
+//            [viewController setGroupName:_groupName];
+//            [viewController setThreadDate:[thread latestDate]];
+//            [self.navigationController pushViewController:viewController animated:YES];
+//        }
+//        else
+//        {
+//            if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
+//            {
+//                ArticleViewController *viewController = [[ArticleViewController alloc] initWithNibName:@"ArticleView"
+//                                                                                                bundle:nil];
+//                [viewController setConnectionPool:_connectionPool];
+//                [viewController setArticleSource:threadIterator];
+//                [viewController setArticleIndex:[threadIterator articleIndexOfThreadIndex:[indexPath row]]];
+//                [viewController setGroupName:_groupName];
+//                [self.navigationController pushViewController:viewController animated:YES];
+//            }
+//            else
+//            {
+//                // Use the main content view
+//                AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+//                ArticleViewController *viewController = [appDelegate articleViewController];
+//                [viewController setConnectionPool:_connectionPool];
+//                [viewController setArticleSource:threadIterator];
+//                [viewController setArticleIndex:[threadIterator articleIndexOfThreadIndex:[indexPath row]]];
+//                [viewController setGroupName:_groupName];
+//                [viewController updateArticle];
+//            }
+//        }
+//    }
+//}
 
 
 #pragma mark - Memory management
@@ -408,6 +397,28 @@
     [super didReceiveMemoryWarning];
     
     // Relinquish ownership any cached data, images, etc that aren't in use.
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
+    if ([[segue identifier] isEqualToString:@"SelectThread"])
+    {
+        Thread *thread = [[self activeThreads] objectAtIndex:[[[self tableView] indexPathForSelectedRow] row]];
+        ThreadViewController *viewController = [segue destinationViewController];
+        [viewController setConnectionPool:_connectionPool];
+        [viewController setArticles:[thread sortedArticles]];
+        [viewController setThreadTitle:[thread subject]];
+        [viewController setGroupName:_groupName];
+        [viewController setThreadDate:[thread latestDate]];
+    }
+    else if ([[segue identifier] isEqualToString:@"SelectArticle"])
+    {
+        ArticleViewController *viewController = [segue destinationViewController];
+        [viewController setConnectionPool:_connectionPool];
+        [viewController setArticleSource:threadIterator];
+        [viewController setArticleIndex:[threadIterator articleIndexOfThreadIndex:[[[self tableView] indexPathForSelectedRow] row]]];
+        [viewController setGroupName:_groupName];
+    }
 }
 
 #pragma mark - UISearchBarDelegate Methods
@@ -580,12 +591,15 @@
 
 - (void)composeButtonPressed:(id)sender
 {
-    NewArticleViewController *viewController = [[NewArticleViewController alloc] initWithGroupName:_groupName
-                                                                                           subject:nil
-                                                                                        references:nil
-                                                                                          bodyText:nil];
+    NewArticleViewController *viewController;
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
+        viewController = [[NewArticleViewController alloc] initWithNibName:@"NewArticleView" bundle:nil];
+    else
+        viewController = [[NewArticleViewController alloc] initWithNibName:@"NewArticleView" bundle:nil];
     [viewController setConnectionPool:_connectionPool];
-    viewController.delegate = self;
+    [viewController setDelegate:self];
+    [viewController setGroupName:_groupName];
+
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
 
     [self presentViewController:navigationController animated:YES completion:NULL];
@@ -880,11 +894,11 @@
 - (void)buildThreadListToolbar
 {
     // Set up toolbar
-    UIBarButtonItem *actionButtonItem =
-    [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction
-                                                  target:self
-                                                  action:@selector(actionButtonPressed:)];
-    UIBarButtonItem *flexibleSpaceButtonItem =
+    UIBarButtonItem *flexibleSpaceButtonItem1 =
+    [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+                                                  target:nil
+                                                  action:nil];
+    UIBarButtonItem *flexibleSpaceButtonItem2 =
     [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
                                                   target:nil
                                                   action:nil];
@@ -894,31 +908,40 @@
 //                                    target:self
 //                                    action:@selector(infoButtonPressed:)];
 
-//    progressView = [[ProgressView alloc] init];
-//    progressView.updatedDate = stack.group.lastUpdate;
-//    progressView.status = ProgressViewStatusUpdated;
-//    UIBarButtonItem *progressItem = [[UIBarButtonItem alloc] initWithCustomView:progressView];
-
     _statusLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+    [_statusLabel setFont:[UIFont systemFontOfSize:11.0]];
     [_statusLabel setOpaque:NO];
     [_statusLabel setBackgroundColor:[UIColor clearColor]];
-    [_statusLabel setShadowColor:[UIColor darkGrayColor]];
-    [_statusLabel setTextColor:[UIColor whiteColor]];
+    [_statusLabel setTextColor:[UIColor toolbarTextColor]];
     UIBarButtonItem *statusItem = [[UIBarButtonItem alloc] initWithCustomView:_statusLabel];
 
-    UIBarButtonItem *composeButtonItem =
-    [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCompose
-                                                  target:self
-                                                  action:@selector(composeButtonPressed:)];
-    self.toolbarItems = [NSArray arrayWithObjects:
-                         actionButtonItem,
-                         flexibleSpaceButtonItem,
-//                         infoButtonItem,
-//                         progressItem,
-                         statusItem,
-                         flexibleSpaceButtonItem,
-                         composeButtonItem,
-                         nil];
+    // If we're on an iPad, then the article view controller handles the toolbar commands
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
+    {
+//        [_statusLabel setShadowColor:[UIColor whiteColor]];
+//        [_statusLabel setShadowOffset:CGSizeMake(0, 1)];
+
+        [self setToolbarItems:@[flexibleSpaceButtonItem1, statusItem, flexibleSpaceButtonItem2]];
+    }
+    else
+    {
+//        [_statusLabel setShadowColor:[UIColor darkGrayColor]];
+
+        UIBarButtonItem *actionButtonItem =
+        [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction
+                                                      target:self
+                                                      action:@selector(actionButtonPressed:)];
+        UIBarButtonItem *composeButtonItem =
+        [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCompose
+                                                      target:self
+                                                      action:@selector(composeButtonPressed:)];
+        [self setToolbarItems:
+         @[actionButtonItem,
+         flexibleSpaceButtonItem1,
+         statusItem,
+         flexibleSpaceButtonItem2,
+         composeButtonItem]];
+    }
 }
 
 - (void)setStatusUpdatedDate:(NSDate *)date
@@ -929,41 +952,58 @@
         return;
     }
 
-    NSString *str = [NSDateFormatter localizedStringFromDate:date
-                                                   dateStyle:NSDateFormatterShortStyle
-                                                   timeStyle:NSDateFormatterShortStyle];
-    NSArray *components = @[@"Updated"];
-    components = [components arrayByAddingObjectsFromArray:[str componentsSeparatedByString:@" "]];
-    NSArray *fonts = @[[UIFont boldSystemFontOfSize:12.0],
-                       [UIFont systemFontOfSize:12.0]];
+//    NSString *str = [NSDateFormatter localizedStringFromDate:date
+//                                                   dateStyle:NSDateFormatterShortStyle
+//                                                   timeStyle:NSDateFormatterShortStyle];
+//    NSArray *components = @[@"Updated "];
+//    components = [components arrayByAddingObjectsFromArray:[str componentsSeparatedByString:@" "]];
+//    NSArray *fonts = @[[UIFont boldSystemFontOfSize:12.0],
+//                       [UIFont systemFontOfSize:12.0]];
+//
+//    NSMutableAttributedString *text = [[NSMutableAttributedString alloc] init];
+//    int index = 0;
+//    for (NSString *component in components)
+//    {
+//        if ([text length] > 0)
+//            [text appendAttributedString:[[NSAttributedString alloc] initWithString:@" "]];
+//        [text appendAttributedString:[[NSMutableAttributedString alloc] initWithString:component
+//                                                                            attributes:@{NSFontAttributeName: fonts[index]}]];
+//        index = (index + 1) % [fonts count];
+//    }
+//
+//    [_statusLabel setAttributedText:text];
+//    [_statusLabel sizeToFit];
 
-    NSMutableAttributedString *text = [[NSMutableAttributedString alloc] init];
-    int index = 0;
-    for (NSString *component in components)
+    NSTimeInterval timeInterval = [date timeIntervalSinceNow];
+
+    NSString *message;
+    if (timeInterval < 60)
     {
-        if ([text length] > 0)
-            [text appendAttributedString:[[NSAttributedString alloc] initWithString:@" "]];
-        [text appendAttributedString:[[NSMutableAttributedString alloc] initWithString:component
-                                                                            attributes:@{NSFontAttributeName: fonts[index]}]];
-        index = (index + 1) % [fonts count];
+        message = @"Updated Just Now";
+    }
+    else if (timeInterval < 600)
+    {
+        message = [NSString stringWithFormat:
+                   @"Updated %d %@ ago",
+                   (int)timeInterval / 60,
+                   timeInterval < 120 ? @"minute" : @"minutes"];
+    }
+    else
+    {
+        NSString *str = [NSDateFormatter localizedStringFromDate:date
+                                                       dateStyle:NSDateFormatterNoStyle
+                                                       timeStyle:NSDateFormatterShortStyle];
+        message = [NSString stringWithFormat:@"Updated %@", str];
     }
 
-//    [text appendAttributedString:[[NSMutableAttributedString alloc] initWithString:@"Updated  "
-//                                                                        attributes:@{NSFontAttributeName: boldFont}]];
-//    [text appendAttributedString:[[NSMutableAttributedString alloc] initWithString:@"01/01/13  "
-//                                                                        attributes:@{NSFontAttributeName: regularFont}]];
-//    [text appendAttributedString:[[NSMutableAttributedString alloc] initWithString:@"12:00 "
-//                                                                        attributes:@{NSFontAttributeName: boldFont}]];
-//    [text appendAttributedString:[[NSMutableAttributedString alloc] initWithString:@"PM"
-//                                                                        attributes:@{NSFontAttributeName: regularFont}]];
-    [_statusLabel setAttributedText:text];
+    [_statusLabel setText:message];
     [_statusLabel sizeToFit];
 }
 
 - (void)setStatusMessage:(NSString *)message
 {
     [_statusLabel setText:message];
-    [_statusLabel setFont:[UIFont boldSystemFontOfSize:12.0]];
+//    [_statusLabel setFont:[UIFont systemFontOfSize:12.0]];
     [_statusLabel sizeToFit];
 }
 
