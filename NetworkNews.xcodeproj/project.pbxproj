@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6302EF0E178D8E7800BBC68E /* ExtendedLayoutManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 6302EF0D178D8E7800BBC68E /* ExtendedLayoutManager.m */; };
 		633D9C3E16E1A489008DD64F /* NewsAccount.m in Sources */ = {isa = PBXBuildFile; fileRef = 633D9C3D16E1A489008DD64F /* NewsAccount.m */; };
 		634191B516D0D6590069B528 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 634191B416D0D6590069B528 /* UIKit.framework */; };
 		634191B716D0D6590069B528 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 634191B616D0D6590069B528 /* Foundation.framework */; };
@@ -77,6 +78,8 @@
 		63A7205216F32B6B000AC69C /* FetchArticleOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 63A7205116F32B6B000AC69C /* FetchArticleOperation.m */; };
 		63C3011C1769707A00F8B6FE /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 63C3011B1769707A00F8B6FE /* Images.xcassets */; };
 		63C3011E176972B300F8B6FE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 63C3011D176972B300F8B6FE /* Main.storyboard */; };
+		63C69193178D6FDB0016776B /* NSMutableAttributedString+NewsAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C69192178D65450016776B /* NSMutableAttributedString+NewsAdditions.m */; };
+		63C69196178D70EB0016776B /* Preferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C69195178D70EB0016776B /* Preferences.m */; };
 		63E3A76C16E99BD300BD3D13 /* NewsConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 63E3A76B16E99BD300BD3D13 /* NewsConnection.m */; };
 		63E3A76F16EA10C200BD3D13 /* NewsResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 63E3A76E16EA10C200BD3D13 /* NewsResponse.m */; };
 		63E3A77316EAD01500BD3D13 /* GroupListSearchOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 63E3A77216EAD01500BD3D13 /* GroupListSearchOperation.m */; };
@@ -102,6 +105,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		6302EF0C178D8E7800BBC68E /* ExtendedLayoutManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtendedLayoutManager.h; sourceTree = "<group>"; };
+		6302EF0D178D8E7800BBC68E /* ExtendedLayoutManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExtendedLayoutManager.m; sourceTree = "<group>"; };
 		633D9C3C16E1A489008DD64F /* NewsAccount.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NewsAccount.h; sourceTree = "<group>"; };
 		633D9C3D16E1A489008DD64F /* NewsAccount.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NewsAccount.m; sourceTree = "<group>"; };
 		634191B116D0D6590069B528 /* NetworkNews.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NetworkNews.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -230,6 +235,10 @@
 		63A7205116F32B6B000AC69C /* FetchArticleOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FetchArticleOperation.m; sourceTree = "<group>"; };
 		63C3011B1769707A00F8B6FE /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		63C3011D176972B300F8B6FE /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
+		63C69191178D65450016776B /* NSMutableAttributedString+NewsAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSMutableAttributedString+NewsAdditions.h"; sourceTree = "<group>"; };
+		63C69192178D65450016776B /* NSMutableAttributedString+NewsAdditions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSMutableAttributedString+NewsAdditions.m"; sourceTree = "<group>"; };
+		63C69194178D70EB0016776B /* Preferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Preferences.h; sourceTree = "<group>"; };
+		63C69195178D70EB0016776B /* Preferences.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Preferences.m; sourceTree = "<group>"; };
 		63E3A76A16E99BD300BD3D13 /* NewsConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NewsConnection.h; sourceTree = "<group>"; };
 		63E3A76B16E99BD300BD3D13 /* NewsConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NewsConnection.m; sourceTree = "<group>"; };
 		63E3A76D16EA10C100BD3D13 /* NewsResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NewsResponse.h; sourceTree = "<group>"; };
@@ -423,6 +432,10 @@
 		638F78D916D430010085B896 /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				6302EF0C178D8E7800BBC68E /* ExtendedLayoutManager.h */,
+				6302EF0D178D8E7800BBC68E /* ExtendedLayoutManager.m */,
+				63C69194178D70EB0016776B /* Preferences.h */,
+				63C69195178D70EB0016776B /* Preferences.m */,
 				63C3011D176972B300F8B6FE /* Main.storyboard */,
 				634192EB16D0DAEE0069B528 /* Thread.h */,
 				634192EC16D0DAEE0069B528 /* Thread.m */,
@@ -492,6 +505,8 @@
 		638F78DB16D432A20085B896 /* Categories */ = {
 			isa = PBXGroup;
 			children = (
+				63C69191178D65450016776B /* NSMutableAttributedString+NewsAdditions.h */,
+				63C69192178D65450016776B /* NSMutableAttributedString+NewsAdditions.m */,
 				634192DD16D0DAED0069B528 /* NSArray+NewsAdditions.h */,
 				634192DE16D0DAEE0069B528 /* NSArray+NewsAdditions.m */,
 				634192DF16D0DAEE0069B528 /* NSData+NewsAdditions.h */,
@@ -659,6 +674,7 @@
 				634191C516D0D6590069B528 /* AppDelegate.m in Sources */,
 				6341926016D0D8800069B528 /* ArticleViewController.m in Sources */,
 				6341926616D0D8800069B528 /* EditableTableViewCell.m in Sources */,
+				6302EF0E178D8E7800BBC68E /* ExtendedLayoutManager.m in Sources */,
 				6341927616D0D8800069B528 /* ExtendedDateFormatter.m in Sources */,
 				6341927816D0D8800069B528 /* FavouriteGroupsViewController.m in Sources */,
 				6341927916D0D8800069B528 /* FieldView.m in Sources */,
@@ -709,9 +725,11 @@
 				63E3A77C16EE89C400BD3D13 /* News.xcdatamodeld in Sources */,
 				63A7205216F32B6B000AC69C /* FetchArticleOperation.m in Sources */,
 				63529AA416FDB31C0089E65E /* AssemblePartsOperation.m in Sources */,
+				63C69196178D70EB0016776B /* Preferences.m in Sources */,
 				63529AA716FEB5320089E65E /* PostArticleOperation.m in Sources */,
 				63529AAA16FEC7A60089E65E /* UIApplication+NewsAdditions.m in Sources */,
 				63442698170E59E800483FC4 /* UIColor+NewsAdditions.m in Sources */,
+				63C69193178D6FDB0016776B /* NSMutableAttributedString+NewsAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

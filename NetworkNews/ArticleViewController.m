@@ -30,6 +30,8 @@
 #import "WelcomeViewController.h"
 #import "NewsConnectionPool.h"
 #import "NewsAccount.h"
+#import "NSMutableAttributedString+NewsAdditions.h"
+#import "ExtendedLayoutManager.h"
 
 @interface ArticleViewController ()
 {
@@ -39,7 +41,7 @@
     UIProgressView *_progressView;
 
     Article *_article;
-    NSMutableString *htmlString;
+    //NSMutableString *htmlString;
     NSOperationQueue *_operationQueue;
     NSURL *_cacheURL;
     NSURL *_attachmentURL;
@@ -50,7 +52,8 @@
 }
 
 @property(nonatomic, weak) IBOutlet UIToolbar *toolbar;
-@property(nonatomic, weak) IBOutlet UIWebView *webView;
+//@property(nonatomic, weak) IBOutlet UIWebView *webView;
+@property(nonatomic) UITextView *textView;
 @property(nonatomic, weak) IBOutlet UIBarButtonItem *replyButtonItem;
 @property(nonatomic, weak) IBOutlet UIBarButtonItem *composeButtonItem;
 @property(nonatomic, weak) IBOutlet UISegmentedControl *navigationSegmentedControl;
@@ -61,9 +64,9 @@
 - (void)followUpToGroup;
 - (void)replyViaEmail;
 - (NSString *)headerValueWithName:(NSString *)name;
-- (void)beginHTML;
-- (void)endHTML;
-- (void)appendHeadFromArticle;
+//- (void)beginHTML;
+//- (void)endHTML;
+//- (void)appendHeadFromArticle;
 - (void)updateWithPlaceholder;
 - (void)loadArticle;
 - (void)updateContent;
@@ -91,11 +94,38 @@
 {
     [super viewDidLoad];
 
+    // Add a text view with our own layout manager
+    NSTextStorage *textStorage = [[NSTextStorage alloc] init];
+
+    NSLayoutManager *layoutManager = [[ExtendedLayoutManager alloc] init];
+    [textStorage addLayoutManager:layoutManager];
+
+    NSTextContainer *textContainer = [[NSTextContainer alloc] initWithSize:self.view.bounds.size];
+    [layoutManager addTextContainer:textContainer];
+
+    self.textView = [[UITextView alloc] initWithFrame:self.view.bounds
+                                        textContainer:textContainer];
+    [self.textView setEditable:NO];
+    [self.textView setTranslatesAutoresizingMaskIntoConstraints:NO];
+    [self.view addSubview:self.textView];
+
+    NSDictionary *views = NSDictionaryOfVariableBindings(_textView);
+    NSArray *constraints = [NSLayoutConstraint constraintsWithVisualFormat:@"|[_textView]|"
+                                                                   options:0
+                                                                   metrics:nil
+                                                                     views:views];
+    [self.view addConstraints:constraints];
+    constraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_textView]|"
+                                                          options:0
+                                                          metrics:nil
+                                                            views:views];
+    [self.view addConstraints:constraints];
+
     // Set up the operation queue to download one part at a time
     _operationQueue = [[NSOperationQueue alloc] init];
     [_operationQueue setMaxConcurrentOperationCount:1];
     
-    htmlString = [NSMutableString string];
+    //htmlString = [NSMutableString string];
 
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
     {
@@ -728,231 +758,274 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     return CFStringConvertEncodingToNSStringEncoding(encoding);
 }
 
-- (void)appendHeadFromArticle
-{
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    dateFormatter.dateStyle = NSDateFormatterLongStyle;
-    dateFormatter.timeStyle = NSDateFormatterShortStyle;
-    
-    EmailAddressFormatter *emailFormatter = [[EmailAddressFormatter alloc] init];
+//- (void)appendHeadFromArticle
+//{
+//    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+//    dateFormatter.dateStyle = NSDateFormatterLongStyle;
+//    dateFormatter.timeStyle = NSDateFormatterShortStyle;
+//    
+//    EmailAddressFormatter *emailFormatter = [[EmailAddressFormatter alloc] init];
+//
+//    [htmlString appendFormat:
+//     @"<div class=\"field-block\">"
+//     @"<p class=\"field\"><span class=\"name\">From:</span> %@</p>"
+//     @"</div>"
+//     @"<div class=\"field-block\">"
+//     @"<p class=\"field subject\">%@</p>"
+//     @"<p class=\"field date\">%@</p>"
+//     @"</div>",
+//     [self htmlEscapedString:[emailFormatter stringForObjectValue:[_article from]]],
+//     [self htmlEscapedString:[_article subject]],
+//     [dateFormatter stringFromDate:[_article date]]];
+//}
 
-    [htmlString appendFormat:
-     @"<div class=\"field-block\">"
-     @"<p class=\"field\"><span class=\"name\">From:</span> %@</p>"
-     @"</div>"
-     @"<div class=\"field-block\">"
-     @"<p class=\"field subject\">%@</p>"
-     @"<p class=\"field date\">%@</p>"
-     @"</div>",
-     [self htmlEscapedString:[emailFormatter stringForObjectValue:[_article from]]],
-     [self htmlEscapedString:[_article subject]],
-     [dateFormatter stringFromDate:[_article date]]];
-}
+//- (void)beginQuoteLevel:(NSUInteger)level
+//{
+//    // Apply <div>s corresponding to the quote level
+//    for (NSUInteger i = 0; i <= level; ++i)
+//    {
+//        NSUInteger j = i;
+//        if (j > 3)
+//            j = (j - 1) % 3 + 1;
+//        [htmlString appendFormat:@"<div class=\"l%d\">", j];
+//    }
+//}
 
-- (void)beginQuoteLevel:(NSUInteger)level
-{
-    // Apply <div>s corresponding to the quote level
-    for (NSUInteger i = 0; i <= level; ++i)
-    {
-        NSUInteger j = i;
-        if (j > 3)
-            j = (j - 1) % 3 + 1;
-        [htmlString appendFormat:@"<div class=\"l%d\">", j];
-    }
-}
+//- (void)endQuoteLevel:(NSUInteger)level
+//{
+//    for (NSUInteger i = 0; i <= level; ++i)
+//        [htmlString appendString:@"</div>"];
+//}
 
-- (void)endQuoteLevel:(NSUInteger)level
-{
-    for (NSUInteger i = 0; i <= level; ++i)
-        [htmlString appendString:@"</div>"];
-}
+//- (void)beginSignature
+//{
+//    [htmlString appendString:@"<div class=\"sig\">"];
+//}
 
-- (void)beginSignature
-{
-    [htmlString appendString:@"<div class=\"sig\">"];
-}
+//- (void)endSignature
+//{
+//    [htmlString appendString:@"</div>"];
+//}
 
-- (void)endSignature
-{
-    [htmlString appendString:@"</div>"];
-}
+//- (void)appendBodyLineData:(NSData *)lineData encoding:(NSStringEncoding)encoding
+//{
+//    if (lineData.length == 2)
+//    {
+//        // Is this just a hard line break?
+//        if (memcmp(lineData.bytes, "\r\n", 2) == 0)
+//        {
+//            [htmlString appendString:@"<br/>"];
+//            return;
+//        }
+//    }
+//
+//    // TODO: Keep an eye on this -- should we do the HTML escaping *after*
+//    // the decoding of the string?
+//    
+//    lineData = [self htmlEscapedData:lineData];
+//
+//    // Decode used the specified encoding.  If this fails, try our two
+//    // fall-back encodings: UTF8 and ISOLatin1.
+//    NSString *articleString = [[NSString alloc] initWithData:lineData
+//                                                    encoding:encoding];
+//
+//    if (!articleString)
+//        articleString = [[NSString alloc] initWithData:lineData
+//                                              encoding:NSUTF8StringEncoding];
+//    if (!articleString)
+//        articleString = [[NSString alloc] initWithData:lineData
+//                                              encoding:NSISOLatin1StringEncoding];
+//
+//    [htmlString appendString:articleString];
+//}
 
-- (void)appendBodyLineData:(NSData *)lineData encoding:(NSStringEncoding)encoding
-{
-    if (lineData.length == 2)
-    {
-        // Is this just a hard line break?
-        if (memcmp(lineData.bytes, "\r\n", 2) == 0)
-        {
-            [htmlString appendString:@"<br/>"];
-            return;
-        }
-    }
+//- (void)appendBodyData:(NSData *)bodyData
+//              encoding:(NSStringEncoding)encoding
+//                flowed:(BOOL)flowed
+//{
+//    // TODO: The "quote level parser" needs to be renamed since its role has
+//    // expanded with the support of format=flowed text and styling of sigs
+//    NNQuoteLevelParser *qlp = [[NNQuoteLevelParser alloc] initWithData:bodyData
+//                                                                flowed:flowed];
+//    NSArray *quoteLevels = qlp.quoteLevels;
+//
+//    BOOL previousFlowed = NO;
+//    NSUInteger previousLevel = 0;
+//    BOOL inSignature = NO;
+//    
+//    [htmlString appendString:@"<p>"];
+//    for (NNQuoteLevel *quoteLevel in quoteLevels)
+//    {
+//        if (inSignature == NO && quoteLevel.signatureDivider)
+//        {
+//            [self beginSignature];
+//            inSignature = YES;
+//        }
+//
+//        if (previousLevel != quoteLevel.level && previousFlowed == YES)
+//        {
+//            // The quote level has changed, even though the text was flowed
+//            [self endQuoteLevel:quoteLevel.level];
+//            previousFlowed = NO;
+//        }
+//        
+//        if (previousFlowed == NO)
+//            [self beginQuoteLevel:quoteLevel.level];
+//        
+//        NSData *lineData = [bodyData subdataWithRange:quoteLevel.range];
+//        [self appendBodyLineData:lineData encoding:encoding];
+//        
+//        if (quoteLevel.flowed == NO)
+//        {
+//            [self endQuoteLevel:quoteLevel.level];
+//            previousFlowed = NO;
+//        }
+//        else
+//        {
+//            previousFlowed = YES;
+//        }
+//    }
+//    if (inSignature)
+//        [self endSignature];
+//
+//    [htmlString appendString:@"</p>"];
+//}
 
-    // TODO: Keep an eye on this -- should we do the HTML escaping *after*
-    // the decoding of the string?
-    
-    lineData = [self htmlEscapedData:lineData];
+//- (void)appendImageURL:(NSURL *)imageURL
+//{
+//    [htmlString appendFormat:@"<img src=\"%@\"/>", imageURL];
+//}
 
-    // Decode used the specified encoding.  If this fails, try our two
-    // fall-back encodings: UTF8 and ISOLatin1.
-    NSString *articleString = [[NSString alloc] initWithData:lineData
-                                                    encoding:encoding];
+//- (void)appendAudioURL:(NSURL *)audioURL
+//{
+//    [htmlString appendFormat:@"<audio src=\"%@\" controls=\"controls\">Some audio</audio>", audioURL];
+//}
 
-    if (!articleString)
-        articleString = [[NSString alloc] initWithData:lineData
-                                              encoding:NSUTF8StringEncoding];
-    if (!articleString)
-        articleString = [[NSString alloc] initWithData:lineData
-                                              encoding:NSISOLatin1StringEncoding];
+//- (void)appendLinkURL:(NSURL *)url
+//{
+//    [htmlString appendFormat:@"<a href=\"%@\">%@</a>", url, url];
+//}
 
-    [htmlString appendString:articleString];
-}
+//- (void)beginHTML
+//{
+//    NSRange range = NSMakeRange(0, [htmlString length]);
+//    [htmlString deleteCharactersInRange:range];
+//    
+//    [htmlString appendString:@"<html>"
+//     "<head>"
+//     "<style>"
+//     "body { margin-top: 0; font-family: sans-serif }"
+//     "table { border-bottom-style: solid; border-bottom-width: 1; border-bottom-color: gray }"
+//     ".field-block { padding-top: 8px; padding-bottom: 8px; margin-left: -8px; margin-right: -8px; border-bottom: solid; border-width: thin; border-color: silver }"
+//     ".field { margin-top: 0; margin-left: 8px; margin-bottom: 0; margin-right: 8px }"
+//     ".name { margin-top: 0; color: gray; text-align: right }"
+//     ".subject { font-weight: bold }"
+//     ".date { color: gray }"
+//     ".sig { color: gray }"
+//     ".status { color: gray }"
+//     ".l1 { padding-left: 5pt; border-left-style: solid; border-left-color: blue; color: blue }"
+//     ".l2 { padding-left: 5pt; border-left-style: solid; border-left-color: green; color: green }"
+//     ".l3 { padding-left: 5pt; border-left-style: solid; border-left-color: red; color: red }"
+//     "img { width: 100% }"
+//     "object { width: 100% }"
+//     "</style>"
+//     "</head>"
+//     "<body>"];
+//}
 
-- (void)appendBodyData:(NSData *)bodyData
-              encoding:(NSStringEncoding)encoding
-                flowed:(BOOL)flowed
-{
-    // TODO: The "quote level parser" needs to be renamed since its role has
-    // expanded with the support of format=flowed text and styling of sigs
-    NNQuoteLevelParser *qlp = [[NNQuoteLevelParser alloc] initWithData:bodyData
-                                                                flowed:flowed];
-    NSArray *quoteLevels = qlp.quoteLevels;
-
-    BOOL previousFlowed = NO;
-    NSUInteger previousLevel = 0;
-    BOOL inSignature = NO;
-    
-    [htmlString appendString:@"<p>"];
-    for (NNQuoteLevel *quoteLevel in quoteLevels)
-    {
-        if (inSignature == NO && quoteLevel.signatureDivider)
-        {
-            [self beginSignature];
-            inSignature = YES;
-        }
-
-        if (previousLevel != quoteLevel.level && previousFlowed == YES)
-        {
-            // The quote level has changed, even though the text was flowed
-            [self endQuoteLevel:quoteLevel.level];
-            previousFlowed = NO;
-        }
-        
-        if (previousFlowed == NO)
-            [self beginQuoteLevel:quoteLevel.level];
-        
-        NSData *lineData = [bodyData subdataWithRange:quoteLevel.range];
-        [self appendBodyLineData:lineData encoding:encoding];
-        
-        if (quoteLevel.flowed == NO)
-        {
-            [self endQuoteLevel:quoteLevel.level];
-            previousFlowed = NO;
-        }
-        else
-        {
-            previousFlowed = YES;
-        }
-    }
-    if (inSignature)
-        [self endSignature];
-
-    [htmlString appendString:@"</p>"];
-}
-
-- (void)appendImageURL:(NSURL *)imageURL
-{
-    [htmlString appendFormat:@"<img src=\"%@\"/>", imageURL];
-}
-
-- (void)appendAudioURL:(NSURL *)audioURL
-{
-    [htmlString appendFormat:@"<audio src=\"%@\" controls=\"controls\">Some audio</audio>", audioURL];
-}
-
-- (void)appendLinkURL:(NSURL *)url
-{
-    [htmlString appendFormat:@"<a href=\"%@\">%@</a>", url, url];
-}
-
-- (void)beginHTML
-{
-    NSRange range = NSMakeRange(0, [htmlString length]);
-    [htmlString deleteCharactersInRange:range];
-    
-    [htmlString appendString:@"<html>"
-     "<head>"
-     "<style>"
-     "body { margin-top: 0; font-family: sans-serif }"
-     "table { border-bottom-style: solid; border-bottom-width: 1; border-bottom-color: gray }"
-     ".field-block { padding-top: 8px; padding-bottom: 8px; margin-left: -8px; margin-right: -8px; border-bottom: solid; border-width: thin; border-color: silver }"
-     ".field { margin-top: 0; margin-left: 8px; margin-bottom: 0; margin-right: 8px }"
-     ".name { margin-top: 0; color: gray; text-align: right }"
-     ".subject { font-weight: bold }"
-     ".date { color: gray }"
-     ".sig { color: gray }"
-     ".status { color: gray }"
-     ".l1 { padding-left: 5pt; border-left-style: solid; border-left-color: blue; color: blue }"
-     ".l2 { padding-left: 5pt; border-left-style: solid; border-left-color: green; color: green }"
-     ".l3 { padding-left: 5pt; border-left-style: solid; border-left-color: red; color: red }"
-     "img { width: 100% }"
-     "object { width: 100% }"
-     "</style>"
-     "</head>"
-     "<body>"];
-}
-
-- (void)endHTML
-{
-    [htmlString appendString:@"</body></html>"];
-}
+//- (void)endHTML
+//{
+//    [htmlString appendString:@"</body></html>"];
+//}
 
 - (void)updateWithPlaceholder
 {
     // No article has been selected, so put a placeholder here - this will
     // happen on the iPad when the article view is displayed with no
     // selected article
-    [self beginHTML];
-    [htmlString appendString:@"<p class=\"status\">No selected article</p>"];
-    [self endHTML];
-    [_webView loadHTMLString:htmlString baseURL:nil];
+//    [self beginHTML];
+//    [htmlString appendString:@"<p class=\"status\">No selected article</p>"];
+//    [self endHTML];
+//    [_webView loadHTMLString:htmlString baseURL:nil];
     [self updateNavigationControls];
 }
 
 - (void)updateContent
 {
-    [self beginHTML];
-    
+    NSTextAttachment *textAttachment = nil;
+//    if (attachmentData)
+//    {
+//        NSImage *image = [[NSImage alloc] initWithData:attachmentData];
+//        NSFileWrapper *fileWrapper = [[NSFileWrapper alloc] initRegularFileWithContents:image.TIFFRepresentation];
+//        fileWrapper.filename = attachmentFileName;
+//        fileWrapper.preferredFilename = attachmentFileName;
+//
+//        textAttachment = [[NSTextAttachment alloc] initWithFileWrapper:fileWrapper];
+//
+//        //        if ([textAttachment.attachmentCell isKindOfClass:[NSImageCell class]])
+//        //        {
+//        //            NSLog(@"NSImageCell");
+//        //        }
+//
+//        [fileWrapper release];
+//        [image release];
+//    }
+
+    NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] init];
+
     // Is the content format=flowed?
     BOOL flowed = [self isFlowed];
-    
-    NSStringEncoding encoding = [self charsetEncoding];
 
-    // Append the visible headers
-    [self appendHeadFromArticle];
+    // Append the text preceeding any attachment (might be all the text)
+    [attrString appendNewsHead:_headEntries];
+    [attrString appendNewsBody:_bodyTextDataTop flowed:flowed];
 
-    // If there is an attachment, include it in the HTML, otherwise just
-    // present the text
-    // Append the text preceeding any attachment
-    [self appendBodyData:_bodyTextDataTop encoding:encoding flowed:flowed];
-
-    if (_attachmentURL)
+    if (textAttachment)
     {
         // Append the attachment
-        if ([[_attachmentURL pathExtension] caseInsensitiveCompare:@"jpg"] == NSOrderedSame)
-            [self appendImageURL:_attachmentURL];
-        else if ([[_attachmentURL pathExtension] caseInsensitiveCompare:@"mp3"] == NSOrderedSame)
-            [self appendAudioURL:_attachmentURL];
-        else
-            [self appendLinkURL:_attachmentURL];
-        
-        // Append the text following the attachment
-        [self appendBodyData:_bodyTextDataBottom encoding:encoding flowed:flowed];
+        [attrString appendAttributedString:
+         [NSAttributedString attributedStringWithAttachment:textAttachment]];
     }
-    
-    [self endHTML];
-    
+
+    // Append any text following the attachment
+    [attrString appendNewsBody:_bodyTextDataBottom flowed:flowed];
+
+    //UITextView *textView = (UITextView *)[self view];
+
+    [[[self textView] textStorage] setAttributedString:attrString];
+
+
+//    [self beginHTML];
+//    
+//    // Is the content format=flowed?
+//    BOOL flowed = [self isFlowed];
+//    
+//    NSStringEncoding encoding = [self charsetEncoding];
+//
+//    // Append the visible headers
+//    [self appendHeadFromArticle];
+//
+//    // If there is an attachment, include it in the HTML, otherwise just
+//    // present the text
+//    // Append the text preceeding any attachment
+//    [self appendBodyData:_bodyTextDataTop encoding:encoding flowed:flowed];
+//
+//    if (_attachmentURL)
+//    {
+//        // Append the attachment
+//        if ([[_attachmentURL pathExtension] caseInsensitiveCompare:@"jpg"] == NSOrderedSame)
+//            [self appendImageURL:_attachmentURL];
+//        else if ([[_attachmentURL pathExtension] caseInsensitiveCompare:@"mp3"] == NSOrderedSame)
+//            [self appendAudioURL:_attachmentURL];
+//        else
+//            [self appendLinkURL:_attachmentURL];
+//        
+//        // Append the text following the attachment
+//        [self appendBodyData:_bodyTextDataBottom encoding:encoding flowed:flowed];
+//    }
+//    
+//    [self endHTML];
+
     _progressView.hidden = YES;
 }
 
@@ -989,21 +1062,21 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
         return;
     
     // Clear the body
-    [self beginHTML];
-    [self appendHeadFromArticle];
+//    [self beginHTML];
+//    [self appendHeadFromArticle];
     
     SizeFormatter *formatter = [[SizeFormatter alloc] init];
     NSString *sizeString = [formatter stringForObjectValue:[_article totalByteCount]];
 
-    if ([_article hasAllParts] == NO)
-    {
-        [htmlString appendString:@"<p class=\"status\">Incomplete parts</p>"];
-    }
-    else
-        [htmlString appendFormat:@"<p class=\"status\">Loading (%@)...</p>", sizeString];
-    
-    [self endHTML];
-    [_webView loadHTMLString:htmlString baseURL:nil];
+//    if ([_article hasAllParts] == NO)
+//    {
+//        [htmlString appendString:@"<p class=\"status\">Incomplete parts</p>"];
+//    }
+//    else
+//        [htmlString appendFormat:@"<p class=\"status\">Loading (%@)...</p>", sizeString];
+
+//    [self endHTML];
+//    [_webView loadHTMLString:htmlString baseURL:nil];
 
     // Bail out if the article has incomplete parts
     if ([_article hasAllParts] == NO)
@@ -1053,7 +1126,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 
         // Display the cached copy
         [self updateContent];
-        [_webView loadHTMLString:htmlString baseURL:nil];
+//        [_webView loadHTMLString:htmlString baseURL:nil];
         [self updateNavigationControls];
         //[self showArticleToolbar];
     }

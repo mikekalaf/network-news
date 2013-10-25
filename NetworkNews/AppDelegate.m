@@ -12,6 +12,7 @@
 #import "NewsAccount.h"
 #import "NSArray+NewsAdditions.h"
 #import "NetworkNews.h"
+#import "Preferences.h"
 
 @interface AppDelegate ()
 {
@@ -23,6 +24,8 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    [Preferences registerDefaults];
+
 //    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 //
 //    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
