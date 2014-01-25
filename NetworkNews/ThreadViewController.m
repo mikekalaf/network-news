@@ -15,6 +15,10 @@
 #import "ThreadListTableViewCell.h"
 //#import "ThreadSectionHeaderView.h"
 #import "ArticleViewController.h"
+#import "NewsConnectionPool.h"
+#import "NewsAccount.h"
+#import "NNNewsrc.h"
+#import "ArticlePart.h"
 
 @interface ThreadViewController () <ArticleSource>
 {
@@ -191,10 +195,14 @@
     cell.textLabel.text = [emailAddressFormatter stringForObjectValue:article.from];
     cell.detailTextLabel.text = article.subject;
     cell.dateLabel.text = [dateFormatter stringFromDate:article.date];
-    
+
+    NNNewsrc *newsrc = [[_connectionPool account] newsrc];
+
+    long long articleNumber = [[[[article parts] anyObject] articleNumber] longLongValue];
+
     if ([article hasAllParts] == NO)
         [[cell imageView] setImage:incompleteIconImage];
-    else if ([[article read] boolValue] == NO)
+    else if ([newsrc isReadForGroupName:_groupName articleNumber:articleNumber] == NO)
         [[cell imageView] setImage:unreadIconImage];
     else
         [[cell imageView] setImage:readIconImage];

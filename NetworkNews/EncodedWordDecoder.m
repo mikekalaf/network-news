@@ -56,8 +56,16 @@ static int hexvalue(char c)
                 if (i + 3 >= string.length
                     || [string characterAtIndex:i + 3] != '=')
                 {
-                    NSString *str = [[NSString alloc] initWithData:dataToDecode encoding:encoding];
-                    [decodedString appendString:str];
+                    @try
+                    {
+                        NSString *str = [[NSString alloc] initWithData:dataToDecode encoding:encoding];
+                        [decodedString appendString:str];
+                    }
+                    @catch (NSException *exception)
+                    {
+                        NSString *str = [[NSString alloc] initWithData:dataToDecode encoding:NSISOLatin1StringEncoding];
+                        [decodedString appendString:str];
+                    }
                     dataToDecode = nil;
                 }
                 i += 2;

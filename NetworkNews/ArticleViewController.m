@@ -32,6 +32,7 @@
 #import "NewsAccount.h"
 #import "NSMutableAttributedString+NewsAdditions.h"
 #import "ExtendedLayoutManager.h"
+#import "NNNewsrc.h"
 
 @interface ArticleViewController ()
 {
@@ -1129,6 +1130,14 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 //        [_webView loadHTMLString:htmlString baseURL:nil];
         [self updateNavigationControls];
         //[self showArticleToolbar];
+
+        // Mark as read all the article parts that make this article
+        for (ArticlePart *part in [_article parts])
+        {
+            [[[_connectionPool account] newsrc] setRead:YES
+                                           forGroupName:_groupName
+                                          articleNumber:[[part articleNumber] integerValue]];
+        }
     }
     else
     {

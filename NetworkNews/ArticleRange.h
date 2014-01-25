@@ -36,3 +36,11 @@ NS_INLINE BOOL EqualArticleRanges(ArticleRange range1, ArticleRange range2)
 {
     return (range1.location == range2.location && range1.length == range2.length);
 }
+
+@interface NSValue (ArticleRange)
+
++ (NSValue *)valueWithArticleRange:(ArticleRange)range;
+
+- (ArticleRange)articleRangeValue;
+
+@end

@@ -16,7 +16,7 @@
 #import "ExtendedDateFormatter.h"
 #import "EmailAddressFormatter.h"
 #import "NSString+NewsAdditions.h"
-#import "AppDelegate.h"
+//#import "AppDelegate.h"
 #import "ThreadListTableViewCell.h"
 #import "ThreadIterator.h"
 #import "NetworkNews.h"
@@ -25,6 +25,7 @@
 #import "GroupInfoViewController.h"
 #import "NewArticleViewController.h"
 #import "UIColor+NewsAdditions.h"
+#import "NNNewsrc.h"
 
 #define ONE_DAY_IN_SECONDS      86400
 #define ONE_WEEK_IN_SECONDS     7 * ONE_DAY_IN_SECONDS
@@ -184,6 +185,8 @@
 {
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc removeObserver:self];
+
+    [[[_connectionPool account] newsrc] sync];
 }
 
 #pragma mark - Public Methods
@@ -306,13 +309,13 @@
     }
     else
     {
-        ReadStatus readStatus = [thread readStatus];
-        if (readStatus == ReadStatusUnread)
+        NSUInteger readCount = [self articlesReadInThread:thread];
+        if (readCount == 0)
         {
             [imageView setImage:unreadIconImage];
             [imageView setAlpha:1.0];
         }
-        else if (readStatus == ReadStatusPartiallyRead)
+        else if (readCount < thread.articles.count)
         {
     //        [[cell imageView] setImage:partReadIconImage];
             [imageView setImage:unreadIconImage];
@@ -1005,6 +1008,23 @@
     [_statusLabel setText:message];
 //    [_statusLabel setFont:[UIFont systemFontOfSize:12.0]];
     [_statusLabel sizeToFit];
+}
+
+- (NSUInteger)articlesReadInThread:(Thread *)thread
+{
+    NNNewsrc *newsrc = [[_connectionPool account] newsrc];
+    NSUInteger readCount = 0;
+    for (Article *article in [thread articles])
+    {
+        ArticlePart *part = [[article parts] anyObject];
+        NSUInteger number = [[part articleNumber] integerValue];
+        if ([newsrc isReadForGroupName:_groupName articleNumber:number])
+            ++readCount;
+    }
+
+    //NSLog(@"%d / %d articles read", readCount, [[thread articles] count]);
+
+    return readCount;
 }
 
 @end

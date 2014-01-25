@@ -14,6 +14,7 @@ typedef enum
     AccountTemplateGiganews
 } AccountTemplate;
 
+@class NNNewsrc;
 
 @interface NewsAccount : NSObject <NSCoding>
 
@@ -28,6 +29,7 @@ typedef enum
 @property (nonatomic) NSString *password;
 
 @property (nonatomic, readonly) NSURL *cacheURL;
+@property (nonatomic, readonly) NNNewsrc *newsrc;
 
 + (id)accountWithTemplate:(AccountTemplate)accountTemplate;
 

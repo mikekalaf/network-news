@@ -7,10 +7,12 @@
 //
 
 #import "NewsAccount.h"
+#import "NNNewsrc.h"
 
 @interface NewsAccount ()
 {
     NSURL *_cacheURL;
+    NNNewsrc *_newsrc;
 }
 
 @end
@@ -91,6 +93,15 @@
                                     error:NULL];
     }
     return _cacheURL;
+}
+
+- (NNNewsrc *)newsrc
+{
+    if (_newsrc == nil)
+    {
+        _newsrc = [[NNNewsrc alloc] initWithServerName:[self hostName]];
+    }
+    return _newsrc;
 }
 
 @end

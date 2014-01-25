@@ -8,7 +8,6 @@
 
 #import <CoreData/CoreData.h>
 
-@class ArticleGroup;
 @class ArticlePart;
 
 /**
@@ -27,7 +26,6 @@
 
 @property(nonatomic, retain) NSDate *date;
 @property(nonatomic, retain) NSString *from;
-@property(nonatomic, retain) NSNumber *read;
 @property(nonatomic, retain) NSString *subject;
 @property(nonatomic, retain) NSNumber *totalByteCount;
 @property(nonatomic, retain) NSNumber *totalLineCount;
@@ -35,7 +33,6 @@
 @property(nonatomic, retain) NSString *references;
 @property(nonatomic, retain) NSString *attachmentFileName;
 
-@property(nonatomic, retain) ArticleGroup *group;
 @property(nonatomic, retain) NSSet *parts;
 
 @property(nonatomic, retain, readonly) NSArray *messageIds;

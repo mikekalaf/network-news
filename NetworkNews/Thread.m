@@ -84,8 +84,7 @@
     [aCoder encodeObject:array forKey:@"Articles"];
 }
 
-#pragma mark -
-#pragma mark Properties
+#pragma mark - Properties
 
 - (NSArray *)sortedArticles
 {
@@ -102,20 +101,6 @@
                           [NSArray arrayWithObject:sortDescriptor]];
     }
     return sortedArticles;
-}
-
-- (ReadStatus)readStatus
-{
-    NSUInteger readCount = 0;
-    for (Article *article in articles)
-        if (article.read.boolValue)
-            ++readCount;
-    if (readCount == 0)
-        return ReadStatusUnread;
-    else if (readCount < articles.count)
-        return ReadStatusPartiallyRead;
-    else
-        return ReadStatusRead;
 }
 
 - (BOOL)hasAllParts

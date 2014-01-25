@@ -8,14 +8,6 @@
 
 #import <Foundation/Foundation.h>
 
-enum
-{
-    ReadStatusUnread,
-    ReadStatusPartiallyRead,
-    ReadStatusRead
-};
-typedef NSUInteger ReadStatus;
-
 typedef enum
 {
     ThreadTypeMessage,
@@ -23,6 +15,7 @@ typedef enum
 } ThreadType;
 
 @class Article;
+@class NNNewsrc;
 
 @interface Thread : NSObject //<NSCoding>
 {
@@ -43,7 +36,6 @@ typedef enum
 @property(nonatomic, retain) NSDate *latestDate;
 @property(nonatomic, retain, readonly) NSMutableArray *articles;
 @property(nonatomic, retain, readonly) NSArray *sortedArticles;
-@property(nonatomic, readonly) ReadStatus readStatus;
 @property(nonatomic, readonly) BOOL hasAllParts;
 @property(nonatomic) BOOL sorted;
 @property(nonatomic, copy) NSString *messageID;

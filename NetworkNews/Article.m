@@ -13,7 +13,6 @@
 
 @dynamic date;
 @dynamic from;
-@dynamic read;
 @dynamic subject;
 @dynamic totalByteCount;
 @dynamic totalLineCount;
@@ -21,7 +20,6 @@
 @dynamic references;
 @dynamic attachmentFileName;
 
-@dynamic group;
 @dynamic parts;
 
 + (NSDate *)dateWithString:(NSString *)dateString

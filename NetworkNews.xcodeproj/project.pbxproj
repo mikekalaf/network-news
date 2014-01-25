@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		6302EF0E178D8E7800BBC68E /* ExtendedLayoutManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 6302EF0D178D8E7800BBC68E /* ExtendedLayoutManager.m */; };
+		631CBA6A1893CB2400B9421A /* ArticleRange.m in Sources */ = {isa = PBXBuildFile; fileRef = 631CBA691893CB2400B9421A /* ArticleRange.m */; };
+		63271077183F20E200CD249E /* NNNewsrc.m in Sources */ = {isa = PBXBuildFile; fileRef = 63271076183F20E200CD249E /* NNNewsrc.m */; };
 		633D9C3E16E1A489008DD64F /* NewsAccount.m in Sources */ = {isa = PBXBuildFile; fileRef = 633D9C3D16E1A489008DD64F /* NewsAccount.m */; };
 		634191B516D0D6590069B528 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 634191B416D0D6590069B528 /* UIKit.framework */; };
 		634191B716D0D6590069B528 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 634191B616D0D6590069B528 /* Foundation.framework */; };
@@ -107,6 +109,9 @@
 /* Begin PBXFileReference section */
 		6302EF0C178D8E7800BBC68E /* ExtendedLayoutManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtendedLayoutManager.h; sourceTree = "<group>"; };
 		6302EF0D178D8E7800BBC68E /* ExtendedLayoutManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExtendedLayoutManager.m; sourceTree = "<group>"; };
+		631CBA691893CB2400B9421A /* ArticleRange.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ArticleRange.m; sourceTree = "<group>"; };
+		63271075183F20E200CD249E /* NNNewsrc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NNNewsrc.h; sourceTree = "<group>"; };
+		63271076183F20E200CD249E /* NNNewsrc.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NNNewsrc.m; sourceTree = "<group>"; };
 		633D9C3C16E1A489008DD64F /* NewsAccount.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NewsAccount.h; sourceTree = "<group>"; };
 		633D9C3D16E1A489008DD64F /* NewsAccount.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NewsAccount.m; sourceTree = "<group>"; };
 		634191B116D0D6590069B528 /* NetworkNews.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NetworkNews.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -398,6 +403,8 @@
 				63E3A77516EB6FF800BD3D13 /* NewsConnectionPool.m */,
 				6398525616D0FBEA009303E2 /* LineIterator.h */,
 				6398525716D0FBEA009303E2 /* LineIterator.m */,
+				63271075183F20E200CD249E /* NNNewsrc.h */,
+				63271076183F20E200CD249E /* NNNewsrc.m */,
 			);
 			name = NewsKit;
 			sourceTree = "<group>";
@@ -425,6 +432,7 @@
 				633D9C3D16E1A489008DD64F /* NewsAccount.m */,
 				63E3A77A16EE89C300BD3D13 /* News.xcdatamodeld */,
 				63A6063A16F2D2080089CF4A /* ArticleRange.h */,
+				631CBA691893CB2400B9421A /* ArticleRange.m */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -678,6 +686,7 @@
 				6341927616D0D8800069B528 /* ExtendedDateFormatter.m in Sources */,
 				6341927816D0D8800069B528 /* FavouriteGroupsViewController.m in Sources */,
 				6341927916D0D8800069B528 /* FieldView.m in Sources */,
+				631CBA6A1893CB2400B9421A /* ArticleRange.m in Sources */,
 				6341928016D0D8800069B528 /* GroupInfoViewController.m in Sources */,
 				6341928D16D0D8800069B528 /* AccountSettingsViewController.m in Sources */,
 				6341928E16D0D8800069B528 /* NewArticleViewController.m in Sources */,
@@ -693,6 +702,7 @@
 				634192F116D0DAEE0069B528 /* Article.m in Sources */,
 				634192F416D0DAEE0069B528 /* ArticlePart.m in Sources */,
 				634192F516D0DAEE0069B528 /* ArticlePartContent.m in Sources */,
+				63271077183F20E200CD249E /* NNNewsrc.m in Sources */,
 				634192F716D0DAEE0069B528 /* Attachment.m in Sources */,
 				634192F816D0DAEE0069B528 /* ConnectionVerifier.m in Sources */,
 				634192F916D0DAEE0069B528 /* ContentType.m in Sources */,
