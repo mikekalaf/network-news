@@ -14,6 +14,8 @@
 
 - (void)appendNewsHead:(NSArray *)entries;
 
+- (void)appendShortNewsHead:(NSArray *)entries;
+
 - (void)appendNewsBody:(NSData *)data flowed:(BOOL)isFlowed;
 
 @end

@@ -82,6 +82,11 @@
 //    [self addAttributes:paragraphAttributes range:headerRange];
 }
 
+- (void)appendShortNewsHead:(NSArray *)entries
+{
+    [self appendNewsHead:[self shortHeadersFromHeaders:entries]];
+}
+
 - (void)appendBodyData:(NSData *)data quoteLevel:(NSUInteger)level
 {
     NSString *str = [[NSString alloc] initWithData:data

@@ -20,8 +20,7 @@
     UIActionSheetDelegate,
     UIPopoverControllerDelegate,
     UISplitViewControllerDelegate,
-    MFMailComposeViewControllerDelegate,
-    UIWebViewDelegate
+    MFMailComposeViewControllerDelegate
 >
 
 @property (nonatomic) NewsConnectionPool *connectionPool;
