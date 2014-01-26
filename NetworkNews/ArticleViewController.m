@@ -49,6 +49,7 @@
     NSData *_bodyTextDataTop;
     NSData *_bodyTextDataBottom;
     //BOOL toolbarSetForPortrait;
+    NSTextAttachment *_textAttachment;
 }
 
 @property(nonatomic, weak) IBOutlet UIToolbar *toolbar;
@@ -190,6 +191,24 @@
     }
     
     [super viewWillDisappear:animated];
+}
+
+- (void)viewWillLayoutSubviews
+{
+    if (_textAttachment)
+    {
+        UIImage *image = _textAttachment.image;
+        float maxWidth = self.view.bounds.size.width - 10;
+        if (image.size.width > maxWidth)
+        {
+            int height = image.size.height * (maxWidth / image.size.width);
+            [_textAttachment setBounds:CGRectMake(0, 0, maxWidth, height)];
+        }
+        else
+        {
+            [_textAttachment setBounds:CGRectMake(0, 0, image.size.width, image.size.height)];
+        }
+    }
 }
 
 - (void)didReceiveMemoryWarning
@@ -761,10 +780,23 @@
     {
         // Append the attachment
         NSData *attachmentData = [[NSData alloc] initWithContentsOfURL:_attachmentURL];
-        NSTextAttachment *textAttachment = [[NSTextAttachment alloc] initWithData:attachmentData
-                                                                           ofType:@"public.image"];
+        UIImage *image = [UIImage imageWithData:attachmentData];
+        _textAttachment = [[NSTextAttachment alloc] init];
+        _textAttachment.image = image;
+
+        float maxWidth = _textView.bounds.size.width - 10;
+        if (image.size.width > maxWidth)
+        {
+            int height = image.size.height * (maxWidth / image.size.width);
+            [_textAttachment setBounds:CGRectMake(0, 0, maxWidth, height)];
+        }
+
         [attrString appendAttributedString:
-         [NSAttributedString attributedStringWithAttachment:textAttachment]];
+         [NSAttributedString attributedStringWithAttachment:_textAttachment]];
+    }
+    else
+    {
+        _textAttachment = nil;
     }
 
     // Append any text following the attachment
