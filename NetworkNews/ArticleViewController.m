@@ -1125,6 +1125,8 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
             }
         }
 
+        [_textView setContentOffset:CGPointZero animated:NO];
+
         // Display the cached copy
         [self updateContent];
 //        [_webView loadHTMLString:htmlString baseURL:nil];
