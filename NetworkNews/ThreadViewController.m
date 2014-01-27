@@ -91,14 +91,12 @@
 //                          atScrollPosition:UITableViewScrollPositionTop
 //                                  animated:NO];
     
-//    // Sort the articles in the thread in ascending date order
-//    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"date"
-//                                                                   ascending:YES];
-//    articles = [thread.articles sortedArrayUsingDescriptors:
-//                [NSArray arrayWithObject:sortDescriptor]];
-//    [articles retain];
-//    
-//    [self.tableView reloadData];
+    // Sort the articles in the thread in ascending date order
+    _articles = [_articles sortedArrayUsingDescriptors:
+                 @[[[NSSortDescriptor alloc] initWithKey:@"date" ascending:YES],
+                   [[NSSortDescriptor alloc] initWithKey:@"subject" ascending:YES]]];
+
+    [self.tableView reloadData];
 }
 
 - (void)viewWillAppear:(BOOL)animated
