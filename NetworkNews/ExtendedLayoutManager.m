@@ -58,7 +58,7 @@
                                              alphaComponent);
 
                     CGRect rect = {
-                        {LEVEL_INDENT * i + 5, paraRect.origin.y},
+                        {LEVEL_INDENT * i + 5, paraRect.origin.y + 8},
                         {2, paraRect.size.height}
                     };
                     CGContextFillRect(context, rect);

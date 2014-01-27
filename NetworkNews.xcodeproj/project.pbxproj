@@ -479,8 +479,6 @@
 				6341920816D0D8800069B528 /* GroupInfoView.xib */,
 				6341920C16D0D8800069B528 /* AccountSettingsView.xib */,
 				6341920E16D0D8800069B528 /* NewArticleView.xib */,
-				6341921A16D0D8800069B528 /* ExtendedDateFormatter.h */,
-				6341921B16D0D8800069B528 /* ExtendedDateFormatter.m */,
 				6341921E16D0D8800069B528 /* FavouriteGroupsViewController.h */,
 				6341921F16D0D8800069B528 /* FavouriteGroupsViewController.m */,
 				6341922016D0D8800069B528 /* FieldView.h */,
@@ -532,6 +530,8 @@
 		638F78DC16D433430085B896 /* Formatters */ = {
 			isa = PBXGroup;
 			children = (
+				6341921A16D0D8800069B528 /* ExtendedDateFormatter.h */,
+				6341921B16D0D8800069B528 /* ExtendedDateFormatter.m */,
 				6341931C16D0DDE30069B528 /* SizeFormatter.h */,
 				6341931D16D0DDE30069B528 /* SizeFormatter.m */,
 				6341931916D0DC0B0069B528 /* EmailAddressFormatter.h */,

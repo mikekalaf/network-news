@@ -14,7 +14,7 @@
 #import "Preferences.h"
 #import "EncodedWordDecoder.h"
 
-#define LEVEL_INDENT 20.0
+#define LEVEL_INDENT 10.0
 
 @implementation NSMutableAttributedString (NewsAdditions)
 
@@ -46,12 +46,12 @@
         // to decode it
         NSString *entryValue = [encodedWordDecoder decodeString:entry.value];
         
-        NSString *rawString = [NSString stringWithFormat:@"\t%@:\t%@\n",
+        NSString *rawString = [NSString stringWithFormat:@"%@: %@\n",
                                entry.name,
                                entryValue];
         NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] initWithString:rawString];
-        NSRange nameRange = NSMakeRange(1, entry.name.length + 1);
-        NSRange valueRange = NSMakeRange(entry.name.length + 3, entryValue.length);
+        NSRange nameRange = NSMakeRange(0, entry.name.length + 1);
+        NSRange valueRange = NSMakeRange(entry.name.length + 2, entryValue.length);
         [attrString setAttributes:nameAttributes range:nameRange];
         if ([entry.name isEqualToString:@"Subject"])
             [attrString setAttributes:boldValueAttributes range:valueRange];

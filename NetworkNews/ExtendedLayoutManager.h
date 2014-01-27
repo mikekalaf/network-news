@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-#define LEVEL_INDENT 20.0
+#define LEVEL_INDENT 10.0
 
 @interface ExtendedLayoutManager : NSLayoutManager
 {
