@@ -18,6 +18,7 @@
 @interface AccountsViewController () <AccountSettingsDelegate>
 {
     NSMutableArray *_accounts;
+    NSString *_selectedServiceName;
 }
 
 
@@ -34,16 +35,20 @@
 {
     [super viewDidLoad];
 
-    [[self navigationItem] setRightBarButtonItem:[self editButtonItem]];
+    [[self navigationItem] setLeftBarButtonItem:[self editButtonItem]];
 
     // Load the accounts data, if we have any
     // (New accounts are written to the archive in WelcomeViewController)
-    _accounts = [self accountsFromArchive];
+    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    _accounts = appDelegate.accounts;
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    _selectedServiceName = [userDefaults valueForKey:@"SelectedServiceName"];
 
     // If there are no accounts, we will prompt the user to create one
     if ([_accounts count] == 0)
@@ -70,45 +75,21 @@
     [self saveAccountsIfNeeded];
 }
 
-//- (void)setEditing:(BOOL)editing animated:(BOOL)animated
-//{
-//    [super setEditing:editing animated:animated];
-//
-//    // Add/remove the add account cell
-//    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:[_accounts count] inSection:0];
-//    if (editing)
-//        [[self tableView] insertRowsAtIndexPaths:@[indexPath]
-//                                withRowAnimation:UITableViewRowAnimationFade];
-//    else
-//        [[self tableView] deleteRowsAtIndexPaths:@[indexPath]
-//                                withRowAnimation:UITableViewRowAnimationFade];
-//}
-
 #pragma mark - UITableViewDataSource Methods
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-//    if ([self isEditing])
-//        return [_accounts count] + 1;
-//    else
-        return [_accounts count];
+    return [_accounts count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    UITableViewCell *cell;
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell"];
+    NewsAccount *account = [_accounts objectAtIndex:[indexPath row]];
+    [[cell textLabel] setText:[account serviceName]];
 
-//    if ([indexPath row] < [_accounts count])
-//    {
-        cell = [tableView dequeueReusableCellWithIdentifier:@"Cell"];
-        NewsAccount *account = [_accounts objectAtIndex:[indexPath row]];
-        [[cell textLabel] setText:[account serviceName]];
-//    }
-//    else
-//    {
-//        cell = [tableView dequeueReusableCellWithIdentifier:@"AddAccountCell"];
-////        [[cell textLabel] setText:@"Add Account"];
-//    }
+    if ([_selectedServiceName isEqualToString:account.serviceName])
+        cell.accessoryType = UITableViewCellAccessoryCheckmark;
 
     return cell;
 }
@@ -123,9 +104,6 @@ commitEditingStyle:(UITableViewCellEditingStyle)editingStyle
         [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath]
                          withRowAnimation:UITableViewRowAnimationFade];
     }
-//    else if (editingStyle == UITableViewCellEditingStyleInsert)
-//    {
-//    }   
 }
 
 -  (void)tableView:(UITableView *)tableView
@@ -146,9 +124,9 @@ moveRowAtIndexPath:(NSIndexPath *)fromIndexPath
 {
     if ([[segue identifier] isEqualToString:@"SelectAccount"])
     {
-        NewsAccount *account = _accounts[[[[self tableView] indexPathForSelectedRow] row]];
-        FavouriteGroupsViewController *viewController = [segue destinationViewController];
-        [viewController setConnectionPool:[[NewsConnectionPool alloc] initWithAccount:account]];
+//        NewsAccount *account = _accounts[[[[self tableView] indexPathForSelectedRow] row]];
+//        FavouriteGroupsViewController *viewController = [segue destinationViewController];
+//        [viewController setConnectionPool:[[NewsConnectionPool alloc] initWithAccount:account]];
     }
     else if ([[segue identifier] isEqualToString:@"AddAccount"])
     {
@@ -169,6 +147,16 @@ moveRowAtIndexPath:(NSIndexPath *)fromIndexPath
 }
 
 #pragma mark - UITableViewDelegate Methods
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    NewsAccount *account = _accounts[indexPath.row];
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setValue:account.serviceName forKey:@"SelectedServiceName"];
+    [userDefaults synchronize];
+
+    [[self presentingViewController] dismissViewControllerAnimated:YES completion:NULL];
+}
 
 - (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -251,25 +239,10 @@ moveRowAtIndexPath:(NSIndexPath *)fromIndexPath
 
 #pragma mark - Private Methods
 
-- (NSURL *)accountsFileURL
-{
-    NSFileManager *fileMananger = [[NSFileManager alloc] init];
-    NSArray *urls = [fileMananger URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask];
-    return [[urls lastObject] URLByAppendingPathComponent:NetworkNewsAccountsFileName];
-}
-
-- (NSMutableArray *)accountsFromArchive
-{
-    NSData *accountsData = [NSData dataWithContentsOfURL:[self accountsFileURL]];
-    if (accountsData)
-        return [NSKeyedUnarchiver unarchiveObjectWithData:accountsData];
-    else
-        return [NSMutableArray array];
-}
-
 - (void)saveAccountsIfNeeded
 {
-    NSURL *accountsURL = [self accountsFileURL];
+    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    NSURL *accountsURL = [appDelegate accountsFileURL];
     NSData *accountsData = [NSKeyedArchiver archivedDataWithRootObject:_accounts];
     NSData *existingAccountsData = [NSData dataWithContentsOfURL:accountsURL];
     if ([existingAccountsData isEqualToData:accountsData] == NO)

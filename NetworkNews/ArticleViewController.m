@@ -226,7 +226,11 @@
     // Determine the cache directory, and make sure it exists
     if (_groupName)
     {
-        _cacheURL = [[[_connectionPool account] cacheURL] URLByAppendingPathComponent:_groupName];
+        //_cacheURL = [[[_connectionPool account] cacheURL] URLByAppendingPathComponent:_groupName];
+
+        // Let's put all articles into the same directory, which will make it easier to
+        // clean up plus any cross-postings will share the same cache
+        _cacheURL = [[[_connectionPool account] cacheURL] URLByAppendingPathComponent:@"Articles"];
 
         NSFileManager *fileManager = [[NSFileManager alloc] init];
         [fileManager createDirectoryAtURL:_cacheURL

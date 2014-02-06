@@ -26,6 +26,8 @@
 {
     [Preferences registerDefaults];
 
+    _accounts = [self accountsFromArchive];
+
 //    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 //
 //    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
@@ -104,6 +106,22 @@
 - (void)swipeRight:(UIGestureRecognizer *)gestureRecognizer
 {
     NSLog(@"swipeRight:");
+}
+
+- (NSURL *)accountsFileURL
+{
+    NSFileManager *fileMananger = [[NSFileManager alloc] init];
+    NSArray *urls = [fileMananger URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask];
+    return [[urls lastObject] URLByAppendingPathComponent:NetworkNewsAccountsFileName];
+}
+
+- (NSMutableArray *)accountsFromArchive
+{
+    NSData *accountsData = [NSData dataWithContentsOfURL:[self accountsFileURL]];
+    if (accountsData)
+        return [NSKeyedUnarchiver unarchiveObjectWithData:accountsData];
+    else
+        return [NSMutableArray array];
 }
 
 @end

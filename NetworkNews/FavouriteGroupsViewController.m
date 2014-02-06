@@ -12,12 +12,14 @@
 #import "SearchGroupsViewController.h"
 #import "NewsAccount.h"
 #import "NewsConnectionPool.h"
+#import "NNNewsrc.h"
 #import "NetworkNews.h"
 
 //static NSString *MostRecentGroupName = @"MostRecentGroupName";
 
 @interface FavouriteGroupsViewController ()
 {
+    NewsAccount *_account;
 }
 
 @end
@@ -28,17 +30,50 @@
 {
     [super viewDidLoad];
 
-    [[self navigationItem] setRightBarButtonItem:[self editButtonItem]];
-    
-    // Load the subscribed groups
-    _groupNames = [[NSMutableArray alloc] initWithContentsOfURL:[self groupNamesFileURL]];
-    if (!_groupNames)
-        _groupNames = [[NSMutableArray alloc] initWithCapacity:1];
+    [[self navigationItem] setLeftBarButtonItem:[self editButtonItem]];
+
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+
+    // Load the selected news account. Ask for a selection if there isn't one
+    NewsAccount *selectedAccount = nil;
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSString *selectedServiceName = [userDefaults valueForKey:@"SelectedServiceName"];
+    if (selectedServiceName)
+    {
+        AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+        for (NewsAccount *account in appDelegate.accounts)
+            if ([selectedServiceName isEqualToString:account.serviceName])
+            {
+                selectedAccount = account;
+                break;
+            }
+    }
+
+    BOOL connect = NO;
+    if (_account != selectedAccount)
+    {
+        _account = selectedAccount;
+        connect = YES;
+    }
+
+    if (_account)
+    {
+        if (connect)
+        {
+            [self setConnectionPool:[[NewsConnectionPool alloc] initWithAccount:_account]];
+
+            // Load the subscribed groups
+            _groupNames = [[[[_connectionPool account] newsrc] subscribedGroupNames] mutableCopy];
+        }
+    }
+    else
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self performSegueWithIdentifier:@"SelectAccount" sender:self];
+        });
 
     // Reload so that newly added/removed groups appear when returning
     // from "Search for Groups"
@@ -49,7 +84,7 @@
 {
     [super viewDidAppear:animated];
 
-    [self saveGroupNamesIfNeeded];
+    [[[_connectionPool account] newsrc] sync];
 
     // Remove any saved search results
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
@@ -61,15 +96,11 @@
 	[super viewWillDisappear:animated];
 }
 
-- (void)didReceiveMemoryWarning {
-	// Releases the view if it doesn't have a superview.
+- (void)didReceiveMemoryWarning
+{
     [super didReceiveMemoryWarning];
 	
 	// Release any cached data, images, etc that aren't in use.
-}
-
-- (void)viewDidUnload
-{
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
@@ -115,12 +146,12 @@ commitEditingStyle:(UITableViewCellEditingStyle)editingStyle
 {
     if (editingStyle == UITableViewCellEditingStyleDelete)
     {
-        // Delete the cache
+//        // Delete the cache
         NSFileManager *fileManager = [NSFileManager defaultManager];
         NSString *name = [_groupNames objectAtIndex:[indexPath row]];
-        NSURL *cacheURL = [[[_connectionPool account] cacheURL] URLByAppendingPathComponent:name];
-        [fileManager removeItemAtURL:cacheURL error:NULL];
-        
+//        NSURL *cacheURL = [[[_connectionPool account] cacheURL] URLByAppendingPathComponent:name];
+//        [fileManager removeItemAtURL:cacheURL error:NULL];
+
         // Delete the database
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,
                                                              NSUserDomainMask,
@@ -129,6 +160,16 @@ commitEditingStyle:(UITableViewCellEditingStyle)editingStyle
         NSString *serverDir = [documentDir stringByAppendingPathComponent:[[_connectionPool account] hostName]];
         NSString *storeNameWithExt = [name stringByAppendingPathExtension:@"sqlite"];
         NSString *path = [serverDir stringByAppendingPathComponent:storeNameWithExt];
+        NSLog(@"Removing path: %@", path);
+        [fileManager removeItemAtPath:path error:NULL];
+
+        storeNameWithExt = [name stringByAppendingPathExtension:@"sqlite-shm"];
+        path = [serverDir stringByAppendingPathComponent:storeNameWithExt];
+        NSLog(@"Removing path: %@", path);
+        [fileManager removeItemAtPath:path error:NULL];
+
+        storeNameWithExt = [name stringByAppendingPathExtension:@"sqlite-wal"];
+        path = [serverDir stringByAppendingPathComponent:storeNameWithExt];
         NSLog(@"Removing path: %@", path);
         [fileManager removeItemAtPath:path error:NULL];
 
@@ -158,6 +199,7 @@ moveRowAtIndexPath:(NSIndexPath *)fromIndexPath
     {
         SearchGroupsViewController *sourceViewController = [segue sourceViewController];
         _groupNames = [sourceViewController checkedGroups];
+        [[[_connectionPool account] newsrc] setSubscribedGroupNames:_groupNames];
     }
 }
 
@@ -174,17 +216,17 @@ moveRowAtIndexPath:(NSIndexPath *)fromIndexPath
 
 #pragma mark - Private Methods
 
-- (NSURL *)groupNamesFileURL
-{
-    return [[[_connectionPool account] cacheURL] URLByAppendingPathComponent:@"groups.plist"];
-}
-
-- (void)saveGroupNamesIfNeeded
-{
-    NSURL *groupNamesURL = [self groupNamesFileURL];
-    NSArray *existingGroupNames = [[NSArray alloc] initWithContentsOfURL:groupNamesURL];
-    if ([existingGroupNames isEqualToArray:_groupNames] == NO)
-        [_groupNames writeToURL:groupNamesURL atomically:YES];
-}
+//- (NSURL *)groupNamesFileURL
+//{
+//    return [[[_connectionPool account] cacheURL] URLByAppendingPathComponent:@"groups.plist"];
+//}
+//
+//- (void)saveGroupNamesIfNeeded
+//{
+//    NSURL *groupNamesURL = [self groupNamesFileURL];
+//    NSArray *existingGroupNames = [[NSArray alloc] initWithContentsOfURL:groupNamesURL];
+//    if ([existingGroupNames isEqualToArray:_groupNames] == NO)
+//        [_groupNames writeToURL:groupNamesURL atomically:YES];
+//}
 
 @end

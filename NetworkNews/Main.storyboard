@@ -4,6 +4,25 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3747"/>
     </dependencies>
     <scenes>
+        <!--Navigation Controller-->
+        <scene sceneID="Dve-q2-J4i">
+            <objects>
+                <navigationController definesPresentationContext="YES" toolbarHidden="NO" id="Sf0-3L-tcM" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="Bqd-4Q-fsz">
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="LnM-SO-C3R">
+                        <rect key="frame" x="0.0" y="524" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </toolbar>
+                    <connections>
+                        <segue destination="I1o-gR-0zS" kind="relationship" relationship="rootViewController" id="AVP-0G-dxa"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="toE-DR-4kg" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1334" y="-1411"/>
+        </scene>
         <!--Accounts View Controller - Accounts-->
         <scene sceneID="qHJ-4N-DKK">
             <objects>
@@ -13,15 +32,15 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="detailDisclosureButton" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" textLabel="YRG-dj-bga" style="IBUITableViewCellStyleDefault" id="GgF-C9-Lrc">
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" textLabel="YRG-dj-bga" style="IBUITableViewCellStyleDefault" id="GgF-C9-Lrc">
                                 <rect key="frame" x="0.0" y="22" width="320" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="GgF-C9-Lrc" id="wa0-Yd-ges">
-                                    <rect key="frame" x="0.0" y="0.0" width="253" height="43"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="YRG-dj-bga">
-                                            <rect key="frame" x="15" y="0.0" width="238" height="43"/>
+                                            <rect key="frame" x="15" y="0.0" width="290" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
@@ -29,10 +48,6 @@
                                         </label>
                                     </subviews>
                                 </tableViewCellContentView>
-                                <connections>
-                                    <segue destination="ojb-eO-6ga" kind="push" identifier="SelectAccount" id="eU5-IB-COl"/>
-                                    <segue destination="9N4-MX-8RM" kind="modal" identifier="EditAccount" trigger="accessoryAction" id="fFM-89-7qn"/>
-                                </connections>
                             </tableViewCell>
                         </prototypes>
                         <connections>
@@ -43,17 +58,18 @@
                     <extendedEdge key="edgesForExtendedLayout"/>
                     <toolbarItems>
                         <barButtonItem style="plain" systemItem="flexibleSpace" id="KsZ-IF-RBU"/>
-                        <barButtonItem systemItem="add" id="a74-c1-PH7">
+                    </toolbarItems>
+                    <navigationItem key="navigationItem" title="Accounts" id="Cy7-Pf-tW1">
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="a74-c1-PH7">
                             <connections>
                                 <segue destination="43Y-mb-9su" kind="push" identifier="AddAccount" id="jlG-NH-NXo"/>
                             </connections>
                         </barButtonItem>
-                    </toolbarItems>
-                    <navigationItem key="navigationItem" title="Accounts" id="Cy7-Pf-tW1"/>
+                    </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="6R0-8e-NTa" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="588" y="77"/>
+            <point key="canvasLocation" x="1839" y="-1411"/>
         </scene>
         <!--Favourite Groups View Controller - Groups-->
         <scene sceneID="KQX-ku-ObA">
@@ -92,14 +108,20 @@
                     </tableView>
                     <extendedEdge key="edgesForExtendedLayout"/>
                     <toolbarItems>
+                        <barButtonItem systemItem="action" id="mo3-fk-hu2">
+                            <connections>
+                                <segue destination="Sf0-3L-tcM" kind="modal" identifier="SelectAccount" id="vHC-Ui-hJJ"/>
+                            </connections>
+                        </barButtonItem>
                         <barButtonItem style="plain" systemItem="flexibleSpace" id="zkl-3S-D1e"/>
-                        <barButtonItem systemItem="add" id="9ld-tK-Cak">
+                    </toolbarItems>
+                    <navigationItem key="navigationItem" title="Groups" id="Boo-gK-ow0">
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="9ld-tK-Cak">
                             <connections>
                                 <segue destination="9qv-we-8PY" kind="modal" identifier="EditGroups" id="G6G-Bd-1zO"/>
                             </connections>
                         </barButtonItem>
-                    </toolbarItems>
-                    <navigationItem key="navigationItem" title="Groups" id="Boo-gK-ow0"/>
+                    </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="wve-hH-s5a" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -367,12 +389,12 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </toolbar>
                     <connections>
-                        <segue destination="I1o-gR-0zS" kind="relationship" relationship="rootViewController" id="0RA-g4-fm5"/>
+                        <segue destination="ojb-eO-6ga" kind="relationship" relationship="rootViewController" id="1wV-7w-sGB"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="0ev-Za-6SP" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="54" y="77"/>
+            <point key="canvasLocation" x="489" y="77"/>
         </scene>
         <!--Welcome View Controller - Add Account-->
         <scene sceneID="3ti-kK-0yp">
@@ -411,7 +433,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="C1E-W4-jEn" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1068" y="-1343"/>
+            <point key="canvasLocation" x="2350" y="-1411"/>
         </scene>
         <!--Account Settings View Controller-->
         <scene sceneID="tjr-0b-E7D">
@@ -441,7 +463,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="1wW-Z7-P81" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2072" y="-1343"/>
+            <point key="canvasLocation" x="3354" y="-1411"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="8fa-Mr-AN2">
@@ -480,7 +502,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="EdF-65-Kst" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1622" y="-1343"/>
+            <point key="canvasLocation" x="2904" y="-1411"/>
         </scene>
     </scenes>
     <resources>
@@ -492,7 +514,6 @@
         <simulatedScreenMetrics key="destination" type="retina4"/>
     </simulatedMetricsContainer>
     <inferredMetricsTieBreakers>
-        <segue reference="fFM-89-7qn"/>
         <segue reference="qlP-Jf-LRj"/>
     </inferredMetricsTieBreakers>
 </document>

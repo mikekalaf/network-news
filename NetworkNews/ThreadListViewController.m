@@ -185,8 +185,6 @@
 {
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc removeObserver:self];
-
-    [[[_connectionPool account] newsrc] sync];
 }
 
 #pragma mark - Public Methods

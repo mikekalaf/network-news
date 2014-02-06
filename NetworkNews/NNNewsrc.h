@@ -14,5 +14,7 @@
 - (void)sync;
 - (BOOL)isReadForGroupName:(NSString *)name articleNumber:(long long)number;
 - (void)setRead:(BOOL)read forGroupName:(NSString *)name articleNumber:(long long)number;
+- (NSArray *)subscribedGroupNames;
+- (void)setSubscribedGroupNames:(NSArray *)groupNames;
 
 @end

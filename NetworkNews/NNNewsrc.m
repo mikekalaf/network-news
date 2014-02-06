@@ -15,6 +15,7 @@
     NSString *_serverName;
     NSURL *_fileURL;
     BOOL changed;
+    NSMutableSet *_subscribedGroups;
 }
 
 @end
@@ -136,8 +137,26 @@
     changed = YES;
 }
 
+- (NSArray *)subscribedGroupNames
+{
+//    // Maintain the order as found in the _groups array
+//    NSMutableArray *groups = [[NSMutableArray alloc] init];
+//    for (NSString *group in _groups)
+//        if ([_subscribedGroups containsObject:group])
+//            [groups addObject:group];
+//    return groups;
+    return [_subscribedGroups allObjects];
+}
+
+- (void)setSubscribedGroupNames:(NSArray *)groupNames
+{
+    _subscribedGroups = [[NSMutableSet alloc] initWithArray:groupNames];
+}
+
 - (void)readNewsrcFileAtURL:(NSURL *)url
 {
+    _subscribedGroups = [[NSMutableSet alloc] init];
+
     NSInputStream *stream = [[NSInputStream alloc] initWithURL:url];
     [stream open];
 
@@ -172,7 +191,8 @@
         NSMutableArray *articleRanges = [[NSMutableArray alloc] init];
         _groups[name] = articleRanges;
 
-        BOOL subscribed = *ptr == ':';
+        if (*ptr == ':')
+            [_subscribedGroups addObject:name];
 
         // Read the ranges
         BOOL moreValues = YES;
