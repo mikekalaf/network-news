@@ -83,7 +83,7 @@
         NSFileManager *fileManager = [[NSFileManager alloc] init];
         
         NSURL *rootCacheURL = [[fileManager URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] lastObject];
-        _cacheURL = [rootCacheURL URLByAppendingPathComponent:_hostName];
+        _cacheURL = [rootCacheURL URLByAppendingPathComponent:_serviceName];
 
         NSLog(@"Cache root: %@", _cacheURL);
 
@@ -99,7 +99,7 @@
 {
     if (_newsrc == nil)
     {
-        _newsrc = [[NNNewsrc alloc] initWithServerName:[self hostName]];
+        _newsrc = [[NNNewsrc alloc] initWithServerName:[self serviceName]];
     }
     return _newsrc;
 }

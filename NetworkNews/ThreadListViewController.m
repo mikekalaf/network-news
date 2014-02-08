@@ -85,7 +85,7 @@
 {
     _groupName = [aGroupName copy];
     _store = [[GroupStore alloc] initWithStoreName:_groupName
-                                       inDirectory:[[_connectionPool account] hostName]];
+                                       inDirectory:[[_connectionPool account] serviceName]];
     [self setTitle:[_groupName shortGroupName]];
 }
 
