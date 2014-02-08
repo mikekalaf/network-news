@@ -9,17 +9,25 @@
 #import "NNNewsrc.h"
 #import "ArticleRange.h"
 
+@interface NNNewsrcItem : NSObject
+@property (nonatomic) NSString *groupName;
+@property (nonatomic) BOOL subscribed;
+@property (nonatomic) NSMutableArray *articleRanges;
+@end
+
+@implementation NNNewsrcItem
+@end
+
 @interface NNNewsrc ()
 {
-    NSMutableDictionary *_groups;
+    NSMutableArray *_groups;
+    NSMutableDictionary *_groupsDictionary;
     NSString *_serverName;
     NSURL *_fileURL;
     BOOL changed;
-    NSMutableSet *_subscribedGroups;
 }
 
 @end
-
 
 @implementation NNNewsrc
 
@@ -28,7 +36,8 @@
     self = [super init];
     if (self)
     {
-        _groups = [[NSMutableDictionary alloc] init];
+        _groups = [[NSMutableArray alloc] init];
+        _groupsDictionary = [[NSMutableDictionary alloc] init];
         _serverName = [serverName copy];
 
         NSFileManager *fileManager = [[NSFileManager alloc] init];
@@ -51,8 +60,8 @@
 
 - (BOOL)isReadForGroupName:(NSString *)name articleNumber:(long long)number
 {
-    NSMutableArray *articleRanges = [_groups objectForKey:name];
-    for (NSValue *rangeObject in articleRanges)
+    NNNewsrcItem *item = [_groupsDictionary objectForKey:name];
+    for (NSValue *rangeObject in item.articleRanges)
     {
         ArticleRange range = [rangeObject articleRangeValue];
         if (range.location <= number && number <= range.location + range.length)
@@ -63,17 +72,12 @@
 
 - (void)setRead:(BOOL)read forGroupName:(NSString *)name articleNumber:(long long)number
 {
-    NSMutableArray *articleRanges = [_groups objectForKey:name];
-    if (articleRanges == nil)
-    {
-        articleRanges = [[NSMutableArray alloc] init];
-        _groups[name] = articleRanges;
-    }
+    NNNewsrcItem *item = [_groupsDictionary objectForKey:name];
 
     // Find existing range containing number or adjacent ranges
     NSValue *followingRange = nil;
     NSValue *precedingRange = nil;
-    for (NSValue *rangeObject in articleRanges)
+    for (NSValue *rangeObject in item.articleRanges)
     {
         ArticleRange range = [rangeObject articleRangeValue];
         if (range.location <= number && number <= range.location + range.length)
@@ -92,7 +96,7 @@
     if (precedingRange == nil && followingRange == nil)
     {
         // New range
-        [articleRanges addObject:[NSValue valueWithArticleRange:ArticleRangeMake(number, 0)]];
+        [item.articleRanges addObject:[NSValue valueWithArticleRange:ArticleRangeMake(number, 0)]];
     }
     else if (precedingRange != nil && followingRange == nil)
     {
@@ -121,17 +125,17 @@
     // Replace the modified ranges within the array
     if (precedingRange)
     {
-        NSUInteger index = [articleRanges indexOfObject:precedingRange];
-        [articleRanges replaceObjectAtIndex:index withObject:newPrecedingRange];
+        NSUInteger index = [item.articleRanges indexOfObject:precedingRange];
+        [item.articleRanges replaceObjectAtIndex:index withObject:newPrecedingRange];
     }
 
     if (followingRange)
     {
-        NSUInteger index = [articleRanges indexOfObject:followingRange];
+        NSUInteger index = [item.articleRanges indexOfObject:followingRange];
         if (newFollowingRange)
-            [articleRanges replaceObjectAtIndex:index withObject:newFollowingRange];
+            [item.articleRanges replaceObjectAtIndex:index withObject:newFollowingRange];
         else
-            [articleRanges removeObjectAtIndex:index];
+            [item.articleRanges removeObjectAtIndex:index];
     }
 
     changed = YES;
@@ -139,24 +143,41 @@
 
 - (NSArray *)subscribedGroupNames
 {
-//    // Maintain the order as found in the _groups array
-//    NSMutableArray *groups = [[NSMutableArray alloc] init];
-//    for (NSString *group in _groups)
-//        if ([_subscribedGroups containsObject:group])
-//            [groups addObject:group];
-//    return groups;
-    return [_subscribedGroups allObjects];
+    NSMutableArray *groupNames = [[NSMutableArray alloc] init];
+    for (NNNewsrcItem *item in _groups)
+        if (item.subscribed)
+            [groupNames addObject:item.groupName];
+    return groupNames;
 }
 
 - (void)setSubscribedGroupNames:(NSArray *)groupNames
 {
-    _subscribedGroups = [[NSMutableSet alloc] initWithArray:groupNames];
+    NSMutableArray *groupNamesChecklist = [groupNames mutableCopy];
+    for (NNNewsrcItem *item in _groups)
+        if ([groupNamesChecklist containsObject:item.groupName])
+        {
+            item.subscribed = YES;
+            [groupNamesChecklist removeObject:item.groupName];
+        }
+        else
+            item.subscribed = NO;
+
+    // Add any remaining checklist names, as they must be new
+    for (NSString *name in groupNamesChecklist)
+    {
+        NNNewsrcItem *item = [[NNNewsrcItem alloc] init];
+        item.groupName = name;
+        item.articleRanges = [[NSMutableArray alloc] init];
+        item.subscribed = YES;
+        [_groups addObject:item];
+        _groupsDictionary[item.groupName] = item;
+    }
+
+    changed = YES;
 }
 
 - (void)readNewsrcFileAtURL:(NSURL *)url
 {
-    _subscribedGroups = [[NSMutableSet alloc] init];
-
     NSInputStream *stream = [[NSInputStream alloc] initWithURL:url];
     [stream open];
 
@@ -185,14 +206,14 @@
         if (eos)
             break;
 
-        NSString *name = [[NSString alloc] initWithBytes:buf
+        NNNewsrcItem *item = [[NNNewsrcItem alloc] init];
+        item.groupName = [[NSString alloc] initWithBytes:buf
                                                   length:ptr - buf
                                                 encoding:NSUTF8StringEncoding];
-        NSMutableArray *articleRanges = [[NSMutableArray alloc] init];
-        _groups[name] = articleRanges;
-
-        if (*ptr == ':')
-            [_subscribedGroups addObject:name];
+        item.articleRanges = [[NSMutableArray alloc] init];
+        item.subscribed = (*ptr == ':');
+        [_groups addObject:item];
+        _groupsDictionary[item.groupName] = item;
 
         // Read the ranges
         BOOL moreValues = YES;
@@ -230,13 +251,13 @@
                 long long n1 = atoll(buf);
                 long long n2 = atoll(buf + i + 1);
                 ArticleRange range = ArticleRangeMake(n1, n2 - n1);
-                [articleRanges addObject:[NSValue valueWithArticleRange:range]];
+                [item.articleRanges addObject:[NSValue valueWithArticleRange:range]];
             }
             else
             {
                 long long n = atoll(buf);
                 ArticleRange range = ArticleRangeMake(n, 0);
-                [articleRanges addObject:[NSValue valueWithArticleRange:range]];
+                [item.articleRanges addObject:[NSValue valueWithArticleRange:range]];
             }
         }
     }
@@ -248,15 +269,18 @@
 {
     NSOutputStream *stream = [[NSOutputStream alloc] initWithURL:url append:NO];
     [stream open];
-    for (NSString *key in [_groups allKeys])
+    for (NNNewsrcItem *item in _groups)
     {
-        [stream write:(const uint8_t *)[key cStringUsingEncoding:NSUTF8StringEncoding]
-            maxLength:[key length]];
-        [stream write:(const uint8_t *)": " maxLength:2];
+        [stream write:(const uint8_t *)[item.groupName cStringUsingEncoding:NSUTF8StringEncoding]
+            maxLength:[item.groupName length]];
 
-        NSArray *values = _groups[key];
+        if (item.subscribed)
+            [stream write:(const uint8_t *)": " maxLength:2];
+        else
+            [stream write:(const uint8_t *)"! " maxLength:2];
+
         BOOL comma = NO;
-        for (NSValue *value in values)
+        for (NSValue *value in item.articleRanges)
         {
             if (comma)
                 [stream write:(const uint8_t *)"," maxLength:1];

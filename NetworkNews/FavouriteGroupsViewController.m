@@ -177,9 +177,11 @@ commitEditingStyle:(UITableViewCellEditingStyle)editingStyle
         [_groupNames removeObjectAtIndex:[indexPath row]];
 
         // Delete the row from the data source
-        [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath]
-                         withRowAnimation:YES];
-    }   
+        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:YES];
+
+        [[[_connectionPool account] newsrc] setSubscribedGroupNames:_groupNames];
+        [[[_connectionPool account] newsrc] sync];
+    }
 }
 
 -  (void)tableView:(UITableView *)tableView
@@ -198,8 +200,13 @@ moveRowAtIndexPath:(NSIndexPath *)fromIndexPath
     if ([[segue identifier] isEqualToString:@"Done"])
     {
         SearchGroupsViewController *sourceViewController = [segue sourceViewController];
-        _groupNames = [sourceViewController checkedGroups];
-        [[[_connectionPool account] newsrc] setSubscribedGroupNames:_groupNames];
+        [[[_connectionPool account] newsrc] setSubscribedGroupNames:[sourceViewController checkedGroups]];
+
+        // Get the subscribed groups via the newsrc object so as to restore
+        // group ordering
+        _groupNames = [[[[_connectionPool account] newsrc] subscribedGroupNames] mutableCopy];
+
+        [[[_connectionPool account] newsrc] sync];
     }
 }
 
