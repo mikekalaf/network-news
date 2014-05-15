@@ -847,8 +847,8 @@
 //    [self beginHTML];
 //    [self appendHeadFromArticle];
     
-    SizeFormatter *formatter = [[SizeFormatter alloc] init];
-    NSString *sizeString = [formatter stringForObjectValue:[_article totalByteCount]];
+//    SizeFormatter *formatter = [[SizeFormatter alloc] init];
+//    NSString *sizeString = [formatter stringForObjectValue:[_article totalByteCount]];
 
 //    if ([_article hasAllParts] == NO)
 //    {
@@ -929,7 +929,7 @@
         _progressView.progress = 0;
         _progressView.hidden = NO;
         
-        NSLog(@"Downloading %d part(s)", [sortedParts count]);
+        NSLog(@"Downloading %lu part(s)", (unsigned long)[sortedParts count]);
 
         // "Common info" carries the attachment filename from the first part
         // to all the following parts - it relies on the operations being done
@@ -960,9 +960,9 @@
 
 - (void)updateTitle
 {
-    [self setTitle:[NSString stringWithFormat:@"%d of %d",
-                    _articleIndex + 1,
-                    [_articleSource articleCount]]];
+    [self setTitle:[NSString stringWithFormat:@"%ld of %lu",
+                    (unsigned long)_articleIndex + 1,
+                    (unsigned long)[_articleSource articleCount]]];
 }
 
 - (void)updateNavigationControls

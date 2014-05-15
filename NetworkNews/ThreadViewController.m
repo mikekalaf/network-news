@@ -40,7 +40,7 @@
 {
     [super viewDidLoad];
     
-    [self setTitle:[NSString stringWithFormat:@"%d Articles", [_articles count]]];
+    [self setTitle:[NSString stringWithFormat:@"%lu Articles", (unsigned long)[_articles count]]];
 
     // We need to do this just to have the back button show "Thread" rather than the title
     UIBarButtonItem *backButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Thread"

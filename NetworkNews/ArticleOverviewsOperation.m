@@ -166,6 +166,12 @@ static BOOL PartNumber(NSString *subject,
 
                 if (_mode == ArticleOverviewsLatest)
                 {
+                    if (high == ArticleRangeMax(storedRange))
+                    {
+                        NSLog(@"Already have latest articles");
+                        return;
+                    }
+
                     if (storedRange.length == 0)
                     {
                         low = MAX(high - _maxArticleCount + 1, 0);
@@ -235,7 +241,7 @@ static BOOL PartNumber(NSString *subject,
                 if (lineIterator.isAtEnd && [line isEqualToString:@".\r\n"])
                     break;
 
-                // Extract the group name from the line
+                // Extract the article name from the line
                 if (linesRead > 0)
                 {
                     [self addArticleWithOver:line toGroupStore:concurrentGroupStore];

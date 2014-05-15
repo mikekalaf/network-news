@@ -20,11 +20,11 @@
         NSNumber *number = obj;
         NSUInteger value = number.integerValue;
         if (value < ONE_KB)
-            return [NSString stringWithFormat:@"%d B", value];
+            return [NSString stringWithFormat:@"%lu B", (unsigned long)value];
         else if (value < ONE_MB)
-            return [NSString stringWithFormat:@"%d KB", value / ONE_KB];
+            return [NSString stringWithFormat:@"%lu KB", (unsigned long)value / ONE_KB];
         else
-            return [NSString stringWithFormat:@"%d MB", value / ONE_MB];
+            return [NSString stringWithFormat:@"%lu MB", (unsigned long)value / ONE_MB];
     }
     return nil;
 }

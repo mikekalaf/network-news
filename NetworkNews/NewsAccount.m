@@ -50,7 +50,7 @@
     self = [super init];
     if (self)
     {
-        _accountTemplate = [decoder decodeIntegerForKey:@"accountTemplate"];
+        _accountTemplate = (AccountTemplate)[decoder decodeIntegerForKey:@"accountTemplate"];
         _serviceName = [decoder decodeObjectForKey:@"serviceName"];
         _supportURL = [decoder decodeObjectForKey:@"supportURL"];
         _iconName = [decoder decodeObjectForKey:@"iconName"];

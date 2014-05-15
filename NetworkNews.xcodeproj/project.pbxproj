@@ -17,7 +17,6 @@
 		634191BF16D0D6590069B528 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 634191BD16D0D6590069B528 /* InfoPlist.strings */; };
 		634191C116D0D6590069B528 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 634191C016D0D6590069B528 /* main.m */; };
 		634191C516D0D6590069B528 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 634191C416D0D6590069B528 /* AppDelegate.m */; };
-		634191D916D0D6590069B528 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 634191D816D0D6590069B528 /* SenTestingKit.framework */; };
 		634191DA16D0D6590069B528 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 634191B416D0D6590069B528 /* UIKit.framework */; };
 		634191DB16D0D6590069B528 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 634191B616D0D6590069B528 /* Foundation.framework */; };
 		634191E316D0D6590069B528 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 634191E116D0D6590069B528 /* InfoPlist.strings */; };
@@ -124,8 +123,7 @@
 		634191C216D0D6590069B528 /* NetworkNews-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NetworkNews-Prefix.pch"; sourceTree = "<group>"; };
 		634191C316D0D6590069B528 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		634191C416D0D6590069B528 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		634191D716D0D6590069B528 /* NetworkNewsTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NetworkNewsTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
-		634191D816D0D6590069B528 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
+		634191D716D0D6590069B528 /* NetworkNewsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NetworkNewsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		634191E016D0D6590069B528 /* NetworkNewsTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "NetworkNewsTests-Info.plist"; sourceTree = "<group>"; };
 		634191E216D0D6590069B528 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		634191E416D0D6590069B528 /* NetworkNewsTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NetworkNewsTests.h; sourceTree = "<group>"; };
@@ -284,7 +282,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				634191D916D0D6590069B528 /* SenTestingKit.framework in Frameworks */,
 				634191DA16D0D6590069B528 /* UIKit.framework in Frameworks */,
 				634191DB16D0D6590069B528 /* Foundation.framework in Frameworks */,
 			);
@@ -309,7 +306,7 @@
 			isa = PBXGroup;
 			children = (
 				634191B116D0D6590069B528 /* NetworkNews.app */,
-				634191D716D0D6590069B528 /* NetworkNewsTests.octest */,
+				634191D716D0D6590069B528 /* NetworkNewsTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -326,7 +323,6 @@
 				634191B416D0D6590069B528 /* UIKit.framework */,
 				634191B616D0D6590069B528 /* Foundation.framework */,
 				634191B816D0D6590069B528 /* CoreGraphics.framework */,
-				634191D816D0D6590069B528 /* SenTestingKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -593,8 +589,8 @@
 			);
 			name = NetworkNewsTests;
 			productName = NetworkNewsTests;
-			productReference = 634191D716D0D6590069B528 /* NetworkNewsTests.octest */;
-			productType = "com.apple.product-type.bundle";
+			productReference = 634191D716D0D6590069B528 /* NetworkNewsTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -602,6 +598,7 @@
 		634191A916D0D6590069B528 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastTestingUpgradeCheck = 0510;
 				LastUpgradeCheck = 0460;
 				ORGANIZATIONNAME = "David Schweinsberg";
 				TargetAttributes = {
@@ -910,13 +907,13 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
 					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
+					"$(inherited)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "NetworkNews/NetworkNews-Prefix.pch";
 				INFOPLIST_FILE = "NetworkNewsTests/NetworkNewsTests-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
-				WRAPPER_EXTENSION = octest;
 			};
 			name = Debug;
 		};
@@ -927,13 +924,13 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
 					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
+					"$(inherited)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "NetworkNews/NetworkNews-Prefix.pch";
 				INFOPLIST_FILE = "NetworkNewsTests/NetworkNewsTests-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
-				WRAPPER_EXTENSION = octest;
 			};
 			name = Release;
 		};

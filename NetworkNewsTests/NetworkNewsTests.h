@@ -6,8 +6,8 @@
 //  Copyright (c) 2013 David Schweinsberg. All rights reserved.
 //
 
-#import <SenTestingKit/SenTestingKit.h>
+#import <XCTest/XCTest.h>
 
-@interface NetworkNewsTests : SenTestCase
+@interface NetworkNewsTests : XCTestCase
 
 @end

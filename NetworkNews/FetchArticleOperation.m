@@ -134,7 +134,7 @@ NSString *FetchArticleCompletedNotification = @"FetchArticleCompletedNotificatio
             }
             else
             {
-                NSLog(@"STATUS CODE: %d", [response statusCode]);
+                NSLog(@"STATUS CODE: %ld", (long)[response statusCode]);
                 NSLog(@"%@", [[NSString alloc] initWithData:[response data] encoding:NSUTF8StringEncoding]);
 
                 retry = NO;
@@ -179,7 +179,7 @@ NSString *FetchArticleCompletedNotification = @"FetchArticleCompletedNotificatio
                           order:(NSUInteger)order
                       extension:(NSString *)extension
 {
-    NSString *fileName = [NSString stringWithFormat:@"%@.%03d", [messageID messageIDFileName], order];
+    NSString *fileName = [NSString stringWithFormat:@"%@.%03lu", [messageID messageIDFileName], (unsigned long)order];
     return [_cacheURL URLByAppendingPathComponent:[fileName stringByAppendingPathExtension:extension]];
 }
 

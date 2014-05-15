@@ -21,7 +21,7 @@
 - (void)appendNewsHead:(NSArray *)entries
 {
     EncodedWordDecoder *encodedWordDecoder = [[EncodedWordDecoder alloc] init];
-    UIFont *userFont = [UIFont systemFontOfSize:-1.0];
+//    UIFont *userFont = [UIFont systemFontOfSize:-1.0];
     UIFont *boldUserFont = [UIFont boldSystemFontOfSize:-1.0];
     
     // Header Field Name Attributes

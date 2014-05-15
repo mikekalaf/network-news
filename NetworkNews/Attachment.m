@@ -50,9 +50,9 @@
                 {
                     NSUInteger dataCRC32 = [_data CRC32];
                     if ([decoder CRC32] != dataCRC32)
-                        NSLog(@"Reported CRC32: %x, Calculated CRC32: %x",
-                              [decoder CRC32],
-                              dataCRC32);
+                        NSLog(@"Reported CRC32: %lx, Calculated CRC32: %lx",
+                              (unsigned long)[decoder CRC32],
+                              (unsigned long)dataCRC32);
                 }
             }
         }

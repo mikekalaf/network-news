@@ -868,7 +868,7 @@
     if (maxCount == 0)
         maxCount = 1000;
 
-    NSLog(@"Max Article Count: %d", maxCount);
+    NSLog(@"Max Article Count: %lu", (unsigned long)maxCount);
 
     // Issue an OVER/XOVER command
     ArticleOverviewsOperation *operation = [[ArticleOverviewsOperation alloc] initWithConnectionPool:_connectionPool

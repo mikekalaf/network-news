@@ -247,7 +247,7 @@ static NSUInteger stopOfData(const char *bytes,
         end = stopOfData(bytes, begin, length, &endOfBlock);
         if (end < NSUIntegerMax)
         {
-            NSLog(@"begin: %d (%d), end: %d (%d)", begin, beginOfBlock, end, endOfBlock);
+            NSLog(@"begin: %lu (%lu), end: %lu (%lu)", (unsigned long)begin, (unsigned long)beginOfBlock, (unsigned long)end, (unsigned long)endOfBlock);
             
             // Determine the range of the encoded data, including the header and footer
             encodedRange = NSMakeRange(beginOfBlock, endOfBlock - beginOfBlock);

@@ -87,7 +87,7 @@
             }
             else
             {
-                NSLog(@"STATUS CODE: %d", [response statusCode]);
+                NSLog(@"STATUS CODE: %ld", (long)[response statusCode]);
                 NSLog(@"%@", [[NSString alloc] initWithData:[response data] encoding:NSUTF8StringEncoding]);
 
                 retry = NO;

@@ -49,7 +49,7 @@ NSString *const NewsConnectionBytesReceivedNotification = @"NewsConnectionBytesR
         CFWriteStreamRef writeStream;
         CFStreamCreatePairWithSocketToHost(NULL,
                                            (__bridge CFStringRef)host,
-                                           port,
+                                           (UInt32)port,
                                            &readStream,
                                            &writeStream);
 
@@ -254,7 +254,7 @@ NSString *const NewsConnectionBytesReceivedNotification = @"NewsConnectionBytesR
         NSInteger bytesRead = [_inputStream read:buffer maxLength:BUFSIZE];
         if (bytesRead > 0)
         {
-            NSLog(@"%d bytes read", bytesRead);
+            NSLog(@"%ld bytes read", (long)bytesRead);
 
             [nc postNotificationName:NewsConnectionBytesReceivedNotification
                               object:self

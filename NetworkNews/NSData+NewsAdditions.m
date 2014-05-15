@@ -13,7 +13,7 @@
 
 - (NSUInteger)CRC32
 {
-    return crc32(0, self.bytes, self.length);
+    return crc32(0, self.bytes, (unsigned int)self.length);
 }
 
 @end
