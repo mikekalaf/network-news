@@ -103,6 +103,11 @@ NSString *FetchArticleCompletedNotification = @"FetchArticleCompletedNotificatio
 
                 retry = NO;
             }
+            else if ([response statusCode] == 400)
+            {
+                // Timeout - retry with a new connection
+                retry = YES;
+            }
             else if ([response statusCode] == 430)
             {
                 NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];

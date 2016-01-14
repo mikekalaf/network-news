@@ -3,10 +3,11 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 47;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		03148F3B1C47348400BAFED3 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 03148F3A1C47348400BAFED3 /* libz.tbd */; };
 		6302EF0E178D8E7800BBC68E /* ExtendedLayoutManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 6302EF0D178D8E7800BBC68E /* ExtendedLayoutManager.m */; };
 		631CBA6A1893CB2400B9421A /* ArticleRange.m in Sources */ = {isa = PBXBuildFile; fileRef = 631CBA691893CB2400B9421A /* ArticleRange.m */; };
 		63271077183F20E200CD249E /* NNNewsrc.m in Sources */ = {isa = PBXBuildFile; fileRef = 63271076183F20E200CD249E /* NNNewsrc.m */; };
@@ -92,7 +93,6 @@
 		63FF913816D108920068ADFB /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63FF913716D108920068ADFB /* QuartzCore.framework */; };
 		63FF913A16D108A00068ADFB /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63FF913916D1089F0068ADFB /* CoreData.framework */; };
 		63FF913C16D108A90068ADFB /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63FF913B16D108A90068ADFB /* MessageUI.framework */; };
-		63FF913E16D108B30068ADFB /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 63FF913D16D108B30068ADFB /* libz.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -106,6 +106,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		03148F3A1C47348400BAFED3 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		6302EF0C178D8E7800BBC68E /* ExtendedLayoutManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtendedLayoutManager.h; sourceTree = "<group>"; };
 		6302EF0D178D8E7800BBC68E /* ExtendedLayoutManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExtendedLayoutManager.m; sourceTree = "<group>"; };
 		631CBA691893CB2400B9421A /* ArticleRange.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ArticleRange.m; sourceTree = "<group>"; };
@@ -258,7 +259,6 @@
 		63FF913716D108920068ADFB /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		63FF913916D1089F0068ADFB /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		63FF913B16D108A90068ADFB /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
-		63FF913D16D108B30068ADFB /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -266,7 +266,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				63FF913E16D108B30068ADFB /* libz.dylib in Frameworks */,
+				03148F3B1C47348400BAFED3 /* libz.tbd in Frameworks */,
 				63FF913C16D108A90068ADFB /* MessageUI.framework in Frameworks */,
 				63FF913A16D108A00068ADFB /* CoreData.framework in Frameworks */,
 				63FF913816D108920068ADFB /* QuartzCore.framework in Frameworks */,
@@ -314,7 +314,7 @@
 		634191B316D0D6590069B528 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				63FF913D16D108B30068ADFB /* libz.dylib */,
+				03148F3A1C47348400BAFED3 /* libz.tbd */,
 				63FF913B16D108A90068ADFB /* MessageUI.framework */,
 				63FF913916D1089F0068ADFB /* CoreData.framework */,
 				63FF913716D108920068ADFB /* QuartzCore.framework */,
@@ -599,16 +599,16 @@
 			isa = PBXProject;
 			attributes = {
 				LastTestingUpgradeCheck = 0510;
-				LastUpgradeCheck = 0460;
+				LastUpgradeCheck = 0720;
 				ORGANIZATIONNAME = "David Schweinsberg";
 				TargetAttributes = {
 					634191B016D0D6590069B528 = {
-						DevelopmentTeam = 49743Y6622;
+						DevelopmentTeam = 9MWCHY26A8;
 					};
 				};
 			};
 			buildConfigurationList = 634191AC16D0D6590069B528 /* Build configuration list for PBXProject "NetworkNews" */;
-			compatibilityVersion = "Xcode 3.2";
+			compatibilityVersion = "Xcode 6.3";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -824,6 +824,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -874,11 +875,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "NetworkNews/NetworkNews-Prefix.pch";
 				INFOPLIST_FILE = "NetworkNews/NetworkNews-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "net.synchroma.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};
@@ -890,11 +894,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "NetworkNews/NetworkNews-Prefix.pch";
 				INFOPLIST_FILE = "NetworkNews/NetworkNews-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "net.synchroma.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};
@@ -912,6 +919,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "NetworkNews/NetworkNews-Prefix.pch";
 				INFOPLIST_FILE = "NetworkNewsTests/NetworkNewsTests-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "net.synchroma.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 			};
@@ -929,6 +937,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "NetworkNews/NetworkNews-Prefix.pch";
 				INFOPLIST_FILE = "NetworkNewsTests/NetworkNewsTests-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "net.synchroma.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 			};
