@@ -10,11 +10,11 @@
 
 @interface NNNewsrc : NSObject
 
-- (id)initWithServerName:(NSString *)serverName;
+- (instancetype)initWithServerName:(NSString *)serverName NS_DESIGNATED_INITIALIZER;
+- (instancetype)init __attribute__((unavailable));
 - (void)sync;
 - (BOOL)isReadForGroupName:(NSString *)name articleNumber:(long long)number;
 - (void)setRead:(BOOL)read forGroupName:(NSString *)name articleNumber:(long long)number;
-- (NSArray *)subscribedGroupNames;
-- (void)setSubscribedGroupNames:(NSArray *)groupNames;
+@property (NS_NONATOMIC_IOSONLY, copy) NSArray *subscribedGroupNames;
 
 @end

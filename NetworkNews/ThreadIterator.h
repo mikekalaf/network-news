@@ -16,7 +16,8 @@
     NSUInteger totalCount;
 }
 
-- (id)initWithThreads:(NSArray *)threadsArray;
+- (instancetype)initWithThreads:(NSArray *)threadsArray NS_DESIGNATED_INITIALIZER;
+- (instancetype)init __attribute__((unavailable));
 
 - (NSInteger)articleIndexOfThreadIndex:(NSUInteger)threadIndex;
 

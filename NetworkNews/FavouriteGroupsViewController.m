@@ -30,7 +30,7 @@
 {
     [super viewDidLoad];
 
-    [[self navigationItem] setLeftBarButtonItem:[self editButtonItem]];
+    self.navigationItem.leftBarButtonItem = [self editButtonItem];
 
 }
 
@@ -44,7 +44,7 @@
     NSString *selectedServiceName = [userDefaults valueForKey:@"SelectedServiceName"];
     if (selectedServiceName)
     {
-        AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+        AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
         for (NewsAccount *account in appDelegate.accounts)
             if ([selectedServiceName isEqualToString:account.serviceName])
             {
@@ -64,10 +64,10 @@
     {
         if (connect)
         {
-            [self setConnectionPool:[[NewsConnectionPool alloc] initWithAccount:_account]];
+            self.connectionPool = [[NewsConnectionPool alloc] initWithAccount:_account];
 
             // Load the subscribed groups
-            _groupNames = [[[[_connectionPool account] newsrc] subscribedGroupNames] mutableCopy];
+            _groupNames = [[_connectionPool.account.newsrc subscribedGroupNames] mutableCopy];
         }
     }
     else
@@ -84,7 +84,7 @@
 {
     [super viewDidAppear:animated];
 
-    [[[_connectionPool account] newsrc] sync];
+    [_connectionPool.account.newsrc sync];
 
     // Remove any saved search results
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
@@ -105,18 +105,18 @@
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
-    if ([[segue identifier] isEqualToString:@"EditGroups"])
+    if ([segue.identifier isEqualToString:@"EditGroups"])
     {
-        SearchGroupsViewController *viewController = (SearchGroupsViewController *)[[segue destinationViewController] topViewController];
-        [viewController setConnectionPool:_connectionPool];
-        [viewController setCheckedGroups:[_groupNames mutableCopy]];
+        SearchGroupsViewController *viewController = (SearchGroupsViewController *)[segue.destinationViewController topViewController];
+        viewController.connectionPool = _connectionPool;
+        viewController.checkedGroups = [_groupNames mutableCopy];
     }
-    else if ([[segue identifier] isEqualToString:@"SelectGroup"])
+    else if ([segue.identifier isEqualToString:@"SelectGroup"])
     {
-        NSString *name = [_groupNames objectAtIndex:[[[self tableView] indexPathForSelectedRow] row]];
-        ThreadListViewController *viewController = [segue destinationViewController];
-        [viewController setConnectionPool:_connectionPool];
-        [viewController setGroupName:name];
+        NSString *name = _groupNames[self.tableView.indexPathForSelectedRow.row];
+        ThreadListViewController *viewController = segue.destinationViewController;
+        viewController.connectionPool = _connectionPool;
+        viewController.groupName = name;
     }
 }
 
@@ -127,14 +127,14 @@
 - (NSInteger)tableView:(UITableView *)tableView
  numberOfRowsInSection:(NSInteger)section
 {
-    return [_groupNames count];
+    return _groupNames.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView
          cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell"];
-    [[cell textLabel] setText:_groupNames[[indexPath row]]];
+    cell.textLabel.text = _groupNames[indexPath.row];
     return cell;
 }
 
@@ -148,7 +148,7 @@ commitEditingStyle:(UITableViewCellEditingStyle)editingStyle
     {
 //        // Delete the cache
         NSFileManager *fileManager = [NSFileManager defaultManager];
-        NSString *name = [_groupNames objectAtIndex:[indexPath row]];
+        NSString *name = _groupNames[indexPath.row];
 //        NSURL *cacheURL = [[[_connectionPool account] cacheURL] URLByAppendingPathComponent:name];
 //        [fileManager removeItemAtURL:cacheURL error:NULL];
 
@@ -156,8 +156,8 @@ commitEditingStyle:(UITableViewCellEditingStyle)editingStyle
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,
                                                              NSUserDomainMask,
                                                              YES);
-        NSString *documentDir = [paths lastObject];
-        NSString *serverDir = [documentDir stringByAppendingPathComponent:[[_connectionPool account] hostName]];
+        NSString *documentDir = paths.lastObject;
+        NSString *serverDir = [documentDir stringByAppendingPathComponent:_connectionPool.account.hostName];
         NSString *storeNameWithExt = [name stringByAppendingPathExtension:@"sqlite"];
         NSString *path = [serverDir stringByAppendingPathComponent:storeNameWithExt];
         NSLog(@"Removing path: %@", path);
@@ -174,13 +174,13 @@ commitEditingStyle:(UITableViewCellEditingStyle)editingStyle
         [fileManager removeItemAtPath:path error:NULL];
 
         // Remove from the table view
-        [_groupNames removeObjectAtIndex:[indexPath row]];
+        [_groupNames removeObjectAtIndex:indexPath.row];
 
         // Delete the row from the data source
         [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:YES];
 
-        [[[_connectionPool account] newsrc] setSubscribedGroupNames:_groupNames];
-        [[[_connectionPool account] newsrc] sync];
+        [_connectionPool.account.newsrc setSubscribedGroupNames:_groupNames];
+        [_connectionPool.account.newsrc sync];
     }
 }
 
@@ -188,25 +188,25 @@ commitEditingStyle:(UITableViewCellEditingStyle)editingStyle
 moveRowAtIndexPath:(NSIndexPath *)fromIndexPath
        toIndexPath:(NSIndexPath *)toIndexPath
 {
-    NSString *groupName = [_groupNames objectAtIndex:[fromIndexPath row]];
-    [_groupNames removeObjectAtIndex:[fromIndexPath row]];
-    [_groupNames insertObject:groupName atIndex:[toIndexPath row]];
+    NSString *groupName = _groupNames[fromIndexPath.row];
+    [_groupNames removeObjectAtIndex:fromIndexPath.row];
+    [_groupNames insertObject:groupName atIndex:toIndexPath.row];
 }
 
 #pragma mark - Actions
 
 - (IBAction)unwindFromSearchGroups:(UIStoryboardSegue *)segue
 {
-    if ([[segue identifier] isEqualToString:@"Done"])
+    if ([segue.identifier isEqualToString:@"Done"])
     {
-        SearchGroupsViewController *sourceViewController = [segue sourceViewController];
-        [[[_connectionPool account] newsrc] setSubscribedGroupNames:[sourceViewController checkedGroups]];
+        SearchGroupsViewController *sourceViewController = segue.sourceViewController;
+        [_connectionPool.account.newsrc setSubscribedGroupNames:sourceViewController.checkedGroups];
 
         // Get the subscribed groups via the newsrc object so as to restore
         // group ordering
-        _groupNames = [[[[_connectionPool account] newsrc] subscribedGroupNames] mutableCopy];
+        _groupNames = [[_connectionPool.account.newsrc subscribedGroupNames] mutableCopy];
 
-        [[[_connectionPool account] newsrc] sync];
+        [_connectionPool.account.newsrc sync];
     }
 }
 

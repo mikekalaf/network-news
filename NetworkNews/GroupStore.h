@@ -17,6 +17,6 @@
 @property (nonatomic, readonly) ArticleRange articleRange;
 @property (nonatomic, readonly) NSDate *lastUpdate;
 
-- (GroupStore *)concurrentGroupStore;
+@property (NS_NONATOMIC_IOSONLY, readonly, strong) GroupStore *concurrentGroupStore;
 
 @end

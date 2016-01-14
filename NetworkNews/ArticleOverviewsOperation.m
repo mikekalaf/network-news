@@ -30,7 +30,7 @@ static BOOL PartNumber(NSString *subject,
 
     // Search backwards for the "("
     NSScanner *scanner = nil;
-    for (NSInteger i = [subject length] - 1; i >= 0; --i)
+    for (NSInteger i = subject.length - 1; i >= 0; --i)
     {
         if ([subject characterAtIndex:i] == L'(')
         {
@@ -39,7 +39,7 @@ static BOOL PartNumber(NSString *subject,
             if (scanner == nil)
                 scanner = [[NSScanner alloc] initWithString:subject];
 
-            [scanner setScanLocation:i + 1];
+            scanner.scanLocation = i + 1;
             if ([scanner scanInteger:partNumber])
             {
                 if ([scanner scanString:@"/" intoString:NULL])
@@ -48,7 +48,7 @@ static BOOL PartNumber(NSString *subject,
                     {
                         if ([scanner scanString:@")" intoString:NULL])
                         {
-                            *numberLen = [scanner scanLocation] - *numberPos;
+                            *numberLen = scanner.scanLocation - *numberPos;
                             break;
                         }
                     }
@@ -75,7 +75,7 @@ static BOOL PartNumber(NSString *subject,
 
 @implementation _ArticlePlaceholder
 
-- (id)init
+- (instancetype)init
 {
     self = [super init];
     if (self)
@@ -102,7 +102,7 @@ static BOOL PartNumber(NSString *subject,
 
 @implementation ArticleOverviewsOperation
 
-- (id)initWithConnectionPool:(NewsConnectionPool *)connectionPool
+- (instancetype)initWithConnectionPool:(NewsConnectionPool *)connectionPool
                   groupStore:(GroupStore *)groupStore
                         mode:(ArticleOverviewsMode)mode
              maxArticleCount:(NSUInteger)maxArticleCount
@@ -140,14 +140,14 @@ static BOOL PartNumber(NSString *subject,
             }
 
             // Select the newsgroup
-            NewsResponse *response = [newsConnection groupWithName:[_groupStore groupName]];
+            NewsResponse *response = [newsConnection groupWithName:_groupStore.groupName];
 
-            if ([response statusCode] == 211)
+            if (response.statusCode == 211)
             {
                 // Group successfully selected
 
                 // Scan the response string for the article numbers
-                NSString *string = [[NSString alloc] initWithData:[response data]
+                NSString *string = [[NSString alloc] initWithData:response.data
                                                          encoding:NSUTF8StringEncoding];
                 NSScanner *scanner = [[NSScanner alloc] initWithString:string];
                 NSInteger response;
@@ -162,7 +162,7 @@ static BOOL PartNumber(NSString *subject,
                 [scanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet]
                                         intoString:&name];
 
-                ArticleRange storedRange = [_groupStore articleRange];
+                ArticleRange storedRange = _groupStore.articleRange;
 
                 if (_mode == ArticleOverviewsLatest)
                 {
@@ -203,14 +203,14 @@ static BOOL PartNumber(NSString *subject,
 
                 retry = NO;
             }
-            else if ([response statusCode] == 411)
+            else if (response.statusCode == 411)
             {
                 // No such newsgroup
                 _status = ArticleOverviewsNoSuchGroup;
                 [_connectionPool enqueueConnection:newsConnection];
                 return;
             }
-            else if ([response statusCode] == 503)
+            else if (response.statusCode == 503)
             {
                 // Connection has probably timed-out, so retry with a
                 // new connection (if we haven't retried already)
@@ -226,12 +226,12 @@ static BOOL PartNumber(NSString *subject,
         NewsResponse *response = [newsConnection overWithRange:_articleRange];
         [_connectionPool enqueueConnection:newsConnection];
 
-        if ([response statusCode] == 224)
+        if (response.statusCode == 224)
         {
             NSUInteger linesRead = 0;
 
             // Overview information follows
-            LineIterator *lineIterator = [[LineIterator alloc] initWithData:[response data]];
+            LineIterator *lineIterator = [[LineIterator alloc] initWithData:response.data];
 
             while (!lineIterator.isAtEnd)
             {
@@ -351,30 +351,30 @@ static BOOL PartNumber(NSString *subject,
     if (partNumber == 0 || (partNumber == 1 && totalParts == 1))
     {
         NSEntityDescription *articleEntity = [NSEntityDescription entityForName:@"Article"
-                                                         inManagedObjectContext:[groupStore managedObjectContext]];
+                                                         inManagedObjectContext:groupStore.managedObjectContext];
         NSEntityDescription *articlePartEntity = [NSEntityDescription entityForName:@"ArticlePart"
-                                                             inManagedObjectContext:[groupStore managedObjectContext]];
+                                                             inManagedObjectContext:groupStore.managedObjectContext];
 
         // Single part text or binary
         Article *article = [[Article alloc] initWithEntity:articleEntity
-                            insertIntoManagedObjectContext:[groupStore managedObjectContext]];
+                            insertIntoManagedObjectContext:groupStore.managedObjectContext];
 
-        [article setSubject:subject];
-        [article setDate:date];
-        [article setFrom:from];
-        [article setTotalByteCount:[NSNumber numberWithInteger:bytes]];
-        [article setCompletePartCount:[NSNumber numberWithInteger:1]];
-        [article setReferences:references];
+        article.subject = subject;
+        article.date = date;
+        article.from = from;
+        article.totalByteCount = @(bytes);
+        article.completePartCount = @1;
+        article.references = references;
 
         ArticlePart *part = [[ArticlePart alloc] initWithEntity:articlePartEntity
-                                 insertIntoManagedObjectContext:[groupStore managedObjectContext]];
+                                 insertIntoManagedObjectContext:groupStore.managedObjectContext];
 
-        [part setArticle:article];
-        [part setArticleNumber:[NSNumber numberWithLongLong:articleNumber]];
-        [part setDate:date];
-        [part setPartNumber:[NSNumber numberWithInteger:1]];
-        [part setMessageId:messageId];
-        [part setByteCount:[NSNumber numberWithInteger:bytes]];
+        part.article = article;
+        part.articleNumber = @(articleNumber);
+        part.date = date;
+        part.partNumber = @1;
+        part.messageId = messageId;
+        part.byteCount = @(bytes);
 
         // TODO Add this to a list to fault
     }
@@ -384,31 +384,31 @@ static BOOL PartNumber(NSString *subject,
         //        subject = [NSString stringWithFormat:@"MP %@", subject];
 
         NSEntityDescription *articlePartEntity = [NSEntityDescription entityForName:@"ArticlePart"
-                                                             inManagedObjectContext:[groupStore managedObjectContext]];
+                                                             inManagedObjectContext:groupStore.managedObjectContext];
 
         // Multi part binary
         ArticlePart *part = [[ArticlePart alloc] initWithEntity:articlePartEntity
-                                 insertIntoManagedObjectContext:[groupStore managedObjectContext]];
+                                 insertIntoManagedObjectContext:groupStore.managedObjectContext];
 
-        [part setArticleNumber:[NSNumber numberWithLongLong:articleNumber]];
-        [part setDate:date];
-        [part setPartNumber:[NSNumber numberWithInteger:partNumber]];
-        [part setMessageId:messageId];
-        [part setByteCount:[NSNumber numberWithInteger:bytes]];
+        part.articleNumber = @(articleNumber);
+        part.date = date;
+        part.partNumber = @(partNumber);
+        part.messageId = messageId;
+        part.byteCount = @(bytes);
 
         // TODO Add this to a list to fault
 
         // Find if there is an existing placeholder, and create if necessary
-        _ArticlePlaceholder *placeholder = [_placeholders objectForKey:subject];
+        _ArticlePlaceholder *placeholder = _placeholders[subject];
         if (placeholder == nil)
         {
             placeholder = [[_ArticlePlaceholder alloc] init];
-            [placeholder setSubject:subject];
-            [placeholder setFrom:from];
-            [placeholder setReferences:references];
-            [placeholder setCompletePartCount:totalParts];
+            placeholder.subject = subject;
+            placeholder.from = from;
+            placeholder.references = references;
+            placeholder.completePartCount = totalParts;
 
-            [_placeholders setObject:placeholder forKey:subject];
+            _placeholders[subject] = placeholder;
         }
 
         [placeholder.parts addObject:part];
@@ -418,22 +418,22 @@ static BOOL PartNumber(NSString *subject,
 - (void)groupTogetherMultipartsInGroupStore:(GroupStore *)groupStore
 {
     NSEntityDescription *articleEntity = [NSEntityDescription entityForName:@"Article"
-                                                     inManagedObjectContext:[groupStore managedObjectContext]];
+                                                     inManagedObjectContext:groupStore.managedObjectContext];
 
     // Find or create articles for multiparts
-    for (_ArticlePlaceholder *placeholder in [_placeholders allValues])
+    for (_ArticlePlaceholder *placeholder in _placeholders.allValues)
     {
         // Does an article with this subject already exist?
 
         NSFetchRequest *request = [[NSFetchRequest alloc] init];
-        [request setEntity:articleEntity];
+        request.entity = articleEntity;
 
         NSPredicate *predicate = [NSPredicate predicateWithFormat:
-                                  @"subject == %@", [placeholder subject]];
-        [request setPredicate:predicate];
+                                  @"subject == %@", placeholder.subject];
+        request.predicate = predicate;
 
         NSError *error;
-        NSArray *array = [[groupStore managedObjectContext] executeFetchRequest:request error:&error];
+        NSArray *array = [groupStore.managedObjectContext executeFetchRequest:request error:&error];
         if (array == nil)
         {
             // Deal with error...
@@ -441,41 +441,41 @@ static BOOL PartNumber(NSString *subject,
 
         Article *article = nil;
         NSUInteger totalByteCount = 0;
-        if ([array count] == 0)
+        if (array.count == 0)
         {
             // Create a new article
             article = [[Article alloc] initWithEntity:articleEntity
-                       insertIntoManagedObjectContext:[groupStore managedObjectContext]];
+                       insertIntoManagedObjectContext:groupStore.managedObjectContext];
 
-            [article setSubject:[placeholder subject]];
-            [article setFrom:[placeholder from]];
-            [article setCompletePartCount:[NSNumber numberWithInteger:placeholder.completePartCount]];
-            [article setReferences:[placeholder references]];
+            article.subject = placeholder.subject;
+            article.from = placeholder.from;
+            article.completePartCount = @(placeholder.completePartCount);
+            article.references = placeholder.references;
         }
         else
         {
             // Use this existing article
-            article = [array objectAtIndex:0];
+            article = array[0];
 
-            totalByteCount = [[article totalByteCount] integerValue];
+            totalByteCount = article.totalByteCount.integerValue;
         }
 
         // Look through all the parts, to make sure we've set the article to
         // the earliest of the part dates
         NSDate *earliestDate = nil;
 
-        for (ArticlePart *part in [placeholder parts])
+        for (ArticlePart *part in placeholder.parts)
         {
             [article addPartsObject:part];
-            totalByteCount += [[part byteCount] integerValue];
+            totalByteCount += part.byteCount.integerValue;
 
             // Note the earliest date of the parts
-            if (earliestDate == nil || [earliestDate compare:[part date]] == NSOrderedDescending)
-                earliestDate = [part date];
+            if (earliestDate == nil || [earliestDate compare:part.date] == NSOrderedDescending)
+                earliestDate = part.date;
         }
-        [article setDate:earliestDate];
+        article.date = earliestDate;
 
-        [article setTotalByteCount:[NSNumber numberWithInteger:totalByteCount]];
+        article.totalByteCount = @(totalByteCount);
 
         NSAssert([article date] != nil, @"Article with nil date");
     }

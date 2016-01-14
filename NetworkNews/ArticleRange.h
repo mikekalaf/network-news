@@ -41,6 +41,6 @@ NS_INLINE BOOL EqualArticleRanges(ArticleRange range1, ArticleRange range2)
 
 + (NSValue *)valueWithArticleRange:(ArticleRange)range;
 
-- (ArticleRange)articleRangeValue;
+@property (NS_NONATOMIC_IOSONLY, readonly) ArticleRange articleRangeValue;
 
 @end

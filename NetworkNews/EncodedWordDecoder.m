@@ -87,9 +87,8 @@ static int hexvalue(char c)
 - (NSString *)decodeBString:(NSString *)string
                    encoding:(NSStringEncoding)encoding
 {
-    NNBase64Decoder *base64Decoder = [[NNBase64Decoder alloc] init];
-    NSString *decodedString = [base64Decoder decodeString:string
-                                         toStringEncoding:encoding];
+    NSString *decodedString = [NNBase64Decoder decodeString:string
+                                           toStringEncoding:encoding];
     return decodedString;
 }
 
@@ -101,19 +100,19 @@ static int hexvalue(char c)
     NSArray *components = [string componentsSeparatedByString:@"?"];
     if (components.count == 5)
     {
-        NSString *encodingName = [components objectAtIndex:1];
+        NSString *encodingName = components[1];
 
         CFStringEncoding targetCFStringEncoding = CFStringConvertIANACharSetNameToEncoding((__bridge CFStringRef)(encodingName));
         NSStringEncoding targetEncoding = CFStringConvertEncodingToNSStringEncoding(targetCFStringEncoding);
-        NSString *encoding = [components objectAtIndex:2];
+        NSString *encoding = components[2];
         if ([encoding caseInsensitiveCompare:@"Q"] == NSOrderedSame)
         {
-            return [self decodeQString:[components objectAtIndex:3]
+            return [self decodeQString:components[3]
                               encoding:targetEncoding];
         }
         else if ([encoding caseInsensitiveCompare:@"B"] == NSOrderedSame)
         {
-            return [self decodeBString:[components objectAtIndex:3]
+            return [self decodeBString:components[3]
                               encoding:targetEncoding];
         }
     }

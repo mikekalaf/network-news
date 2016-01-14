@@ -14,7 +14,7 @@
 @synthesize partial;
 @synthesize lineNumber;
 
-- (id)initWithData:(NSData *)aData
+- (instancetype)initWithData:(NSData *)aData
 {
     self = [super init];
     if (self)

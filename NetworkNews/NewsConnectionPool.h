@@ -15,9 +15,10 @@
 
 @property (nonatomic, readonly) NewsAccount *account;
 
-- (id)initWithAccount:(NewsAccount *)account;
+- (instancetype)initWithAccount:(NewsAccount *)account NS_DESIGNATED_INITIALIZER;
+- (instancetype)init __attribute__((unavailable));
 
-- (NewsConnection *)dequeueConnection;
+@property (NS_NONATOMIC_IOSONLY, readonly, strong) NewsConnection *dequeueConnection;
 - (void)enqueueConnection:(NewsConnection *)connection;
 
 @end

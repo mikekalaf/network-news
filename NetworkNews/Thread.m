@@ -22,7 +22,7 @@
 @synthesize messageID;
 @synthesize threadType;
 
-- (id)init
+- (instancetype)init
 {
     self = [super init];
     if (self)
@@ -33,7 +33,7 @@
     return self;
 }
 
-- (id)initWithArticle:(Article *)article
+- (instancetype)initWithArticle:(Article *)article
 {
     self = [self init];
     if (self)
@@ -98,7 +98,7 @@
                                                                        ascending:YES];
         
         sortedArticles = [articles sortedArrayUsingDescriptors:
-                          [NSArray arrayWithObject:sortDescriptor]];
+                          @[sortDescriptor]];
     }
     return sortedArticles;
 }
@@ -106,7 +106,7 @@
 - (BOOL)hasAllParts
 {
     for (Article *article in articles)
-        if (![article hasAllParts])
+        if (!article.hasAllParts)
             return NO;
     return YES;
 }

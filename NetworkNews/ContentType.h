@@ -16,6 +16,7 @@
 @property(nonatomic, readonly, getter=isFormatFlowed) BOOL formatFlowed;
 @property(nonatomic, copy) NSString *name;
 
-- (id)initWithString:(NSString *)string;
+- (instancetype)initWithString:(NSString *)string NS_DESIGNATED_INITIALIZER;
+- (instancetype)init __attribute__((unavailable));
 
 @end

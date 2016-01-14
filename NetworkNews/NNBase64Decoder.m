@@ -38,7 +38,7 @@ static char base64LUT[256] = {
 
 @implementation NNBase64Decoder
 
-- (id)initWithData:(NSData *)encodedData
+- (instancetype)initWithData:(NSData *)encodedData
 {
     self = [super init];
     if (self)
@@ -53,7 +53,7 @@ static char base64LUT[256] = {
     NSMutableData *decodedData = nil;
     char inputGroup[4];
     char outputGroup[3];
-    for (NSUInteger i = 0; i < [_data length]; i += 4)
+    for (NSUInteger i = 0; i < _data.length; i += 4)
     {
         NSRange range = NSMakeRange(i, 4);
         [_data getBytes:inputGroup range:range];
@@ -80,12 +80,12 @@ static char base64LUT[256] = {
         outputGroup[2] = ((in2 << 6) & 0xc0) | (in3 & 0x3f);
 
         if (decodedData == nil)
-            decodedData = [[NSMutableData alloc] initWithCapacity:[_data length] / 4 * 3];
+            decodedData = [[NSMutableData alloc] initWithCapacity:_data.length / 4 * 3];
 
         [decodedData appendBytes:outputGroup length:3];
 
         // It it only a CRLF that remains?
-        if (i + 6 >= [_data length] - 2)
+        if (i + 6 >= _data.length - 2)
         {
             char b[2];
             [_data getBytes:b range:NSMakeRange(i + 4, 1)];
@@ -95,7 +95,7 @@ static char base64LUT[256] = {
     return decodedData;
 }
 
-- (NSString *)decodeString:(NSString *)string
++ (NSString *)decodeString:(NSString *)string
           toStringEncoding:(NSStringEncoding)encoding
 {
     // The string length must be a multiple of 4

@@ -22,7 +22,7 @@
 
 @implementation NewsConnectionPool
 
-- (id)initWithAccount:(NewsAccount *)account
+- (instancetype)initWithAccount:(NewsAccount *)account
 {
     self = [super init];
     if (self)
@@ -39,18 +39,18 @@
 
     NewsConnection *newsConnection = nil;
 
-    if ([_connections count] == 0)
+    if (_connections.count == 0)
     {
-        newsConnection = [[NewsConnection alloc] initWithHost:[_account hostName]
-                                                         port:[_account port]
-                                                     isSecure:[_account isSecure]];
-        [newsConnection loginWithUser:[_account userName] password:[_account password]];
+        newsConnection = [[NewsConnection alloc] initWithHost:_account.hostName
+                                                         port:_account.port
+                                                     isSecure:_account.secure];
+        [newsConnection loginWithUser:_account.userName password:_account.password];
     }
     else
     {
         @synchronized(self)
         {
-            newsConnection = [_connections lastObject];
+            newsConnection = _connections.lastObject;
             [_connections removeLastObject];
         }
     }

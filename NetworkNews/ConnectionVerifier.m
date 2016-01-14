@@ -19,17 +19,17 @@
         BOOL connected = NO;
         BOOL authenticated = NO;
         BOOL verified = NO;
-        NewsConnection *connection = [[NewsConnection alloc] initWithHost:[account hostName]
-                                                                     port:[account port]
-                                                                 isSecure:[account isSecure]];
+        NewsConnection *connection = [[NewsConnection alloc] initWithHost:account.hostName
+                                                                     port:account.port
+                                                                 isSecure:account.secure];
         if (connection)
         {
             connected = YES;
 
-            if ([account userName])
+            if (account.userName)
             {
-                NSUInteger statusCode = [connection loginWithUser:[account userName]
-                                                         password:[account password]];
+                NSUInteger statusCode = [connection loginWithUser:account.userName
+                                                         password:account.password];
                 if (statusCode == 281)
                     authenticated = YES;
             }
@@ -39,7 +39,7 @@
             }
 
             NewsResponse *response = [connection help];
-            if ([response statusCode] == 100)
+            if (response.statusCode == 100)
                 verified = YES;
         }
 

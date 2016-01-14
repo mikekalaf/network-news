@@ -40,7 +40,7 @@
 
 @protocol ArticleSource
 
-- (NSUInteger)articleCount;
+@property (NS_NONATOMIC_IOSONLY, readonly) NSUInteger articleCount;
 - (Article *)articleAtIndex:(NSUInteger)index;
 
 @end

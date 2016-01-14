@@ -17,11 +17,13 @@
 @property(nonatomic, readonly) NSManagedObjectModel *managedObjectModel;
 @property(nonatomic, readonly) NSManagedObjectContext *managedObjectContext;
 
-- (id)initWithStoreName:(NSString *)aStoreName inDirectory:(NSString *)aDirPath;
+- (instancetype)initWithStoreName:(NSString *)aStoreName inDirectory:(NSString *)aDirPath;
 
--        (id)initWithStoreName:(NSString *)aStoreName
-                   inDirectory:(NSString *)aDirPath
-withPersistentStoreCoordinator:(NSPersistentStoreCoordinator *)persistentStoreCoordinator;
+- (instancetype)initWithStoreName:(NSString *)aStoreName
+                      inDirectory:(NSString *)aDirPath
+   withPersistentStoreCoordinator:(NSPersistentStoreCoordinator *)persistentStoreCoordinator NS_DESIGNATED_INITIALIZER;
+
+- (instancetype)init __attribute__((unavailable));
 
 - (void)save;
 

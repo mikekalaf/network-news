@@ -8,11 +8,11 @@
 
 #import <Foundation/Foundation.h>
 
-typedef enum
+typedef NS_ENUM(unsigned int, ThreadType)
 {
     ThreadTypeMessage,
     ThreadTypeFile
-} ThreadType;
+};
 
 @class Article;
 @class NNNewsrc;
@@ -41,6 +41,6 @@ typedef enum
 @property(nonatomic, copy) NSString *messageID;
 @property(nonatomic) ThreadType threadType;
 
-- (id)initWithArticle:(Article *)article;
+- (instancetype)initWithArticle:(Article *)article;
 
 @end

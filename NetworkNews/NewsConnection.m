@@ -40,7 +40,7 @@ NSString *const NewsConnectionBytesReceivedNotification = @"NewsConnectionBytesR
 
 @implementation NewsConnection
 
-- (id)initWithHost:(NSString *)host port:(NSUInteger)port isSecure:(BOOL)secure
+- (instancetype)initWithHost:(NSString *)host port:(NSUInteger)port isSecure:(BOOL)secure
 {
     self = [super init];
     if (self)
@@ -55,8 +55,8 @@ NSString *const NewsConnectionBytesReceivedNotification = @"NewsConnectionBytesR
 
         _inputStream = (__bridge_transfer NSInputStream *)readStream;
         _outputStream = (__bridge_transfer NSOutputStream *)writeStream;
-        [_inputStream setDelegate:self];
-        [_outputStream setDelegate:self];
+        _inputStream.delegate = self;
+        _outputStream.delegate = self;
         [_inputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
         [_outputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
 
@@ -75,9 +75,9 @@ NSString *const NewsConnectionBytesReceivedNotification = @"NewsConnectionBytesR
 
         // We're expecting a 200 response when we connect successfully
         NewsResponse *response = [self readResponse];
-        if ([response statusCode] == 200)
+        if (response.statusCode == 200)
         {
-            _welcome = [[NSString alloc] initWithData:[response data] encoding:NSUTF8StringEncoding];
+            _welcome = [[NSString alloc] initWithData:response.data encoding:NSUTF8StringEncoding];
             NSLog(@"Connected: %@", _welcome);
         }
         else
@@ -187,7 +187,7 @@ NSString *const NewsConnectionBytesReceivedNotification = @"NewsConnectionBytesR
     NSUInteger count;
 
     // Convert to a UTF-8 string
-    NSRange range = NSMakeRange(0, [commandString length]);
+    NSRange range = NSMakeRange(0, commandString.length);
     [commandString getBytes:buf
                   maxLength:510
                  usedLength:&count
@@ -222,13 +222,13 @@ NSString *const NewsConnectionBytesReceivedNotification = @"NewsConnectionBytesR
 {
     // TODO We need to scan through the buffer and escape any lines that
     // contain a single period ('.') as the only line
-    NSInteger bytesWritten = [_outputStream write:[data bytes] maxLength:[data length]];
+    NSInteger bytesWritten = [_outputStream write:data.bytes maxLength:data.length];
 
     if (bytesWritten < 0)
     {
         NSLog(@"WRITE ERROR: bytesWritten < 0");
     }
-    else if (bytesWritten != [data length])
+    else if (bytesWritten != data.length)
     {
         NSLog(@"WRITE ERROR: bytesWritten != [data length]");
     }
@@ -287,8 +287,8 @@ NSString *const NewsConnectionBytesReceivedNotification = @"NewsConnectionBytesR
 
 - (BOOL)isMultilineTerminatedData:(NSData *)data
 {
-    const unsigned char *bytes = [data bytes];
-    NSUInteger len = [data length];
+    const unsigned char *bytes = data.bytes;
+    NSUInteger len = data.length;
     if (len >= 5
         && bytes[len - 5] == 13
         && bytes[len - 4] == 10
@@ -304,8 +304,8 @@ NSString *const NewsConnectionBytesReceivedNotification = @"NewsConnectionBytesR
 
 - (BOOL)isLineTerminatedData:(NSData *)data
 {
-    const unsigned char *bytes = [data bytes];
-    NSUInteger len = [data length];
+    const unsigned char *bytes = data.bytes;
+    NSUInteger len = data.length;
     if (len > 2 && bytes[len - 2] == 13 && bytes[len - 1] == 10)
     {
         return YES;
@@ -321,23 +321,23 @@ NSString *const NewsConnectionBytesReceivedNotification = @"NewsConnectionBytesR
     [self sendCommandString:AUTHINFO_USER_COMMAND withParameterString:user];
     NewsResponse *response = [self readResponse];
 
-    if ([response statusCode] == 381)
+    if (response.statusCode == 381)
     {
         [self sendCommandString:AUTHINFO_PASS_COMMAND withParameterString:password];
         response = [self readResponse];
 
-        if ([response statusCode] == 281)
+        if (response.statusCode == 281)
         {
             // Success
             NSLog(@"Successful log in");
         }
-        else if ([response statusCode] == 481)
+        else if (response.statusCode == 481)
         {
             // Failure
             NSLog(@"Failed to log in");
         }
     }
-    return [response statusCode];
+    return response.statusCode;
 }
 
 - (NewsResponse *)listActiveWithWildmat:(NSString *)wildmat
@@ -398,19 +398,19 @@ NSString *const NewsConnectionBytesReceivedNotification = @"NewsConnectionBytesR
 
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
 
-    if ([response statusCode] == 101)
+    if (response.statusCode == 101)
     {
         NSArray *capabilities = [[response string] componentsSeparatedByString:@"\r\n"];
-        for (NSUInteger i = 1; i < [capabilities count] - 2; ++i)
+        for (NSUInteger i = 1; i < capabilities.count - 2; ++i)
         {
             NSString *capability = capabilities[i];
             NSArray *components = [capability componentsSeparatedByString:@" "];
-            if ([components count] > 1)
-                dict[components[0]] = [components subarrayWithRange:NSMakeRange(1, [components count] - 1)];
+            if (components.count > 1)
+                dict[components[0]] = [components subarrayWithRange:NSMakeRange(1, components.count - 1)];
             else
                 dict[components[0]] = [NSNull null];
         }
-        [response setDictionary:dict];
+        response.dictionary = dict;
     }
 
     return response;
@@ -428,7 +428,7 @@ NSString *const NewsConnectionBytesReceivedNotification = @"NewsConnectionBytesR
     [self sendCommandString:POST_COMMAND];
     NewsResponse *response = [self readResponse];
 
-    if ([response statusCode] == 340)
+    if (response.statusCode == 340)
     {
         [self writeData:data];
         response = [self readResponse];

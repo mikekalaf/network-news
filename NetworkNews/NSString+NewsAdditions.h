@@ -11,11 +11,11 @@
 
 @interface NSString (NewsAdditions)
 
-- (NSString *)shortGroupName;
+@property (NS_NONATOMIC_IOSONLY, readonly, copy) NSString *shortGroupName;
 
 - (NSString *)stringByWrappingWordsAtColumn:(NSUInteger)location;
 
-- (NSString *)messageIDFileName;
+@property (NS_NONATOMIC_IOSONLY, readonly, copy) NSString *messageIDFileName;
 
 - (NSString *)stringByReplacingOccurrencesOfNumbersWithString:(NSString *)replacement;
 

@@ -10,33 +10,33 @@
 
 @implementation ContentType
 
-- (id)initWithString:(NSString *)string
+- (instancetype)initWithString:(NSString *)string
 {
     self = [super init];
     if (self)
     {
         NSArray *components = [string componentsSeparatedByString:@";"];
-        [self setMediaType:components[0]];
+        self.mediaType = components[0];
         
         if (components.count > 1)
         {
             NSCharacterSet *set = [NSCharacterSet characterSetWithCharactersInString:@" \""];
             
             // Parse any parameters
-            for (NSUInteger i = 1; i < [components count]; ++i)
+            for (NSUInteger i = 1; i < components.count; ++i)
             {
                 NSArray *paramComponents = [components[i] componentsSeparatedByString:@"="];
-                if ([paramComponents count] == 2)
+                if (paramComponents.count == 2)
                 {
                     NSString *name = [paramComponents[0] stringByTrimmingCharactersInSet:set];
                     NSString *value = [paramComponents[1] stringByTrimmingCharactersInSet:set];
                     
                     if ([name caseInsensitiveCompare:@"charset"] == NSOrderedSame)
-                        [self setCharset:[value lowercaseString]];
+                        self.charset = value.lowercaseString;
                     else if ([name caseInsensitiveCompare:@"format"] == NSOrderedSame)
-                        [self setFormat:[value lowercaseString]];
+                        self.format = value.lowercaseString;
                     else if ([name caseInsensitiveCompare:@"name"] == NSOrderedSame)
-                        [self setName:value];
+                        self.name = value;
                 }
             }
         }

@@ -25,9 +25,10 @@
 
 @property BOOL signatureDivider;
 
-- (id)initWithLevel:(NSUInteger)aLevel
-              range:(NSRange)aRange
-             flowed:(BOOL)isFlowed
-   signatureDivider:(BOOL)isSignatureDivider;
+- (instancetype)initWithLevel:(NSUInteger)aLevel
+                        range:(NSRange)aRange
+                       flowed:(BOOL)isFlowed
+             signatureDivider:(BOOL)isSignatureDivider NS_DESIGNATED_INITIALIZER;
+- (instancetype)init __attribute__((unavailable));
 
 @end

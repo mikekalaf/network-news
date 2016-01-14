@@ -65,7 +65,7 @@
 
 - (UITextView *)textView
 {
-    return (UITextView *)[self view];
+    return (UITextView *)self.view;
 }
 
 - (void)setGroupName:(NSString *)groupName
@@ -117,25 +117,25 @@
     activityIndicatorView.center = self.view.center;
     
     // Set up the text view
-    [[self view] addSubview:_toView];
-    [[self view] addSubview:_subjectView];
+    [self.view addSubview:_toView];
+    [self.view addSubview:_subjectView];
 
-    CGRect frame = [_toView frame];
+    CGRect frame = _toView.frame;
     frame.origin.y = -100;
-    frame.size.width = [[self view] frame].size.width;
-    [_toView setFrame:frame];
-    [_toView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
+    frame.size.width = self.view.frame.size.width;
+    _toView.frame = frame;
+    _toView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 
-    frame = [_subjectView frame];
-    frame.origin.y = -100 + [_toView frame].size.height;
-    frame.size.width = [[self view] frame].size.width;
-    [_subjectView setFrame:frame];
-    [_subjectView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
+    frame = _subjectView.frame;
+    frame.origin.y = -100 + _toView.frame.size.height;
+    frame.size.width = self.view.frame.size.width;
+    _subjectView.frame = frame;
+    _subjectView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 
-    [_toLabel setText:_groupName];
-    [_subjectTextField setText:_subject];
+    _toLabel.text = _groupName;
+    _subjectTextField.text = _subject;
 
-    [[self textView] setContentInset:UIEdgeInsetsMake(100, 0, 0, 0)];
+    [self textView].contentInset = UIEdgeInsetsMake(100, 0, 0, 0);
     
     // Do we have body text to load?
     if (_messageBody)
@@ -147,7 +147,7 @@
 //        text = [text stringByReplacingOccurrencesOfString:LF_STR
 //                                               withString:PARAGRAPH_SIGN_LF_STR];
 //        [[self textView] setText:text];
-        [[self textView] setText:_messageBody];
+        [self textView].text = _messageBody;
     }
 
 //    textView.text = @"\n\n\nAndnowasinglelinewithoutwordbreaksandwehavetohandlethissituationalsoespeciallywhenitcomestolinks.  This is a whole load of test text so we can test the word wrapping function.  Lets add a whole lot more to test things out.\n\nThis is a new paragraph.\nAndnowasinglelinewithoutwordbreaksandwehavetohandlethissituationalsoespeciallywhenitcomestolinks.\n";
@@ -163,7 +163,7 @@
             NSString *signature = [NSString stringWithFormat:@"\n-- \n%@", sigText];
 //            signature = [signature stringByReplacingOccurrencesOfString:LF_STR
 //                                                             withString:PARAGRAPH_SIGN_LF_STR];
-            [[self textView] setText:[[[self textView] text] stringByAppendingString:signature]];
+            [self textView].text = [[self textView].text stringByAppendingString:signature];
         }
     }
 //    else
@@ -383,7 +383,7 @@
     // Make the text view the first responder and position the cursor at
     // the top
     [[self textView] becomeFirstResponder];
-    [[self textView] setSelectedRange:NSMakeRange(0, 0)];
+    [self textView].selectedRange = NSMakeRange(0, 0);
     
     return NO;
 }
@@ -435,7 +435,7 @@
                                                        subject:newSubject];
     
     // Chop off the hacky three CRs at the beginning of the text
-    NSString *articleText = [[self textView] text];
+    NSString *articleText = [self textView].text;
     
     // Strip-out instances of paragraph sign
 //    articleText = [articleText stringByReplacingOccurrencesOfString:PARAGRAPH_SIGN_STR
@@ -450,12 +450,12 @@
     
     PostArticleOperation *operation = [[PostArticleOperation alloc] initWithConnectionPool:_connectionPool
                                                                                       data:articleData];
-    [operation setCompletionBlock:^{
+    operation.completionBlock = ^{
         dispatch_async(dispatch_get_main_queue(), ^{
             [activityIndicatorView stopAnimating];
             [_delegate newArticleViewController:self didSend:YES];
         });
-    }];
+    };
     [_operationQueue addOperation:operation];
 }
 
@@ -514,7 +514,7 @@
     NSDictionary *info = notification.userInfo;
     
     // Get the size of the keyboard
-    NSValue *value = [info objectForKey:UIKeyboardBoundsUserInfoKey];
+    NSValue *value = info[UIKeyboardBoundsUserInfoKey];
     CGSize keyboardSize = value.CGRectValue.size;
     
     // Resize the text view
@@ -530,7 +530,7 @@
     NSDictionary *info = notification.userInfo;
     
     // Get the size of the keyboard
-    NSValue *value = [info objectForKey:UIKeyboardBoundsUserInfoKey];
+    NSValue *value = info[UIKeyboardBoundsUserInfoKey];
     CGSize keyboardSize = value.CGRectValue.size;
     
     // Reset the height of the scroll view to its original value

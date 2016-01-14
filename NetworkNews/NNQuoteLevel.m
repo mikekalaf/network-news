@@ -16,10 +16,10 @@
 @synthesize flowed;
 @synthesize signatureDivider;
 
-- (id)initWithLevel:(NSUInteger)aLevel
-              range:(NSRange)aRange
-             flowed:(BOOL)isFlowed
-   signatureDivider:(BOOL)isSignatureDivider
+- (instancetype)initWithLevel:(NSUInteger)aLevel
+                        range:(NSRange)aRange
+                       flowed:(BOOL)isFlowed
+             signatureDivider:(BOOL)isSignatureDivider
 {
     self = [super init];
     if (self)

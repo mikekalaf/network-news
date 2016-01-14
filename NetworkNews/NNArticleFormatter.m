@@ -22,7 +22,7 @@
                          subject:(NSString *)subject
 {
     NSBundle *bundle = [NSBundle mainBundle];
-    NSDictionary *infoDict = [bundle infoDictionary];
+    NSDictionary *infoDict = bundle.infoDictionary;
 
 #if TARGET_OS_IPHONE
 
@@ -32,8 +32,8 @@
     NSString *userAgent = [NSString stringWithFormat:
                            @"%@/%@b%@ (%@ %@; %@)",
                            APP_NAME_TOKEN,
-                           [infoDict objectForKey:@"CFBundleShortVersionString"],
-                           [infoDict objectForKey:@"CFBundleVersion"],
+                           infoDict[@"CFBundleShortVersionString"],
+                           infoDict[@"CFBundleVersion"],
                            device.systemName,
                            device.systemVersion,
                            device.model];
@@ -63,7 +63,7 @@
 
     // Format the date according to RFC 5322
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:@"EEE, dd MMM yyyy HH:mm:ss Z"];
+    dateFormatter.dateFormat = @"EEE, dd MMM yyyy HH:mm:ss Z";
     [headers addObject:[[NNHeaderEntry alloc] initWithName:@"Date"
                                                      value:[dateFormatter stringFromDate:date]]];
 

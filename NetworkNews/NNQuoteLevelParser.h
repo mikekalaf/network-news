@@ -17,7 +17,8 @@
 
 @property(retain, readonly) NSArray *quoteLevels;
 
-- (id)initWithData:(NSData *)aData
-            flowed:(BOOL)isFlowed;
+- (instancetype)initWithData:(NSData *)aData
+            flowed:(BOOL)isFlowed NS_DESIGNATED_INITIALIZER;
+- (instancetype)init __attribute__((unavailable));
 
 @end

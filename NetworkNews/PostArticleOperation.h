@@ -12,7 +12,8 @@
 
 @interface PostArticleOperation : NSOperation
 
-- (id)initWithConnectionPool:(NewsConnectionPool *)connectionPool
-                        data:(NSData *)data;
+- (instancetype)initWithConnectionPool:(NewsConnectionPool *)connectionPool
+                                  data:(NSData *)data NS_DESIGNATED_INITIALIZER;
+- (instancetype)init __attribute__((unavailable));
 
 @end

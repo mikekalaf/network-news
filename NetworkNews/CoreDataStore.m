@@ -22,9 +22,9 @@
 
 @implementation CoreDataStore
 
--        (id)initWithStoreName:(NSString *)aStoreName
-                   inDirectory:(NSString *)aDirPath
-withPersistentStoreCoordinator:(NSPersistentStoreCoordinator *)persistentStoreCoordinator
+- (instancetype)initWithStoreName:(NSString *)aStoreName
+                      inDirectory:(NSString *)aDirPath
+   withPersistentStoreCoordinator:(NSPersistentStoreCoordinator *)persistentStoreCoordinator
 {
     self = [super init];
     if (self)
@@ -36,7 +36,7 @@ withPersistentStoreCoordinator:(NSPersistentStoreCoordinator *)persistentStoreCo
     return self;
 }
 
-- (id)initWithStoreName:(NSString *)aStoreName inDirectory:(NSString *)aDirPath
+- (instancetype)initWithStoreName:(NSString *)aStoreName inDirectory:(NSString *)aDirPath
 {
     self = [self initWithStoreName:aStoreName inDirectory:aDirPath withPersistentStoreCoordinator:nil];
     if (self)
@@ -48,7 +48,7 @@ withPersistentStoreCoordinator:(NSPersistentStoreCoordinator *)persistentStoreCo
 
 - (NSURL *)applicationDocumentsDirectory
 {
-    return [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
+    return [[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask].lastObject;
 }
 
 - (NSManagedObjectModel *)managedObjectModel
@@ -72,7 +72,7 @@ withPersistentStoreCoordinator:(NSPersistentStoreCoordinator *)persistentStoreCo
         storeURL = applicationDocumentsDirectory;
     NSError *error = nil;
     
-    if (![fileManager fileExistsAtPath:[storeURL path] isDirectory:NULL])
+    if (![fileManager fileExistsAtPath:storeURL.path isDirectory:NULL])
     {
 		if (![fileManager createDirectoryAtURL:storeURL
                    withIntermediateDirectories:YES
@@ -94,14 +94,14 @@ withPersistentStoreCoordinator:(NSPersistentStoreCoordinator *)persistentStoreCo
     NSURL *url = [storeURL URLByAppendingPathComponent:storeNameWithExt];
 
     // Create the store
-    _persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[self managedObjectModel]];
+    _persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:self.managedObjectModel];
     if (![_persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType
                                                   configuration:nil 
                                                             URL:url 
                                                         options:nil 
                                                           error:&error])
     {
-        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+        NSLog(@"Unresolved error %@, %@", error, error.userInfo);
         abort();
     }
 }
@@ -111,11 +111,11 @@ withPersistentStoreCoordinator:(NSPersistentStoreCoordinator *)persistentStoreCo
     if (_managedObjectContext)
         return _managedObjectContext;
     
-    NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
+    NSPersistentStoreCoordinator *coordinator = self.persistentStoreCoordinator;
     if (coordinator != nil)
     {
         _managedObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSConfinementConcurrencyType];
-        [_managedObjectContext setPersistentStoreCoordinator:coordinator];
+        _managedObjectContext.persistentStoreCoordinator = coordinator;
     }
     return _managedObjectContext;
 }

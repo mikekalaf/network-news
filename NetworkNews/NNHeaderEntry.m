@@ -14,7 +14,7 @@
 @synthesize name;
 @synthesize value;
 
-- (id)initWithName:(NSString *)aName value:(NSString *)aValue
+- (instancetype)initWithName:(NSString *)aName value:(NSString *)aValue
 {
     self = [super init];
     if (self)

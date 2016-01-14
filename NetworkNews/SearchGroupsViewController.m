@@ -83,7 +83,7 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     if (_foundGroupList)
-        return [_foundGroupList count];
+        return _foundGroupList.count;
     else
         return 0;
 }
@@ -102,7 +102,7 @@
 //        cell.textLabel.lineBreakMode = NSLineBreakByTruncatingMiddle;
 //    }
 
-    GroupListing *listing = [_foundGroupList objectAtIndex:indexPath.row];
+    GroupListing *listing = _foundGroupList[indexPath.row];
     NSString *groupName = listing.name;
 //    long long articleCount = listInfo.high - listInfo.low + 1;
     long long articleCount = [listing count];
@@ -141,16 +141,16 @@
                              animated:NO];
     
     // Add to or remove from favourites, adding or removing a checkmark also
-    NSString *groupName = [[_foundGroupList objectAtIndex:indexPath.row] name];
+    NSString *groupName = [_foundGroupList[indexPath.row] name];
     UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
     if ([_checkedGroups containsObject:groupName])
     {
-        [cell setAccessoryType:UITableViewCellAccessoryNone];
+        cell.accessoryType = UITableViewCellAccessoryNone;
         [_checkedGroups removeObject:groupName];
     }
     else
     {
-        [cell setAccessoryType:UITableViewCellAccessoryCheckmark];
+        cell.accessoryType = UITableViewCellAccessoryCheckmark;
         [_checkedGroups addObject:groupName];
     }
 }
@@ -212,13 +212,13 @@
     GroupListSearchOperation *operation = [[GroupListSearchOperation alloc] initWithConnectionPool:_connectionPool
                                                                                            wildmat:wildmat];
     GroupListSearchOperation __weak* weakRef = operation;
-    [operation setCompletionBlock:^{
-        [self cacheGroupList:[weakRef groups]];
+    operation.completionBlock = ^{
+        [self cacheGroupList:weakRef.groups];
         dispatch_async(dispatch_get_main_queue(), ^{
             [activityIndicatorView stopAnimating];
-            [[self tableView] reloadData];
+            [self.tableView reloadData];
         });
-    }];
+    };
     [_operationQueue addOperation:operation];
 }
 
@@ -230,7 +230,7 @@
 
     // Clear the results list
     _foundGroupList = nil;
-    [[self tableView] reloadData];
+    [self.tableView reloadData];
 }
 
 #pragma mark - Private Methods

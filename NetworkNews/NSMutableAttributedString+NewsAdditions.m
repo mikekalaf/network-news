@@ -27,16 +27,12 @@
     // Header Field Name Attributes
     // - Bold
     // - Grey
-    NSDictionary *nameAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
-                                    boldUserFont, NSFontAttributeName,
-                                    [UIColor grayColor], NSForegroundColorAttributeName,
-                                    nil];
+    NSDictionary *nameAttributes = @{NSFontAttributeName: boldUserFont,
+                                    NSForegroundColorAttributeName: [UIColor grayColor]};
     
     // Header Field Bold Value Attributes
     // - Bold
-    NSDictionary *boldValueAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
-                                         boldUserFont, NSFontAttributeName,
-                                         nil];
+    NSDictionary *boldValueAttributes = @{NSFontAttributeName: boldUserFont};
 
     NSRange headerRange = NSMakeRange(self.length, 0);
 
@@ -101,10 +97,8 @@
         NSMutableParagraphStyle *ps = [[NSMutableParagraphStyle alloc] init];
         ps.firstLineHeadIndent = LEVEL_INDENT * level;
         ps.headIndent = LEVEL_INDENT * level;
-        NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
-                                    ps, NSParagraphStyleAttributeName,
-                                    [Preferences colorForQuoteLevel:level], NSForegroundColorAttributeName,
-                                    nil];
+        NSDictionary *attributes = @{NSParagraphStyleAttributeName: ps,
+                                    NSForegroundColorAttributeName: [Preferences colorForQuoteLevel:level]};
 
         NSMutableAttributedString *attrStr = [[NSMutableAttributedString alloc] initWithString:str
                                                                                     attributes:attributes];

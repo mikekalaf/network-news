@@ -24,24 +24,21 @@ NSString *NewsQuoteLevel3ColorKey = @"NewsQuoteLevel3Color";
                             green:0.349019
                              blue:0.764705
                             alpha:1.0];
-    [defaultValues setObject:[NSKeyedArchiver archivedDataWithRootObject:color]
-                      forKey:NewsQuoteLevel1ColorKey];
+    defaultValues[NewsQuoteLevel1ColorKey] = [NSKeyedArchiver archivedDataWithRootObject:color];
     
     // Level 2 - Green
     color = [UIColor colorWithRed:0.0
                             green:0.482352
                              blue:0.0
                             alpha:1.0];
-    [defaultValues setObject:[NSKeyedArchiver archivedDataWithRootObject:color]
-                      forKey:NewsQuoteLevel2ColorKey];
+    defaultValues[NewsQuoteLevel2ColorKey] = [NSKeyedArchiver archivedDataWithRootObject:color];
     
     // Level 3 - Red
     color = [UIColor colorWithRed:0.45
                             green:0.0
                              blue:0.0
                             alpha:1.0];
-    [defaultValues setObject:[NSKeyedArchiver archivedDataWithRootObject:color]
-                      forKey:NewsQuoteLevel3ColorKey];
+    defaultValues[NewsQuoteLevel3ColorKey] = [NSKeyedArchiver archivedDataWithRootObject:color];
     
     [[NSUserDefaults standardUserDefaults] registerDefaults:defaultValues];
 }

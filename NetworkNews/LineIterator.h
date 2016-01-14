@@ -22,13 +22,14 @@
 
 @property(readonly) NSUInteger lineNumber;
 
-- (id)initWithData:(NSData *)aData;
+- (instancetype)initWithData:(NSData *)aData NS_DESIGNATED_INITIALIZER;
+- (instancetype)init __attribute__((unavailable));
 
 /*!
  Returns a single line as terminated by a CRLF in the data.  The string (if
  complete) includes the terminating CRLF.  If there is no CRLF in the data, and
  thus in the string, then the line is flagged as "partial".
  */
-- (NSString *)nextLine;
+@property (NS_NONATOMIC_IOSONLY, readonly, copy) NSString *nextLine;
 
 @end

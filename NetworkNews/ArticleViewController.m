@@ -60,7 +60,7 @@
 //@property(nonatomic, weak) IBOutlet UIProgressView *progressView;
 
 - (NSURL *)cacheURLForMessageId:(NSString *)messageId extension:(NSString *)extension;
-- (NSString *)bodyTextForFollowUp;
+@property (NS_NONATOMIC_IOSONLY, readonly, copy) NSString *bodyTextForFollowUp;
 - (void)followUpToGroup;
 - (void)replyViaEmail;
 - (NSString *)headerValueWithName:(NSString *)name;
@@ -120,9 +120,9 @@
 
     // Set up the operation queue to download one part at a time
     _operationQueue = [[NSOperationQueue alloc] init];
-    [_operationQueue setMaxConcurrentOperationCount:1];
+    _operationQueue.maxConcurrentOperationCount = 1;
     
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
+    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone)
     {
         UIBarButtonItem *nextButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"button-down-arrow"]
                                                                        style:UIBarButtonItemStylePlain
@@ -132,7 +132,7 @@
                                                                            style:UIBarButtonItemStylePlain
                                                                           target:self
                                                                           action:@selector(previousArticlePressed:)];
-        [[self navigationItem] setRightBarButtonItems:@[nextButton, previousButton]];
+        self.navigationItem.rightBarButtonItems = @[nextButton, previousButton];
 
 //        // Navigation up and down buttons for the right-hand side
 //        NSArray *itemArray = [NSArray arrayWithObjects:
@@ -202,11 +202,11 @@
         if (image.size.width > maxWidth)
         {
             int height = image.size.height * (maxWidth / image.size.width);
-            [_textAttachment setBounds:CGRectMake(0, 0, maxWidth, height)];
+            _textAttachment.bounds = CGRectMake(0, 0, maxWidth, height);
         }
         else
         {
-            [_textAttachment setBounds:CGRectMake(0, 0, image.size.width, image.size.height)];
+            _textAttachment.bounds = CGRectMake(0, 0, image.size.width, image.size.height);
         }
     }
 }
@@ -230,7 +230,7 @@
 
         // Let's put all articles into the same directory, which will make it easier to
         // clean up plus any cross-postings will share the same cache
-        _cacheURL = [[[_connectionPool account] cacheURL] URLByAppendingPathComponent:@"Articles"];
+        _cacheURL = [_connectionPool.account.cacheURL URLByAppendingPathComponent:@"Articles"];
 
         NSFileManager *fileManager = [[NSFileManager alloc] init];
         [fileManager createDirectoryAtURL:_cacheURL
@@ -359,7 +359,7 @@
 {
     // Remove the split view controller's bar button item, and the navigation
     // segmented controller, from the toolbar
-    NSMutableArray *items = [NSMutableArray arrayWithArray:[_toolbar items]];
+    NSMutableArray *items = [NSMutableArray arrayWithArray:_toolbar.items];
     [items removeObjectAtIndex:0];
     [items removeObjectAtIndex:0];
     [_toolbar setItems:items animated:YES];
@@ -448,12 +448,12 @@
 - (IBAction)composeButtonPressed:(id)sender
 {
     NewArticleViewController *viewController;
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
+    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad)
         viewController = [[NewArticleViewController alloc] initWithNibName:@"NewArticleView" bundle:nil];
     else
         viewController = [[NewArticleViewController alloc] initWithNibName:@"NewArticleView" bundle:nil];
-    [viewController setConnectionPool:_connectionPool];
-    [viewController setDelegate:self];
+    viewController.connectionPool = _connectionPool;
+    viewController.delegate = self;
     [viewController setGroupName:_groupName];
 
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
@@ -531,7 +531,7 @@
 
 - (void)fetchArticleCompleted:(NSNotification *)notification
 {
-    NSDictionary *userInfo = [notification userInfo];
+    NSDictionary *userInfo = notification.userInfo;
     NSInteger statusCode = [userInfo[@"statusCode"] integerValue];
     if (statusCode == 220 || statusCode == 222)
     {
@@ -567,7 +567,7 @@
 
     NSMutableString *mutableString = [NSMutableString stringWithCapacity:_bodyTextDataTop.length];
     
-    [mutableString appendFormat:@"%@ wrote:\n", [_article from]];
+    [mutableString appendFormat:@"%@ wrote:\n", _article.from];
     
     for (NNQuoteLevel *quoteLevel in quoteLevels)
     {
@@ -595,12 +595,12 @@
 {
     // Collect the references, and add this messageId
     NSMutableString *references = [NSMutableString stringWithCapacity:1];
-    if ([_article references])
+    if (_article.references)
     {
-        [references appendString:[_article references]];
+        [references appendString:_article.references];
         [references appendString:@" "];
     }
-    [references appendString:[_article firstMessageId]];
+    [references appendString:_article.firstMessageId];
     
     // Make sure we follow-up to the requested group
     NSString *followupTo = [self headerValueWithName:@"Followup-To"];
@@ -608,14 +608,14 @@
         followupTo = _groupName;
 
     NewArticleViewController *viewController;
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
+    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad)
         viewController = [[NewArticleViewController alloc] initWithNibName:@"NewArticleView" bundle:nil];
     else
         viewController = [[NewArticleViewController alloc] initWithNibName:@"NewArticleView" bundle:nil];
-    [viewController setConnectionPool:_connectionPool];
-    [viewController setDelegate:self];
+    viewController.connectionPool = _connectionPool;
+    viewController.delegate = self;
     [viewController setGroupName:followupTo];
-    [viewController setSubject:[_article reSubject]];
+    [viewController setSubject:_article.reSubject];
     [viewController setReferences:references];
     [viewController setMessageBody:[self bodyTextForFollowUp]];
 
@@ -634,11 +634,11 @@
     // Who do we reply to?
     NSString *replyTo = [self headerValueWithName:@"Reply-To"];
     if (!replyTo)
-        replyTo = [_article from];
+        replyTo = _article.from;
     
     MFMailComposeViewController *mailViewController = [[MFMailComposeViewController alloc] init];
-    [mailViewController setToRecipients:[NSArray arrayWithObject:replyTo]];
-    [mailViewController setSubject:[_article reSubject]];
+    [mailViewController setToRecipients:@[replyTo]];
+    [mailViewController setSubject:_article.reSubject];
     [mailViewController setMessageBody:[self bodyTextForFollowUp] isHTML:NO];
     mailViewController.mailComposeDelegate = self;
     [self presentViewController:mailViewController
@@ -725,11 +725,11 @@
     ContentType *contentType = [self contentType];
     if (contentType)
     {
-        NSLog(@"Media Type: '%@'", [contentType mediaType]);
-        NSLog(@"Charset   : '%@'", [contentType charset]);
-        NSLog(@"Format    : '%@'", [contentType format]);
+        NSLog(@"Media Type: '%@'", contentType.mediaType);
+        NSLog(@"Charset   : '%@'", contentType.charset);
+        NSLog(@"Format    : '%@'", contentType.format);
         
-        flowed = [contentType isFormatFlowed];
+        flowed = contentType.formatFlowed;
     }
     return flowed;
 }
@@ -739,7 +739,7 @@
     NSString *charsetName = nil;
     ContentType *contentType = [self contentType];
     if (contentType)
-        charsetName = [contentType charset];
+        charsetName = contentType.charset;
     return charsetName;
 }
 
@@ -792,7 +792,7 @@
         if (image.size.width > maxWidth)
         {
             int height = image.size.height * (maxWidth / image.size.width);
-            [_textAttachment setBounds:CGRectMake(0, 0, maxWidth, height)];
+            _textAttachment.bounds = CGRectMake(0, 0, maxWidth, height);
         }
 
         [attrString appendAttributedString:
@@ -806,7 +806,7 @@
     // Append any text following the attachment
     [attrString appendNewsBody:_bodyTextDataBottom flowed:flowed];
 
-    [[[self textView] textStorage] setAttributedString:attrString];
+    [self.textView.textStorage setAttributedString:attrString];
 
     _progressView.hidden = YES;
 }
@@ -861,7 +861,7 @@
 //    [_webView loadHTMLString:htmlString baseURL:nil];
 
     // Bail out if the article has incomplete parts
-    if ([_article hasAllParts] == NO)
+    if (_article.hasAllParts == NO)
     {
         [self updateNavigationControls];
         return;
@@ -872,16 +872,16 @@
     // part will have the required filename.
     NSSortDescriptor *descriptor = [[NSSortDescriptor alloc] initWithKey:@"partNumber"
                                                                ascending:YES];
-    NSArray *sortedParts = [[[_article parts] allObjects] sortedArrayUsingDescriptors:
-                            [NSArray arrayWithObject:descriptor]];
+    NSArray *sortedParts = [_article.parts.allObjects sortedArrayUsingDescriptors:
+                            @[descriptor]];
 
-    NSString *messageID = [[sortedParts objectAtIndex:0] messageId];
+    NSString *messageID = [sortedParts[0] messageId];
     NSArray *URLs = [self cachedURLsForMessageID:messageID];
-    if ([URLs count])
+    if (URLs.count)
     {
         for (NSURL *cacheURL in URLs)
         {
-            NSString *lastPathComponent = [cacheURL lastPathComponent];
+            NSString *lastPathComponent = cacheURL.lastPathComponent;
             if ([lastPathComponent hasSuffix:@"0.txt"])
             {
                 // Load the headers
@@ -889,7 +889,7 @@
                 if (headData)
                 {
                     NNHeaderParser *hp = [[NNHeaderParser alloc] initWithData:headData];
-                    _headEntries = [hp entries];
+                    _headEntries = hp.entries;
                 }
             }
             else if ([lastPathComponent hasSuffix:@"1.txt"])
@@ -914,11 +914,11 @@
         //[self showArticleToolbar];
 
         // Mark as read all the article parts that make this article
-        for (ArticlePart *part in [_article parts])
+        for (ArticlePart *part in _article.parts)
         {
-            [[[_connectionPool account] newsrc] setRead:YES
+            [_connectionPool.account.newsrc setRead:YES
                                            forGroupName:_groupName
-                                          articleNumber:[[part articleNumber] integerValue]];
+                                          articleNumber:part.articleNumber.integerValue];
         }
     }
     else
@@ -929,28 +929,28 @@
         _progressView.progress = 0;
         _progressView.hidden = NO;
         
-        NSLog(@"Downloading %lu part(s)", (unsigned long)[sortedParts count]);
+        NSLog(@"Downloading %lu part(s)", (unsigned long)sortedParts.count);
 
         // "Common info" carries the attachment filename from the first part
         // to all the following parts - it relies on the operations being done
         // sequentially and in order. See if this process can be improved.
         NSMutableDictionary *commonInfo = [[NSMutableDictionary alloc] initWithCapacity:1];
-        NSUInteger totalBytes = [[_article totalByteCount] integerValue];
+        NSUInteger totalBytes = _article.totalByteCount.integerValue;
         __block NSUInteger bytesFetchedSoFar = 0;
 
         for (ArticlePart *part in sortedParts)
         {
             FetchArticleOperation *operation =
             [[FetchArticleOperation alloc] initWithConnectionPool:_connectionPool
-                                                        messageID:[part messageId]
-                                                       partNumber:[[part partNumber] integerValue]
-                                                   totalPartCount:[sortedParts count]
+                                                        messageID:part.messageId
+                                                       partNumber:part.partNumber.integerValue
+                                                   totalPartCount:sortedParts.count
                                                          cacheURL:_cacheURL
                                                        commonInfo:commonInfo
                                                          progress:^(NSUInteger bytesReceived) {
                                                              bytesFetchedSoFar += bytesReceived;
                                                              dispatch_async(dispatch_get_main_queue(), ^{
-                                                                 [_progressView setProgress:(float)bytesFetchedSoFar / totalBytes];
+                                                                 _progressView.progress = (float)bytesFetchedSoFar / totalBytes;
                                                              });
                                                          }];
             [_operationQueue addOperation:operation];
@@ -960,9 +960,9 @@
 
 - (void)updateTitle
 {
-    [self setTitle:[NSString stringWithFormat:@"%ld of %lu",
+    self.title = [NSString stringWithFormat:@"%ld of %lu",
                     (unsigned long)_articleIndex + 1,
-                    (unsigned long)[_articleSource articleCount]]];
+                    (unsigned long)[_articleSource articleCount]];
 }
 
 - (void)updateNavigationControls
@@ -973,8 +973,8 @@
 //    [_navigationSegmentedControl setEnabled:(_articleIndex < [_articleSource articleCount] - 1)
 //                         forSegmentAtIndex:1];
 
-    [[[self navigationItem] rightBarButtonItems][0] setEnabled:(_articleIndex < [_articleSource articleCount] - 1)];
-    [[[self navigationItem] rightBarButtonItems][1] setEnabled:(_articleIndex > 0)];
+    (self.navigationItem.rightBarButtonItems[0]).enabled = (_articleIndex < [_articleSource articleCount] - 1);
+    (self.navigationItem.rightBarButtonItems[1]).enabled = (_articleIndex > 0);
 }
 
 - (void)disableNavigationControls
@@ -983,8 +983,8 @@
 //    [_navigationSegmentedControl setEnabled:NO forSegmentAtIndex:0];
 //    [_navigationSegmentedControl setEnabled:NO forSegmentAtIndex:1];
 
-    [[[self navigationItem] rightBarButtonItems][0] setEnabled:NO];
-    [[[self navigationItem] rightBarButtonItems][1] setEnabled:NO];
+    [self.navigationItem.rightBarButtonItems[0] setEnabled:NO];
+    [self.navigationItem.rightBarButtonItems[1] setEnabled:NO];
 }
 
 //- (void)showProgressToolbar

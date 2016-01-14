@@ -15,6 +15,7 @@
 @property(nonatomic, readonly) NSString *wildmat;
 @property(nonatomic, readonly) NSArray *groups;
 
-- (id)initWithConnectionPool:(NewsConnectionPool *)connectionPool wildmat:(NSString *)wildmat;
+- (instancetype)initWithConnectionPool:(NewsConnectionPool *)connectionPool wildmat:(NSString *)wildmat NS_DESIGNATED_INITIALIZER;
+- (instancetype)init __attribute__((unavailable));
 
 @end

@@ -12,13 +12,13 @@
 #import "NewsAccount.h"
 #import "ConnectionVerifier.h"
 
-typedef enum {
+typedef NS_ENUM(unsigned int, AccountSettingsTag) {
     AccountSettingsServiceNameTag = 1,
     AccountSettingsHostTag,
     AccountSettingsUserNameTag,
     AccountSettingsPasswordTag,
     //AccountSettingsDescriptionTag,
-} AccountSettingsTag;
+};
 
 @interface AccountSettingsViewController ()
 {
@@ -36,8 +36,8 @@ typedef enum {
 - (IBAction)textFieldValueChanged:(id)sender;
 - (IBAction)linkTouchUp:(id)sender;
 
-- (UIView *)createVerifyView;
-- (BOOL)selectNextField;
+@property (NS_NONATOMIC_IOSONLY, readonly, strong) UIView *createVerifyView;
+@property (NS_NONATOMIC_IOSONLY, readonly) BOOL selectNextField;
 
 @end
 
@@ -49,24 +49,24 @@ typedef enum {
 {
     [super viewDidLoad];
 
-    [self setTitle:[_account serviceName]];
-    if ([_account supportURL])
+    self.title = _account.serviceName;
+    if (_account.supportURL)
         [_linkButton setTitle:[NSString stringWithFormat:
                                @"Learn More about %@",
-                               [_account serviceName]]
+                               _account.serviceName]
                      forState:UIControlStateNormal];
     else
         [_linkButton setHidden:YES];
 
     // Cancel and Save buttons
     // We only want to display a cancel button if we're the root view controller
-    if ([[self navigationController] viewControllers][0] == self)
+    if (self.navigationController.viewControllers[0] == self)
     {
         cancelButtonItem =
         [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
                                                       target:self
                                                       action:@selector(cancelButtonPressed:)];
-        [[self navigationItem] setLeftBarButtonItem:cancelButtonItem];
+        self.navigationItem.leftBarButtonItem = cancelButtonItem;
     }
 
     saveButtonItem =
@@ -74,44 +74,44 @@ typedef enum {
                                                   target:self
                                                   action:@selector(saveButtonPressed:)];
     [saveButtonItem setEnabled:NO];
-    [[self navigationItem] setRightBarButtonItem:saveButtonItem];
+    self.navigationItem.rightBarButtonItem = saveButtonItem;
 
     _fields = [[NSMutableArray alloc] init];
 
-    if ([_account accountTemplate] == AccountTemplateDefault)
+    if (_account.accountTemplate == AccountTemplateDefault)
     {
         [_fields addObject:@{
-         @"tag": [NSNumber numberWithInteger:AccountSettingsHostTag],
+         @"tag": @(AccountSettingsHostTag),
          @"textLabel.text": @"Server",
-         @"textField.text": [_account hostName] ? [_account hostName] : @"",
+         @"textField.text": _account.hostName ? _account.hostName : @"",
          @"textField.placeholder": @"Server address",
-         @"textField.secureTextEntry": [NSNumber numberWithBool:NO],
-         @"textField.keyboardType": [NSNumber numberWithInteger:UIKeyboardTypeDefault]}];
+         @"textField.secureTextEntry": @NO,
+         @"textField.keyboardType": @(UIKeyboardTypeDefault)}];
     }
 
     [_fields addObject:@{
-     @"tag": [NSNumber numberWithInteger:AccountSettingsUserNameTag],
+     @"tag": @(AccountSettingsUserNameTag),
      @"textLabel.text": @"User Name",
-     @"textField.text": [_account userName] ? [_account userName] : @"",
+     @"textField.text": _account.userName ? _account.userName : @"",
      @"textField.placeholder": @"username",
-     @"textField.secureTextEntry": [NSNumber numberWithBool:NO],
-     @"textField.keyboardType": [NSNumber numberWithInteger:UIKeyboardTypeDefault]}];
+     @"textField.secureTextEntry": @NO,
+     @"textField.keyboardType": @(UIKeyboardTypeDefault)}];
 
     [_fields addObject:@{
-     @"tag": [NSNumber numberWithInteger:AccountSettingsPasswordTag],
+     @"tag": @(AccountSettingsPasswordTag),
      @"textLabel.text": @"Password",
-     @"textField.text": [_account password] ? [_account password] : @"",
+     @"textField.text": _account.password ? _account.password : @"",
      @"textField.placeholder": @"optional",
-     @"textField.secureTextEntry": [NSNumber numberWithBool:YES],
-     @"textField.keyboardType": [NSNumber numberWithInteger:UIKeyboardTypeASCIICapable]}];
+     @"textField.secureTextEntry": @YES,
+     @"textField.keyboardType": @(UIKeyboardTypeASCIICapable)}];
 
     [_fields addObject:@{
-     @"tag": [NSNumber numberWithInteger:AccountSettingsServiceNameTag],
+     @"tag": @(AccountSettingsServiceNameTag),
      @"textLabel.text": @"Name",
-     @"textField.text": [_account serviceName],
+     @"textField.text": _account.serviceName,
      @"textField.placeholder": @"required",
-     @"textField.secureTextEntry": [NSNumber numberWithBool:NO],
-     @"textField.keyboardType": [NSNumber numberWithInteger:UIKeyboardTypeDefault],
+     @"textField.secureTextEntry": @NO,
+     @"textField.keyboardType": @(UIKeyboardTypeDefault),
      @"validation": [NSValue valueWithPointer:@selector(isServiceNameValid)]}];
 }
 
@@ -119,7 +119,7 @@ typedef enum {
 {
     [super viewWillAppear:animated];
 
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
+    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad)
     {
         // Set the first field ready for entry
         [self selectNextField];
@@ -139,7 +139,7 @@ typedef enum {
  numberOfRowsInSection:(NSInteger)section
 {
     // Return the number of rows in the section.
-    return [_fields count];
+    return _fields.count;
 }
 
 
@@ -163,27 +163,27 @@ typedef enum {
             cell.textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
         }
 
-        NSDictionary *field = _fields[[indexPath row]];
+        NSDictionary *field = _fields[indexPath.row];
         cell.tag = [field[@"tag"] integerValue];
         cell.textField.tag = [field[@"tag"] integerValue];
-        [[cell textLabel] setText:field[@"textLabel.text"]];
-        [[cell textField] setText:field[@"textField.text"]];
-        [[cell textField] setPlaceholder:field[@"textField.placeholder"]];
-        [[cell textField] setSecureTextEntry:[field[@"textField.secureTextEntry"] boolValue]];
-        [[cell textField] setKeyboardType:[field[@"textField.keyboardType"] integerValue]];
+        cell.textLabel.text = field[@"textLabel.text"];
+        cell.textField.text = field[@"textField.text"];
+        cell.textField.placeholder = field[@"textField.placeholder"];
+        cell.textField.secureTextEntry = [field[@"textField.secureTextEntry"] boolValue];
+        cell.textField.keyboardType = [field[@"textField.keyboardType"] integerValue];
 
         BOOL isValid = YES;
         NSValue *value = field[@"validation"];
         if (value)
         {
-            SEL validationSelector = [value pointerValue];
+            SEL validationSelector = value.pointerValue;
             isValid = [[self performSelector:validationSelector] boolValue];
         }
 
         if (isValid)
-            [[cell textField] setTextColor:[UIColor blackColor]];
+            cell.textField.textColor = [UIColor blackColor];
         else
-            [[cell textField] setTextColor:[UIColor redColor]];
+            cell.textField.textColor = [UIColor redColor];
 
         return cell;
     }
@@ -194,7 +194,7 @@ typedef enum {
 - (CGFloat)tableView:(UITableView *)tableView
 heightForFooterInSection:(NSInteger)section
 {
-    if ([_linkButton isHidden])
+    if (_linkButton.hidden)
         return 0;
     else
         return 72;
@@ -203,7 +203,7 @@ heightForFooterInSection:(NSInteger)section
 - (UIView *)tableView:(UITableView *)tableView
 viewForFooterInSection:(NSInteger)section
 {
-    if ([_linkButton isHidden])
+    if (_linkButton.hidden)
         return nil;
     else
         return _linkButton;
@@ -215,8 +215,8 @@ viewForFooterInSection:(NSInteger)section
 didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     // Select the text field within the selected row
-    EditableTableViewCell *cell = (EditableTableViewCell *)[[self tableView] cellForRowAtIndexPath:indexPath];
-    [[cell textField] becomeFirstResponder];
+    EditableTableViewCell *cell = (EditableTableViewCell *)[self.tableView cellForRowAtIndexPath:indexPath];
+    [cell.textField becomeFirstResponder];
 }
 
 
@@ -276,7 +276,7 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
     {
         NSString *alertMessage = @"This account may not be able to send or receive news articles. Are you sure you want to save?";
 
-        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
+        if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad)
         {
             UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"New Account"
                                                                 message:alertMessage
@@ -309,7 +309,7 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
             isModified = NO;
 
             // Remove the "verifying" title
-            [[self navigationItem] setTitleView:nil];
+            [self.navigationItem setTitleView:nil];
 
             if (verified)
             {
@@ -327,15 +327,15 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
                 if (!connected)
                     errorString = [NSString stringWithFormat:
                                    @"The connection to \"%@\" failed",
-                                   [_account hostName]];
+                                   _account.hostName];
                 else if (!authenticated)
                     errorString = [NSString stringWithFormat:
                                    @"The user name or password for \"%@\" is incorrect",
-                                   [_account hostName]];
+                                   _account.hostName];
                 else
                     errorString = [NSString stringWithFormat:
                                    @"There was an unknown problem with \"%@\"",
-                                   [_account hostName]];
+                                   _account.hostName];
                 UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Cannot Get News"
                                                                     message:errorString
                                                                    delegate:nil
@@ -359,28 +359,28 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 - (IBAction)textFieldValueChanged:(id)sender
 {
     UITextField *textField = sender;
-    NSUInteger tag = [textField tag];
+    NSUInteger tag = textField.tag;
 
     if (tag == AccountSettingsHostTag)
     {
-        [_account setHostName:[textField text]];
+        _account.hostName = textField.text;
     }
     else if (tag == AccountSettingsUserNameTag)
     {
-        [_account setUserName:[textField text]];
+        _account.userName = textField.text;
     }
     else if (tag == AccountSettingsPasswordTag)
     {
-        [_account setPassword:[textField text]];
+        _account.password = textField.text;
     }
     else if (tag == AccountSettingsServiceNameTag)
     {
-        [_account setServiceName:[textField text]];
+        _account.serviceName = textField.text;
         [self isServiceNameValid];
         if (_isServiceNameValid)
-            [textField setTextColor:[UIColor blackColor]];
+            textField.textColor = [UIColor blackColor];
         else
-            [textField setTextColor:[UIColor redColor]];
+            textField.textColor = [UIColor redColor];
     }
 //    else if (tag == AccountSettingsDescriptionTag)
 //    {
@@ -389,22 +389,22 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 
 
     // Is the name unique? If not, disable save and display the name in red
-    BOOL serviceNameIsValid = [[self isServiceNameValid] boolValue];
+    BOOL serviceNameIsValid = [self isServiceNameValid].boolValue;
 
     if (serviceNameIsValid)
     {
-        if ([_account hostName] && [[_account hostName] length])
+        if (_account.hostName && _account.hostName.length)
         {
             // If both the username and password fields have entries, then we can
             // enable the save button, otherwise it should be disabled
-            if ([[_account userName] length] > 0 && [[_account password] length] > 0)
+            if (_account.userName.length > 0 && _account.password.length > 0)
                 [saveButtonItem setEnabled:YES];
             else
                 [saveButtonItem setEnabled:NO];
         }
         else
         {
-            if ([[_account hostName] length] > 0)
+            if (_account.hostName.length > 0)
                 [saveButtonItem setEnabled:YES];
             else
                 [saveButtonItem setEnabled:NO];
@@ -420,7 +420,7 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 
 - (IBAction)linkTouchUp:(id)sender
 {
-    [[UIApplication sharedApplication] openURL:[_account supportURL]];
+    [[UIApplication sharedApplication] openURL:_account.supportURL];
 }
 
 #pragma mark - UITextFieldDelegate Methods
@@ -430,7 +430,7 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
     // Make sure the cell is selected
     UITableViewCell *cell = (UITableViewCell *)textField.superview.superview;
     NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
-    NSIndexPath *selectedIndexPath = [self.tableView indexPathForSelectedRow];
+    NSIndexPath *selectedIndexPath = (self.tableView).indexPathForSelectedRow;
     if (![indexPath isEqual:selectedIndexPath])
     {
         [self.tableView selectRowAtIndexPath:indexPath
@@ -473,12 +473,12 @@ didDismissWithButtonIndex:(NSInteger)buttonIndex
 
 - (NSNumber *)isServiceNameValid
 {
-    if ([[_account serviceName] length] == 0 ||
-        [_delegate accountSettingsViewController:self verifyAccountName:[_account serviceName]] == NO)
+    if (_account.serviceName.length == 0 ||
+        [_delegate accountSettingsViewController:self verifyAccountName:_account.serviceName] == NO)
         _isServiceNameValid = NO;
     else
         _isServiceNameValid = YES;
-    return [NSNumber numberWithBool:_isServiceNameValid];
+    return @(_isServiceNameValid);
 }
 
 - (UIView *)createVerifyView
@@ -487,7 +487,7 @@ didDismissWithButtonIndex:(NSInteger)buttonIndex
 //    verifyView.backgroundColor = [UIColor grayColor];
 
     UIActivityIndicatorViewStyle style;
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
+    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad)
         style = UIActivityIndicatorViewStyleGray;
     else
         style = UIActivityIndicatorViewStyleWhite;
@@ -503,7 +503,7 @@ didDismissWithButtonIndex:(NSInteger)buttonIndex
     UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(28, 0, 90, 24)];
     label.text = @"Verifying";
     label.font = [UIFont boldSystemFontOfSize:20];
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
+    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad)
     {
         label.textColor = [UIColor grayColor];
         label.shadowColor = [UIColor whiteColor];
@@ -528,7 +528,7 @@ didDismissWithButtonIndex:(NSInteger)buttonIndex
     NSUInteger rowCount = [self.tableView numberOfRowsInSection:0];
 
     NSIndexPath *indexPath;
-    NSIndexPath *selectedIndexPath = [self.tableView indexPathForSelectedRow];
+    NSIndexPath *selectedIndexPath = (self.tableView).indexPathForSelectedRow;
     if (!selectedIndexPath)
         indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
     else if (selectedIndexPath.row < rowCount - 1)

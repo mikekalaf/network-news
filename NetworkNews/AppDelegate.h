@@ -20,7 +20,7 @@
 @property (nonatomic) ArticleViewController *articleViewController;
 @property (nonatomic) NSMutableArray *accounts;
 
-- (NSURL *)accountsFileURL;
-- (NSMutableArray *)accountsFromArchive;
+@property (NS_NONATOMIC_IOSONLY, readonly, copy) NSURL *accountsFileURL;
+@property (NS_NONATOMIC_IOSONLY, readonly, copy) NSMutableArray *accountsFromArchive;
 
 @end

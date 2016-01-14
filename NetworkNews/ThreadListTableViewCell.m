@@ -9,7 +9,7 @@
 #import "ThreadListTableViewCell.h"
 #import <QuartzCore/QuartzCore.h>
 
-@interface ThreadListTableViewCell (Private)
+@interface ThreadListTableViewCell ()
 
 - (void)colorAsSelected:(BOOL)selected;
 
@@ -21,71 +21,46 @@
 @synthesize dateLabel;
 @synthesize threadCountLabel;
 
-- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
+- (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
 {
     if ((self = [super initWithStyle:style reuseIdentifier:reuseIdentifier]))
     {
-        [[self detailTextLabel] setTextColor:[UIColor blackColor]];
-        [[self detailTextLabel] setNumberOfLines:3];
+        self.detailTextLabel.textColor = [UIColor blackColor];
+        self.detailTextLabel.numberOfLines = 3;
 
-//        // Add a label to display the date
-//        dateLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-//        [dateLabel setFont:[UIFont systemFontOfSize:[UIFont systemFontSize]]];
-//        [[self contentView] addSubview:dateLabel];
-//        
-//        // Add a label to display the thread count
-//        threadCountLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-//        [threadCountLabel setTextAlignment:NSTextAlignmentCenter];
-//        [threadCountLabel setFont:[UIFont boldSystemFontOfSize:12]];
-//        [[threadCountLabel layer] setCornerRadius:4];
-//        [[self contentView] addSubview:threadCountLabel];
-
-        if ([[self reuseIdentifier] isEqualToString:@"ThreadCell"])
-            [self setAccessoryView:[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"accessory-arrow-2"]]];
-        else if ([[self reuseIdentifier] isEqualToString:@"ArticleCell"])
-            [self setAccessoryView:[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"accessory-arrow-1"]]];
+        if ([self.reuseIdentifier isEqualToString:@"ThreadCell"])
+            self.accessoryView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"accessory-arrow-2"]];
+        else if ([self.reuseIdentifier isEqualToString:@"ArticleCell"])
+            self.accessoryView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"accessory-arrow-1"]];
 
         [self colorAsSelected:NO];
     }
     return self;
 }
 
-- (id)initWithCoder:(NSCoder *)aDecoder
+- (instancetype)initWithCoder:(NSCoder *)aDecoder
 {
     self = [super initWithCoder:aDecoder];
     if (self)
     {
-        //[[self detailTextLabel] setTextColor:[UIColor blackColor]];
-        [[self detailTextLabel] setNumberOfLines:3];
+        self.detailTextLabel.numberOfLines = 3;
 
         // Add a label to display the date
         dateLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-        [dateLabel setFont:[UIFont systemFontOfSize:[UIFont systemFontSize]]];
-        [dateLabel setTextColor:[UIColor lightGrayColor]];
+        dateLabel.font = [UIFont systemFontOfSize:[UIFont systemFontSize]];
+        dateLabel.textColor = [UIColor lightGrayColor];
 
-        [[self contentView] addSubview:dateLabel];
-        if ([[self reuseIdentifier] isEqualToString:@"ThreadCell"])
-            [self setAccessoryView:[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"accessory-arrow-2"]]];
-        else if ([[self reuseIdentifier] isEqualToString:@"ArticleCell"])
-            [self setAccessoryView:[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"accessory-arrow-1"]]];
+        [self.contentView addSubview:dateLabel];
+        if ([self.reuseIdentifier isEqualToString:@"ThreadCell"])
+            self.accessoryView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"accessory-arrow-2"]];
+        else if ([self.reuseIdentifier isEqualToString:@"ArticleCell"])
+            self.accessoryView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"accessory-arrow-1"]];
     }
     return self;
 }
 
 - (void)colorAsSelected:(BOOL)selected
 {
-//    if (selected)
-//    {
-//        [dateLabel setTextColor:[UIColor whiteColor]];
-//        [threadCountLabel setBackgroundColor:[UIColor whiteColor]];
-//        [threadCountLabel setTextColor:[UIColor blueColor]];
-//    }
-//    else
-//    {
-//        [dateLabel setTextColor:[UIColor blueColor]];
-//        [threadCountLabel setBackgroundColor:[UIColor grayColor]];
-//        [threadCountLabel setTextColor:[UIColor whiteColor]];
-//    }
 }
 
 - (void)setHighlighted:(BOOL)highlighted animated:(BOOL)animated
@@ -104,45 +79,31 @@
 {
     [super layoutSubviews];
 
-    CGRect rect = [[self imageView] frame];
+    CGRect rect = self.imageView.frame;
     rect.origin.x = 8;
     rect.origin.y = 12;
-    [[self imageView] setFrame:rect];
+    self.imageView.frame = rect;
 
-    rect = [[self accessoryView] frame];
+    rect = self.accessoryView.frame;
     rect.origin.y = 12;
-    [[self accessoryView] setFrame:rect];
+    self.accessoryView.frame = rect;
 
-    CGSize contentSize = [[self contentView] frame].size;
+    CGSize contentSize = self.contentView.frame.size;
 
     // Size the date label to fit the content
     [dateLabel sizeToFit];
-    CGRect dateFrame = [dateLabel frame];
+    CGRect dateFrame = dateLabel.frame;
 
     // Position the main text at the top of the cell
-    CGRect textFrame = [[self textLabel] frame];
+    CGRect textFrame = self.textLabel.frame;
     textFrame.origin.y = 2;
     textFrame.size.width = contentSize.width - textFrame.origin.x - dateFrame.size.width - 12;
-    [[self textLabel] setFrame:textFrame];
+    self.textLabel.frame = textFrame;
     
     // Position the date label
     dateFrame.origin.x = contentSize.width - dateFrame.size.width - 8;
     dateFrame.origin.y = 2 + (textFrame.size.height - dateFrame.size.height);
-    [dateLabel setFrame:dateFrame];
-    
-//    // Position the thread-count label
-//    [threadCountLabel sizeToFit];
-//    CGRect frame = [threadCountLabel frame];
-//    frame.origin.x = contentSize.width - 25;
-//    frame.origin.y = (int)(contentSize.height / 2 - 8);
-//    frame.size.width = MAX(frame.size.width, 20);
-//    frame.size.height = 17;
-//    [threadCountLabel setFrame:frame];
-//
-//    // Shorten the detail text label so it doesn't overwrite the thread-count label
-//    CGRect detailTextFrame = [[self detailTextLabel] frame];
-//    detailTextFrame.size.width = contentSize.width - detailTextFrame.origin.x - frame.size.width - 12;
-//    [[self detailTextLabel] setFrame:detailTextFrame];
+    dateLabel.frame = dateFrame;
 }
 
 @end

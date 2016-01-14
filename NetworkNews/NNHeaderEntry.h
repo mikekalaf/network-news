@@ -17,6 +17,7 @@
 @property (copy, readonly) NSString *name;
 @property (copy, readonly) NSString *value;
 
-- (id)initWithName:(NSString *)aName value:(NSString *)aValue;
+- (instancetype)initWithName:(NSString *)aName value:(NSString *)aValue NS_DESIGNATED_INITIALIZER;
+- (instancetype)init __attribute__((unavailable));
 
 @end

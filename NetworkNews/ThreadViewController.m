@@ -40,14 +40,14 @@
 {
     [super viewDidLoad];
     
-    [self setTitle:[NSString stringWithFormat:@"%lu Articles", (unsigned long)[_articles count]]];
+    self.title = [NSString stringWithFormat:@"%lu Articles", (unsigned long)_articles.count];
 
     // We need to do this just to have the back button show "Thread" rather than the title
     UIBarButtonItem *backButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Thread"
                                                                        style:UIBarButtonItemStyleBordered
                                                                       target:nil
                                                                       action:nil];
-    [[self navigationItem] setBackBarButtonItem:backButtonItem];
+    self.navigationItem.backBarButtonItem = backButtonItem;
 
     dateFormatter = [[ExtendedDateFormatter alloc] init];
     emailAddressFormatter = [[EmailAddressFormatter alloc] init];
@@ -134,23 +134,23 @@
 
 - (void)returningFromArticleIndex:(NSUInteger)fromArticleIndex
 {
-    NSIndexPath *selectedIndexPath = [[self tableView] indexPathForSelectedRow];
-    [[self tableView] deselectRowAtIndexPath:selectedIndexPath animated:NO];
+    NSIndexPath *selectedIndexPath = self.tableView.indexPathForSelectedRow;
+    [self.tableView deselectRowAtIndexPath:selectedIndexPath animated:NO];
 
     // Update any read/unread info display
-    NSArray *indexPaths = [[self tableView] indexPathsForVisibleRows];
-    [[self tableView] reloadRowsAtIndexPaths:indexPaths
+    NSArray *indexPaths = self.tableView.indexPathsForVisibleRows;
+    [self.tableView reloadRowsAtIndexPaths:indexPaths
                             withRowAnimation:NO];
     
     // Something a bit weird is going on here.  If I use UITableViewScrollPositionNone,
     // then no scrolling happens at all, so as a workaround I'm deciding myself
     // if it should be top, bottom, or none.
     UITableViewScrollPosition scrollPosition = UITableViewScrollPositionNone;
-    if ([indexPaths count] > 0)
+    if (indexPaths.count > 0)
     {
-        if (fromArticleIndex < [[indexPaths objectAtIndex:0] row])
+        if (fromArticleIndex < [indexPaths[0] row])
             scrollPosition = UITableViewScrollPositionTop;
-        else if (fromArticleIndex > [[indexPaths objectAtIndex:[indexPaths count] - 1] row])
+        else if (fromArticleIndex > [indexPaths[indexPaths.count - 1] row])
             scrollPosition = UITableViewScrollPositionBottom;
     }
     else
@@ -158,17 +158,17 @@
 
     NSIndexPath *indexPath = [NSIndexPath indexPathForRow:fromArticleIndex
                                                 inSection:0];
-    [[self tableView] selectRowAtIndexPath:indexPath
+    [self.tableView selectRowAtIndexPath:indexPath
                                   animated:NO
                             scrollPosition:scrollPosition];
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
-    ArticleViewController *viewController = [segue destinationViewController];
-    [viewController setConnectionPool:_connectionPool];
+    ArticleViewController *viewController = segue.destinationViewController;
+    viewController.connectionPool = _connectionPool;
     viewController.articleSource = self;
-    viewController.articleIndex = [[[self tableView] indexPathForSelectedRow] row];
+    viewController.articleIndex = self.tableView.indexPathForSelectedRow.row;
     viewController.groupName = _groupName;
 }
 
@@ -177,7 +177,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return [_articles count];
+    return _articles.count;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
@@ -189,21 +189,21 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     ThreadListTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"ArticleCell"];
-    Article *article = [_articles objectAtIndex:indexPath.row];
+    Article *article = _articles[indexPath.row];
     cell.textLabel.text = [emailAddressFormatter stringForObjectValue:article.from];
     cell.detailTextLabel.text = article.subject;
     cell.dateLabel.text = [dateFormatter stringFromDate:article.date];
 
-    NNNewsrc *newsrc = [[_connectionPool account] newsrc];
+    NNNewsrc *newsrc = _connectionPool.account.newsrc;
 
-    long long articleNumber = [[[[article parts] anyObject] articleNumber] longLongValue];
+    long long articleNumber = [[article.parts anyObject] articleNumber].longLongValue;
 
-    if ([article hasAllParts] == NO)
-        [[cell imageView] setImage:incompleteIconImage];
+    if (article.hasAllParts == NO)
+        cell.imageView.image = incompleteIconImage;
     else if ([newsrc isReadForGroupName:_groupName articleNumber:articleNumber] == NO)
-        [[cell imageView] setImage:unreadIconImage];
+        cell.imageView.image = unreadIconImage;
     else
-        [[cell imageView] setImage:readIconImage];
+        cell.imageView.image = readIconImage;
 
     return cell;
 }
@@ -275,12 +275,12 @@
 
 - (NSUInteger)articleCount
 {
-    return [_articles count];
+    return _articles.count;
 }
 
 - (Article *)articleAtIndex:(NSUInteger)index
 {
-    return [_articles objectAtIndex:index];
+    return _articles[index];
 }
 
 #pragma mark -

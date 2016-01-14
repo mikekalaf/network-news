@@ -19,6 +19,7 @@
 @property (readonly) NSUInteger length;
 @property (readonly) NSArray *entries;
 
-- (id)initWithData:(NSData *)articleData;
+- (instancetype)initWithData:(NSData *)articleData NS_DESIGNATED_INITIALIZER;
+- (instancetype)init __attribute__((unavailable));
 
 @end

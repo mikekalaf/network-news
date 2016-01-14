@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="5056" systemVersion="13C1021" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="CnJ-Fz-JJk">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="9531" systemVersion="15C50" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="CnJ-Fz-JJk">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9529"/>
     </dependencies>
     <scenes>
         <!--Navigation Controller-->
@@ -23,7 +24,7 @@
             </objects>
             <point key="canvasLocation" x="1334" y="-1411"/>
         </scene>
-        <!--Accounts View Controller - Accounts-->
+        <!--Accounts-->
         <scene sceneID="qHJ-4N-DKK">
             <objects>
                 <tableViewController id="I1o-gR-0zS" customClass="AccountsViewController" sceneMemberID="viewController">
@@ -71,7 +72,7 @@
             </objects>
             <point key="canvasLocation" x="1839" y="-1411"/>
         </scene>
-        <!--Favourite Groups View Controller - Groups-->
+        <!--Groups-->
         <scene sceneID="KQX-ku-ObA">
             <objects>
                 <tableViewController id="ojb-eO-6ga" customClass="FavouriteGroupsViewController" sceneMemberID="viewController">
@@ -127,7 +128,7 @@
             </objects>
             <point key="canvasLocation" x="1050" y="77"/>
         </scene>
-        <!--Thread List View Controller - Threads-->
+        <!--Threads-->
         <scene sceneID="6QM-NR-cCe">
             <objects>
                 <tableViewController id="nCd-TS-7j6" customClass="ThreadListViewController" sceneMemberID="viewController">
@@ -144,14 +145,14 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="ehP-gG-vix">
-                                            <rect key="frame" x="15" y="20" width="34" height="22"/>
+                                            <rect key="frame" x="15" y="20" width="36" height="22"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Subtitle" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="jOY-ue-Sb7">
-                                            <rect key="frame" x="15" y="42" width="43" height="15"/>
+                                            <rect key="frame" x="15" y="42" width="44" height="15"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
@@ -171,14 +172,14 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Jb7-At-Txd">
-                                            <rect key="frame" x="15" y="20" width="34" height="22"/>
+                                            <rect key="frame" x="15" y="20" width="36" height="22"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Subtitle" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="8OC-bT-j7h">
-                                            <rect key="frame" x="15" y="42" width="43" height="15"/>
+                                            <rect key="frame" x="15" y="42" width="44" height="15"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
@@ -232,7 +233,7 @@
             </objects>
             <point key="canvasLocation" x="1622" y="77"/>
         </scene>
-        <!--Thread View Controller - Thread-->
+        <!--Thread-->
         <scene sceneID="rSx-7G-UG6">
             <objects>
                 <tableViewController id="QKf-Mr-mCo" customClass="ThreadViewController" sceneMemberID="viewController">
@@ -249,14 +250,14 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="cAr-R9-78o">
-                                            <rect key="frame" x="15" y="20" width="34" height="22"/>
+                                            <rect key="frame" x="15" y="20" width="36" height="22"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Subtitle" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="DGF-H0-a0Z">
-                                            <rect key="frame" x="15" y="42" width="43" height="15"/>
+                                            <rect key="frame" x="15" y="42" width="44" height="15"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
@@ -281,7 +282,7 @@
             </objects>
             <point key="canvasLocation" x="2072" y="432"/>
         </scene>
-        <!--Article View Controller - Article-->
+        <!--Article-->
         <scene sceneID="mNe-hQ-lid">
             <objects>
                 <viewController id="STc-Ql-pWw" customClass="ArticleViewController" sceneMemberID="viewController">
@@ -302,7 +303,7 @@
             </objects>
             <point key="canvasLocation" x="2527" y="77"/>
         </scene>
-        <!--Search Groups View Controller - Select Groups-->
+        <!--Select Groups-->
         <scene sceneID="p3H-12-FeV">
             <objects>
                 <tableViewController id="ERq-rk-wgg" customClass="SearchGroupsViewController" sceneMemberID="viewController">
@@ -325,21 +326,21 @@
                         </searchBar>
                         <prototypes>
                             <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" textLabel="nqj-zk-1sH" detailTextLabel="EWT-bW-kcl" style="IBUITableViewCellStyleSubtitle" id="JZh-ff-dso">
-                                <rect key="frame" x="0.0" y="103" width="320" height="44"/>
+                                <rect key="frame" x="0.0" y="66" width="320" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="JZh-ff-dso" id="yDk-P4-n7u">
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="middleTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="nqj-zk-1sH">
-                                            <rect key="frame" x="15" y="3" width="34" height="22"/>
+                                            <rect key="frame" x="15" y="3" width="36" height="22"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Subtitle" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="EWT-bW-kcl">
-                                            <rect key="frame" x="15" y="25" width="43" height="15"/>
+                                            <rect key="frame" x="15" y="25" width="44" height="15"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
@@ -396,7 +397,7 @@
             </objects>
             <point key="canvasLocation" x="489" y="77"/>
         </scene>
-        <!--Welcome View Controller - Add Account-->
+        <!--Add Account-->
         <scene sceneID="3ti-kK-0yp">
             <objects>
                 <tableViewController id="43Y-mb-9su" customClass="WelcomeViewController" sceneMemberID="viewController">
@@ -406,7 +407,7 @@
                         <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                         <prototypes>
                             <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="LogoCell" id="aS0-S4-f2F">
-                                <rect key="frame" x="0.0" y="55" width="320" height="66"/>
+                                <rect key="frame" x="0.0" y="50" width="320" height="66"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="aS0-S4-f2F" id="eqM-8c-Cpt">
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="65"/>
@@ -414,7 +415,6 @@
                                     <subviews>
                                         <imageView userInteractionEnabled="NO" tag="1" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tGT-ic-oLQ">
                                             <rect key="frame" x="49" y="1" width="223" height="64"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         </imageView>
                                     </subviews>
                                 </tableViewCellContentView>
@@ -508,11 +508,6 @@
     <resources>
         <image name="Default" width="320" height="480"/>
     </resources>
-    <simulatedMetricsContainer key="defaultSimulatedMetrics">
-        <simulatedStatusBarMetrics key="statusBar"/>
-        <simulatedOrientationMetrics key="orientation"/>
-        <simulatedScreenMetrics key="destination" type="retina4"/>
-    </simulatedMetricsContainer>
     <inferredMetricsTieBreakers>
         <segue reference="SO7-25-V3r"/>
     </inferredMetricsTieBreakers>

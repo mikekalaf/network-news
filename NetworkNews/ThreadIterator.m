@@ -11,7 +11,7 @@
 
 @implementation ThreadIterator
 
-- (id)initWithThreads:(NSArray *)threadsArray
+- (instancetype)initWithThreads:(NSArray *)threadsArray
 {
     self = [super init];
     if (self)
@@ -22,9 +22,9 @@
         NSMutableArray *counts = [NSMutableArray array];
         for (Thread *thread in threads)
         {
-            NSUInteger count = [[thread articles] count];
+            NSInteger count = thread.articles.count;
             totalCount += count;
-            [counts addObject:[NSNumber numberWithInteger:count]];
+            [counts addObject:@(count)];
         }
         articleCounts = [counts copy];
     }
@@ -35,7 +35,7 @@
 {
     NSInteger runningCount = 0;
     for (NSUInteger i = 0; i < threadIndex; ++i)
-        runningCount += [[articleCounts objectAtIndex:i] integerValue];
+        runningCount += [articleCounts[i] integerValue];
     return runningCount;
 }
 
@@ -45,7 +45,7 @@
     NSInteger runningCount = 0;
     for (NSNumber *articleCount in articleCounts)
     {
-        runningCount += [articleCount integerValue];
+        runningCount += articleCount.integerValue;
         if (runningCount > articleIndex)
             return threadIndex;
         ++threadIndex;
@@ -66,9 +66,9 @@
     NSUInteger runningCount = 0;
     for (Thread *thread in threads)
     {
-        NSUInteger count = [[thread articles] count];
+        NSUInteger count = thread.articles.count;
         if (runningCount + count > index)
-            return [[thread sortedArticles] objectAtIndex:index - runningCount];
+            return thread.sortedArticles[index - runningCount];
         runningCount += count;
     }
     return nil;

@@ -10,8 +10,8 @@
 
 @interface NSArray (NewsAdditions)
 
-- (NSObject *)head;
-- (NSArray *)tail;
+@property (NS_NONATOMIC_IOSONLY, readonly, strong) NSObject *head;
+@property (NS_NONATOMIC_IOSONLY, readonly, copy) NSArray *tail;
 - (id)objectWithName:(NSString *)name;
 
 @end

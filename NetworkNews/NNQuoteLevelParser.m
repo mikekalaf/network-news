@@ -11,7 +11,7 @@
 
 @implementation NNQuoteLevelParser
 
-- (id)initWithData:(NSData *)aData
+- (instancetype)initWithData:(NSData *)aData
             flowed:(BOOL)isFlowed
 {
     self = [super init];

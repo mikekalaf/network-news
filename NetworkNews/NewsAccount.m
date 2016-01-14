@@ -20,32 +20,32 @@
 
 @implementation NewsAccount
 
-+ (id)accountWithTemplate:(AccountTemplate)accountTemplate
++ (instancetype)accountWithTemplate:(AccountTemplate)accountTemplate
 {
     NewsAccount *account = [[NewsAccount alloc] init];
 
     switch (accountTemplate)
     {
         case AccountTemplateGiganews:
-            [account setAccountTemplate:AccountTemplateGiganews];
-            [account setServiceName:@"Giganews"];
-            [account setSupportURL:[NSURL URLWithString:@"http://www.giganews.com/?c=gn1113881"]];
-            [account setIconName:@"gn"];
-            [account setHostName:@"news.giganews.com"];
+            account.accountTemplate = AccountTemplateGiganews;
+            account.serviceName = @"Giganews";
+            account.supportURL = [NSURL URLWithString:@"http://www.giganews.com/?c=gn1113881"];
+            account.iconName = @"gn";
+            account.hostName = @"news.giganews.com";
             [account setSecure:YES];
-            [account setPort:563];
+            account.port = 563;
             break;
 
         default:
-            [account setServiceName:@"Usenet Server"];
-            [account setPort:119];
+            account.serviceName = @"Usenet Server";
+            account.port = 119;
             break;
     }
 
     return account;
 }
 
-- (id)initWithCoder:(NSCoder *)decoder
+- (instancetype)initWithCoder:(NSCoder *)decoder
 {
     self = [super init];
     if (self)
@@ -82,7 +82,7 @@
     {
         NSFileManager *fileManager = [[NSFileManager alloc] init];
         
-        NSURL *rootCacheURL = [[fileManager URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] lastObject];
+        NSURL *rootCacheURL = [fileManager URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask].lastObject;
         _cacheURL = [rootCacheURL URLByAppendingPathComponent:_serviceName];
 
         NSLog(@"Cache root: %@", _cacheURL);
@@ -99,7 +99,7 @@
 {
     if (_newsrc == nil)
     {
-        _newsrc = [[NNNewsrc alloc] initWithServerName:[self serviceName]];
+        _newsrc = [[NNNewsrc alloc] initWithServerName:self.serviceName];
     }
     return _newsrc;
 }

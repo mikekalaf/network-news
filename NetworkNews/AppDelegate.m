@@ -112,7 +112,7 @@
 {
     NSFileManager *fileMananger = [[NSFileManager alloc] init];
     NSArray *urls = [fileMananger URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask];
-    return [[urls lastObject] URLByAppendingPathComponent:NetworkNewsAccountsFileName];
+    return [urls.lastObject URLByAppendingPathComponent:NetworkNewsAccountsFileName];
 }
 
 - (NSMutableArray *)accountsFromArchive

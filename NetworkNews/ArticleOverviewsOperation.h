@@ -11,18 +11,18 @@
 @class NewsConnectionPool;
 @class GroupStore;
 
-typedef enum
+typedef NS_ENUM(unsigned int, ArticleOverviewsMode)
 {
     ArticleOverviewsLatest,
     ArticleOverviewsMore
-} ArticleOverviewsMode;
+};
 
-typedef enum {
+typedef NS_ENUM(unsigned int, ArticleOverviewsStatus) {
     ArticleOverviewsUndefined,
     ArticleOverviewsFailed,
     ArticleOverviewsComplete,
     ArticleOverviewsNoSuchGroup
-} ArticleOverviewsStatus;
+};
 
 @interface ArticleOverviewsOperation : NSOperation
 
@@ -31,9 +31,10 @@ typedef enum {
 @property (nonatomic, readonly) NSUInteger maxArticleCount;
 @property (nonatomic, readonly) ArticleOverviewsStatus status;
 
-- (id)initWithConnectionPool:(NewsConnectionPool *)connectionPool
+- (instancetype)initWithConnectionPool:(NewsConnectionPool *)connectionPool
                   groupStore:(GroupStore *)groupStore
                         mode:(ArticleOverviewsMode)mode
-             maxArticleCount:(NSUInteger)maxArticleCount;
+             maxArticleCount:(NSUInteger)maxArticleCount NS_DESIGNATED_INITIALIZER;
+- (instancetype)init __attribute__((unavailable));
 
 @end

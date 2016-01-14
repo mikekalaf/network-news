@@ -40,7 +40,7 @@ NSString *FetchArticleCompletedNotification = @"FetchArticleCompletedNotificatio
 
 @implementation FetchArticleOperation
 
-- (id)initWithConnectionPool:(NewsConnectionPool *)connectionPool
+- (instancetype)initWithConnectionPool:(NewsConnectionPool *)connectionPool
                    messageID:(NSString *)messageID
                   partNumber:(NSUInteger)partNumber
               totalPartCount:(NSUInteger)totalPartCount
@@ -84,46 +84,46 @@ NSString *FetchArticleCompletedNotification = @"FetchArticleCompletedNotificatio
             else
                 response = [newsConnection articleWithMessageID:_messageID];
 
-            if ([response statusCode] == 220 || [response statusCode] == 222)
+            if (response.statusCode == 220 || response.statusCode == 222)
             {
                 // TODO Properly escape the data, removing escaped '.'
 
-                [self processHead:[response data]];
+                [self processHead:response.data];
 
-                [self processBody:[response data]];
+                [self processBody:response.data];
 
                 NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
                 [nc postNotificationName:FetchArticleCompletedNotification
                                   object:self
                                 userInfo:@{
-                 @"statusCode": @([response statusCode]),
+                 @"statusCode": @(response.statusCode),
                  @"messageID": _messageID,
                  @"partNumber": @(_partNumber),
                  @"totalPartCount": @(_totalPartCount)}];
 
                 retry = NO;
             }
-            else if ([response statusCode] == 400)
+            else if (response.statusCode == 400)
             {
                 // Timeout - retry with a new connection
                 retry = YES;
             }
-            else if ([response statusCode] == 430)
+            else if (response.statusCode == 430)
             {
                 NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
                 [nc postNotificationName:FetchArticleCompletedNotification
                                   object:self
-                                userInfo:@{@"statusCode": @([response statusCode])}];
+                                userInfo:@{@"statusCode": @(response.statusCode)}];
                 retry = NO;
             }
-            else if ([response statusCode] == 503)
+            else if (response.statusCode == 503)
             {
                 // Connection has probably timed-out, so retry with a
                 // new connection (if we haven't retried already)
                 newsConnection = nil;
                 retry = !retry;
             }
-            else if ([response statusCode] == 0)
+            else if (response.statusCode == 0)
             {
                 // TODO: If we are here, it is probably because an error was
                 // encountered when trying to send the command - we should
@@ -139,8 +139,8 @@ NSString *FetchArticleCompletedNotification = @"FetchArticleCompletedNotificatio
             }
             else
             {
-                NSLog(@"STATUS CODE: %ld", (long)[response statusCode]);
-                NSLog(@"%@", [[NSString alloc] initWithData:[response data] encoding:NSUTF8StringEncoding]);
+                NSLog(@"STATUS CODE: %ld", (long)response.statusCode);
+                NSLog(@"%@", [[NSString alloc] initWithData:response.data encoding:NSUTF8StringEncoding]);
 
                 retry = NO;
             }
@@ -160,7 +160,7 @@ NSString *FetchArticleCompletedNotification = @"FetchArticleCompletedNotificatio
 
 - (void)bytesReceived:(NSNotification *)notification
 {
-    _progressBlock([[notification userInfo][@"byteCount"] integerValue]);
+    _progressBlock([notification.userInfo[@"byteCount"] integerValue]);
 }
 
 - (NSString *)headerValueWithName:(NSString *)name
@@ -196,7 +196,7 @@ NSString *FetchArticleCompletedNotification = @"FetchArticleCompletedNotificatio
     if (_partNumber > 1)
     {
         _headRange = NSMakeRange(0, 0);
-        _bodyRange = NSMakeRange(0, [data length] - 3);
+        _bodyRange = NSMakeRange(0, data.length - 3);
     }
     else
     {
@@ -234,9 +234,9 @@ NSString *FetchArticleCompletedNotification = @"FetchArticleCompletedNotificatio
             [headData writeToURL:mIdHeadURL atomically:NO];
 
             // Only cache the top text if there is actually any
-            if ([attachment rangeInArticleData].location > 0)
+            if (attachment.rangeInArticleData.location > 0)
             {
-                NSRange range = NSMakeRange(0, [attachment rangeInArticleData].location);
+                NSRange range = NSMakeRange(0, attachment.rangeInArticleData.location);
                 NSData *bodyTextDataTop = [bodyData subdataWithRange:range];
 
                 NSURL *mIdURL = [self cacheURLForMessageID:_messageID
@@ -248,7 +248,7 @@ NSString *FetchArticleCompletedNotification = @"FetchArticleCompletedNotificatio
             // Note the attachment filename
             NSURL *attachmentURL = [self cacheURLForMessageID:_messageID
                                                         order:2
-                                                    extension:[[attachment fileName] pathExtension]];
+                                                    extension:attachment.fileName.pathExtension];
 //            [_article setAttachmentFileName:[attachment fileName]];
 //
 //            AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
@@ -262,8 +262,8 @@ NSString *FetchArticleCompletedNotification = @"FetchArticleCompletedNotificatio
             // Grab the trailing text in the last part (this could still be
             // the first part)
 
-            NSUInteger end = NSMaxRange([attachment rangeInArticleData]);
-            NSRange range = NSMakeRange(end, [bodyData length] - end);
+            NSUInteger end = NSMaxRange(attachment.rangeInArticleData);
+            NSRange range = NSMakeRange(end, bodyData.length - end);
 
             // Only cache it if there is actual content
             if (range.length > 0)
@@ -290,9 +290,9 @@ NSString *FetchArticleCompletedNotification = @"FetchArticleCompletedNotificatio
         {
             // Create the file
             NSError *error;
-            if ([[attachment data] writeToURL:attachmentURL options:0 error:&error] == NO)
+            if ([attachment.data writeToURL:attachmentURL options:0 error:&error] == NO)
             {
-                NSLog(@"Error in caching file: %@", [error description]);
+                NSLog(@"Error in caching file: %@", error.description);
             }
         }
         else
@@ -300,7 +300,7 @@ NSString *FetchArticleCompletedNotification = @"FetchArticleCompletedNotificatio
             // Append to the end of the file
             NSFileHandle *fileHandle = [NSFileHandle fileHandleForWritingToURL:attachmentURL error:NULL];
             [fileHandle seekToEndOfFile];
-            [fileHandle writeData:[attachment data]];
+            [fileHandle writeData:attachment.data];
             [fileHandle closeFile];
         }
     }

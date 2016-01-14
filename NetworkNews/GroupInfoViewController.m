@@ -13,7 +13,7 @@
 
 @synthesize delegate;
 
-- (id)init
+- (instancetype)init
 {
     self = [super initWithNibName:@"GroupInfoView" bundle:nil];
     if (self)

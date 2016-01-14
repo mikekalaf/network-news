@@ -8,11 +8,11 @@
 
 #import <Foundation/Foundation.h>
 
-typedef enum
+typedef NS_ENUM(unsigned int, AccountTemplate)
 {
     AccountTemplateDefault = 0,
     AccountTemplateGiganews
-} AccountTemplate;
+};
 
 @class NNNewsrc;
 
@@ -31,6 +31,6 @@ typedef enum
 @property (nonatomic, readonly) NSURL *cacheURL;
 @property (nonatomic, readonly) NNNewsrc *newsrc;
 
-+ (id)accountWithTemplate:(AccountTemplate)accountTemplate;
++ (instancetype)accountWithTemplate:(AccountTemplate)accountTemplate;
 
 @end

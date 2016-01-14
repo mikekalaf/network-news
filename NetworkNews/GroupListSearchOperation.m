@@ -23,7 +23,7 @@
 
 @implementation GroupListSearchOperation
 
-- (id)initWithConnectionPool:(NewsConnectionPool *)connectionPool wildmat:(NSString *)wildmat
+- (instancetype)initWithConnectionPool:(NewsConnectionPool *)connectionPool wildmat:(NSString *)wildmat
 {
     self = [super init];
     if (self)
@@ -44,12 +44,12 @@
             NewsConnection *newsConnection = [_connectionPool dequeueConnection];
             NewsResponse *response = [newsConnection listActiveWithWildmat:_wildmat];
 
-            if ([response statusCode] == 215)
+            if (response.statusCode == 215)
             {
                 NSMutableArray *groups = [[NSMutableArray alloc] initWithCapacity:1];
                 NSUInteger linesRead = 0;
 
-                LineIterator *lineIterator = [[LineIterator alloc] initWithData:[response data]];
+                LineIterator *lineIterator = [[LineIterator alloc] initWithData:response.data];
 
                 while (!lineIterator.isAtEnd)
                 {
@@ -78,7 +78,7 @@
 
                 retry = NO;
             }
-            else if ([response statusCode] == 503)
+            else if (response.statusCode == 503)
             {
                 // Connection has probably timed-out, so retry with a
                 // new connection (if we haven't retried already)
@@ -87,8 +87,8 @@
             }
             else
             {
-                NSLog(@"STATUS CODE: %ld", (long)[response statusCode]);
-                NSLog(@"%@", [[NSString alloc] initWithData:[response data] encoding:NSUTF8StringEncoding]);
+                NSLog(@"STATUS CODE: %ld", (long)response.statusCode);
+                NSLog(@"%@", [[NSString alloc] initWithData:response.data encoding:NSUTF8StringEncoding]);
 
                 retry = NO;
             }

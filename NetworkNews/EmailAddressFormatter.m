@@ -44,12 +44,12 @@ static NSCharacterSet *trimCharacterSet;
         if (addressIndex > 0)
         {
             // Use the text preceeding the email address as the name
-            string = [[components objectAtIndex:0] stringByTrimmingCharactersInSet:trimCharacterSet];
+            string = [components[0] stringByTrimmingCharactersInSet:trimCharacterSet];
         }
         else if (addressIndex == 0 && components.count > 1)
         {
             // Use the text following the email address as the name
-            string = [[components objectAtIndex:1] stringByTrimmingCharactersInSet:trimCharacterSet];
+            string = [components[1] stringByTrimmingCharactersInSet:trimCharacterSet];
         }
 
         if ([string isEqualToString:@""])
@@ -57,7 +57,7 @@ static NSCharacterSet *trimCharacterSet;
             if (addressIndex != NSNotFound)
             {
                 // Use the email address as the name
-                string = [components objectAtIndex:addressIndex];
+                string = components[addressIndex];
             }
             else
             {

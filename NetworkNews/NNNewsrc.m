@@ -31,7 +31,7 @@
 
 @implementation NNNewsrc
 
-- (id)initWithServerName:(NSString *)serverName
+- (instancetype)initWithServerName:(NSString *)serverName
 {
     self = [super init];
     if (self)
@@ -41,8 +41,8 @@
         _serverName = [serverName copy];
 
         NSFileManager *fileManager = [[NSFileManager alloc] init];
-        NSURL *url = [[fileManager URLsForDirectory:NSDocumentDirectory
-                                          inDomains:NSUserDomainMask] lastObject];
+        NSURL *url = [fileManager URLsForDirectory:NSDocumentDirectory
+                                          inDomains:NSUserDomainMask].lastObject;
         url = [url URLByAppendingPathComponent:_serverName];
         _fileURL = [url URLByAppendingPathComponent:@"newsrc"];
         [self readNewsrcFileAtURL:_fileURL];
@@ -60,7 +60,7 @@
 
 - (BOOL)isReadForGroupName:(NSString *)name articleNumber:(long long)number
 {
-    NNNewsrcItem *item = [_groupsDictionary objectForKey:name];
+    NNNewsrcItem *item = _groupsDictionary[name];
     for (NSValue *rangeObject in item.articleRanges)
     {
         ArticleRange range = [rangeObject articleRangeValue];
@@ -72,7 +72,7 @@
 
 - (void)setRead:(BOOL)read forGroupName:(NSString *)name articleNumber:(long long)number
 {
-    NNNewsrcItem *item = [_groupsDictionary objectForKey:name];
+    NNNewsrcItem *item = _groupsDictionary[name];
 
     // Find existing range containing number or adjacent ranges
     NSValue *followingRange = nil;
@@ -126,14 +126,14 @@
     if (precedingRange)
     {
         NSUInteger index = [item.articleRanges indexOfObject:precedingRange];
-        [item.articleRanges replaceObjectAtIndex:index withObject:newPrecedingRange];
+        (item.articleRanges)[index] = newPrecedingRange;
     }
 
     if (followingRange)
     {
         NSUInteger index = [item.articleRanges indexOfObject:followingRange];
         if (newFollowingRange)
-            [item.articleRanges replaceObjectAtIndex:index withObject:newFollowingRange];
+            (item.articleRanges)[index] = newFollowingRange;
         else
             [item.articleRanges removeObjectAtIndex:index];
     }
@@ -181,7 +181,7 @@
     NSInputStream *stream = [[NSInputStream alloc] initWithURL:url];
     [stream open];
 
-    if ([stream streamStatus] == NSStreamStatusError)
+    if (stream.streamStatus == NSStreamStatusError)
         return;
 
     while (YES)
@@ -272,7 +272,7 @@
     for (NNNewsrcItem *item in _groups)
     {
         [stream write:(const uint8_t *)[item.groupName cStringUsingEncoding:NSUTF8StringEncoding]
-            maxLength:[item.groupName length]];
+            maxLength:(item.groupName).length];
 
         if (item.subscribed)
             [stream write:(const uint8_t *)": " maxLength:2];

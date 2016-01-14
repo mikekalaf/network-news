@@ -11,11 +11,12 @@
 
 @interface NNBase64Decoder : NSObject
 
-- (id)initWithData:(NSData *)encodedData;
+- (instancetype)initWithData:(NSData *)encodedData NS_DESIGNATED_INITIALIZER;
+- (instancetype)init __attribute__((unavailable));
 
-- (NSData *)decode;
+@property (NS_NONATOMIC_IOSONLY, readonly, copy) NSData *decode;
 
-- (NSString *)decodeString:(NSString *)string
++ (NSString *)decodeString:(NSString *)string
           toStringEncoding:(NSStringEncoding)encoding;
 
 @end

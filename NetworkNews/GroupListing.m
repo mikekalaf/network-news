@@ -10,7 +10,7 @@
 
 @implementation GroupListing 
 
-- (id)initWithName:(NSString *)name
+- (instancetype)initWithName:(NSString *)name
     highestArticle:(long long)highestArticle
      lowestArticle:(long long)lowestArticle
      postingStatus:(char)postingStatus
@@ -26,16 +26,12 @@
     return self;
 }
 
-- (id)initWithCoder:(NSCoder *)aDecoder
+- (instancetype)initWithCoder:(NSCoder *)aDecoder
 {
-    self = [super init];
-    if (self)
-    {
-        _name = [aDecoder decodeObjectForKey:@"Name"];
-        _highestArticle = [aDecoder decodeInt64ForKey:@"High"];
-        _lowestArticle = [aDecoder decodeInt64ForKey:@"Low"];
-    }
-    return self;
+    return [self initWithName:[aDecoder decodeObjectForKey:@"Name"]
+               highestArticle:[aDecoder decodeInt64ForKey:@"High"]
+                lowestArticle:[aDecoder decodeInt64ForKey:@"Low"]
+                postingStatus:0];
 }
 
 - (void)encodeWithCoder:(NSCoder *)aCoder

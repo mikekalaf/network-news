@@ -16,8 +16,9 @@
 @property(nonatomic, readonly) NSData *data;
 @property(nonatomic, readonly) NSRange rangeInArticleData;
 
--   (id)initWithBodyData:(NSData *)bodyData
+-   (instancetype)initWithBodyData:(NSData *)bodyData
              contentType:(ContentType *)contentType
- contentTransferEncoding:(NSString *)contentTransferEncoding;
+ contentTransferEncoding:(NSString *)contentTransferEncoding NS_DESIGNATED_INITIALIZER;
+- (instancetype)init __attribute__((unavailable));
 
 @end

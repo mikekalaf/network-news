@@ -10,7 +10,7 @@
 
 @implementation NewsResponse
 
-- (id)initWithData:(NSData *)data statusCode:(NSInteger)statusCode
+- (instancetype)initWithData:(NSData *)data statusCode:(NSInteger)statusCode
 {
     self = [super init];
     if (self)

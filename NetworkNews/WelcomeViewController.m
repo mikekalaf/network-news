@@ -65,17 +65,17 @@
 //    }
 
     NewsAccount *account = _templateAccounts[indexPath.row];
-    if ([account iconName])
+    if (account.iconName)
     {
         //[[cell imageView] setImage:[UIImage imageNamed:[account iconName]]];
         UIImageView *imageView = (UIImageView *)[cell viewWithTag:1];
-        [imageView setImage:[UIImage imageNamed:[account iconName]]];
+        imageView.image = [UIImage imageNamed:account.iconName];
     }
     else
     {
-        [[cell textLabel] setText:[account serviceName]];
+        cell.textLabel.text = account.serviceName;
         //[[cell textLabel] setFont:[UIFont boldSystemFontOfSize:24]];
-        [[cell textLabel] setTextAlignment:NSTextAlignmentCenter];
+        cell.textLabel.textAlignment = NSTextAlignmentCenter;
     }
     
     return cell;
@@ -103,10 +103,10 @@
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
-    AccountSettingsViewController *viewController = (AccountSettingsViewController *)[[segue destinationViewController] topViewController];
-    NSIndexPath *selectedRowIndexPath = [[self tableView] indexPathForSelectedRow];
-    [viewController setAccount:_templateAccounts[[selectedRowIndexPath row]]];
-    [viewController setDelegate:self];
+    AccountSettingsViewController *viewController = (AccountSettingsViewController *)[segue.destinationViewController topViewController];
+    NSIndexPath *selectedRowIndexPath = self.tableView.indexPathForSelectedRow;
+    viewController.account = _templateAccounts[selectedRowIndexPath.row];
+    viewController.delegate = self;
 }
 
 - (void)didReceiveMemoryWarning
@@ -126,13 +126,13 @@
 
     NSFileManager *fileMananger = [[NSFileManager alloc] init];
     NSArray *urls = [fileMananger URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask];
-    NSURL *accountsURL = [[urls lastObject] URLByAppendingPathComponent:NetworkNewsAccountsFileName];
+    NSURL *accountsURL = [urls.lastObject URLByAppendingPathComponent:NetworkNewsAccountsFileName];
 
     NSData *data = [NSKeyedArchiver archivedDataWithRootObject:_accounts];
     [data writeToURL:accountsURL atomically:YES];
 
     [self dismissViewControllerAnimated:YES completion:NULL];
-    [[self navigationController] popViewControllerAnimated:NO];
+    [self.navigationController popViewControllerAnimated:NO];
 }
 
 - (void)accountSettingsViewControllerCancelled:(AccountSettingsViewController *)controller
@@ -146,8 +146,8 @@
     // Is the account name unique?
     for (NewsAccount *account in _accounts)
     {
-        if ([[controller account] isEqual:account] == NO &&
-            [[account serviceName] caseInsensitiveCompare:accountName] == NSOrderedSame)
+        if ([controller.account isEqual:account] == NO &&
+            [account.serviceName caseInsensitiveCompare:accountName] == NSOrderedSame)
         {
             return NO;
         }

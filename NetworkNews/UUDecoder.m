@@ -218,7 +218,7 @@ static NSUInteger stopOfData(const char *bytes,
     return NO;
 }
 
-- (id)initWithData:(NSData *)encodedData
+- (instancetype)initWithData:(NSData *)encodedData
 {
     self = [super init];
     if (self)

@@ -20,7 +20,7 @@
 
 - (NSString *)groupName
 {
-    return [self storeName];
+    return self.storeName;
 }
 
 - (ArticleRange)articleRange
@@ -31,20 +31,20 @@
     // Sort all the article parts and pick out the lowest and highest
     // article numbers
     NSFetchRequest *request = [[NSFetchRequest alloc] init];
-    [request setEntity:[NSEntityDescription entityForName:@"ArticlePart"
-                                   inManagedObjectContext:[self managedObjectContext]]];
-    [request setResultType:NSDictionaryResultType];
-    [request setPropertiesToFetch:@[@"articleNumber"]];
+    request.entity = [NSEntityDescription entityForName:@"ArticlePart"
+                                   inManagedObjectContext:self.managedObjectContext];
+    request.resultType = NSDictionaryResultType;
+    request.propertiesToFetch = @[@"articleNumber"];
 
     NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"articleNumber" ascending:YES];
-    [request setSortDescriptors:@[sortDescriptor]];
+    request.sortDescriptors = @[sortDescriptor];
 
     NSError *error;
-    NSArray *array = [[self managedObjectContext] executeFetchRequest:request error:&error];
-    if (array && [array count] > 0)
+    NSArray *array = [self.managedObjectContext executeFetchRequest:request error:&error];
+    if (array && array.count > 0)
     {
         NSDictionary *first = array[0];
-        NSDictionary *last = [array lastObject];
+        NSDictionary *last = array.lastObject;
         NSLog(@"%@ -> %@", first, last);
 
         uint64_t low = [first[@"articleNumber"] longLongValue];
@@ -68,9 +68,9 @@
 
     // Create a new store with the same persistent store coordinator, but a
     // new managed object context
-    GroupStore *groupStore = [[GroupStore alloc] initWithStoreName:[self groupName]
-                                                       inDirectory:[self dirPath]
-                                    withPersistentStoreCoordinator:[self persistentStoreCoordinator]];
+    GroupStore *groupStore = [[GroupStore alloc] initWithStoreName:self.groupName
+                                                       inDirectory:self.dirPath
+                                    withPersistentStoreCoordinator:self.persistentStoreCoordinator];
 
     return groupStore;
 }
@@ -86,20 +86,20 @@
 - (NSManagedObject *)group
 {
     NSEntityDescription *groupEntity = [NSEntityDescription entityForName:@"Group"
-                                                   inManagedObjectContext:[self managedObjectContext]];
+                                                   inManagedObjectContext:self.managedObjectContext];
     NSFetchRequest *request = [[NSFetchRequest alloc] init];
-    [request setEntity:groupEntity];
+    request.entity = groupEntity;
 
     NSError *error;
-    NSArray *array = [[self managedObjectContext] executeFetchRequest:request error:&error];
-    if ([array count] > 0)
+    NSArray *array = [self.managedObjectContext executeFetchRequest:request error:&error];
+    if (array.count > 0)
     {
-        return [array lastObject];
+        return array.lastObject;
     }
     else
     {
         return [[NSManagedObject alloc] initWithEntity:groupEntity
-                        insertIntoManagedObjectContext:[self managedObjectContext]];
+                        insertIntoManagedObjectContext:self.managedObjectContext];
     }
 }
 

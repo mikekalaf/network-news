@@ -17,7 +17,8 @@ extern NSString *const NewsConnectionBytesReceivedNotification;
 
 @property(nonatomic, readonly) NSString *welcome;
 
-- (id)initWithHost:(NSString *)host port:(NSUInteger)port isSecure:(BOOL)secure;
+- (instancetype)initWithHost:(NSString *)host port:(NSUInteger)port isSecure:(BOOL)secure NS_DESIGNATED_INITIALIZER;
+- (instancetype)init __attribute__((unavailable));
 
 - (NSUInteger)loginWithUser:(NSString *)user password:(NSString *)password;
 - (NewsResponse *)listActiveWithWildmat:(NSString *)wildmat;

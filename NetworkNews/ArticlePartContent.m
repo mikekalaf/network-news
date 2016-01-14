@@ -13,7 +13,7 @@
 
 @synthesize data;
 
-- (id)initWithHead:(BOOL)withHead
+- (instancetype)initWithHead:(BOOL)withHead
 {
     self = [super init];
     if (self)
@@ -24,29 +24,34 @@
     return self;
 }
 
-- (NSArray *)headEntries
+- (void)collectHeadEntries
 {
     if (containsHead && headEntries == nil)
     {
         // Initialise the head and body ranges
         NNHeaderParser *hp = [[NNHeaderParser alloc] initWithData:data];
         headEntries = hp.entries;
-
+        
         headRange = NSMakeRange(0, hp.length);
         bodyRange = NSMakeRange(hp.length, data.length - hp.length);
     }
+}
+
+- (NSArray *)headEntries
+{
+    [self collectHeadEntries];
     return headEntries;
 }
 
 - (NSRange)headRange
 {
-    [self headEntries];
+    [self collectHeadEntries];
     return headRange;
 }
 
 - (NSRange)bodyRange
 {
-    [self headEntries];
+    [self collectHeadEntries];
     return bodyRange;
 }
 
@@ -54,7 +59,7 @@
 {
     if (containsHead && bodyData == nil)
     {
-        [self headEntries];
+        [self collectHeadEntries];
         bodyData = [data subdataWithRange:bodyRange];
     }
 

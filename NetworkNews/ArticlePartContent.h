@@ -29,6 +29,7 @@
 
 @property(nonatomic, retain, readonly) NSData *bodyData;
 
-- (id)initWithHead:(BOOL)withHead;
+- (instancetype)initWithHead:(BOOL)withHead NS_DESIGNATED_INITIALIZER;
+- (instancetype)init __attribute__((unavailable));
 
 @end

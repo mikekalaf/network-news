@@ -12,7 +12,7 @@
 
 + (UIColor *)toolbarTextColor
 {
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
+    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad)
     {
         return [UIColor colorWithRed:0.443 green:0.47 blue:0.5 alpha:1.0];
     }

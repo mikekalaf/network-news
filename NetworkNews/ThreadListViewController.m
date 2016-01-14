@@ -68,7 +68,7 @@
     NSOperationQueue *_operationQueue;
 }
 
-- (NSArray *)activeThreads;
+@property (NS_NONATOMIC_IOSONLY, readonly, copy) NSArray *activeThreads;
 
 - (NSArray *)threadsWithArticles:(NSArray *)articles;
 - (void)groupFileSets:(NSMutableDictionary *)threadDict;
@@ -85,8 +85,8 @@
 {
     _groupName = [aGroupName copy];
     _store = [[GroupStore alloc] initWithStoreName:_groupName
-                                       inDirectory:[[_connectionPool account] serviceName]];
-    [self setTitle:[_groupName shortGroupName]];
+                                       inDirectory:_connectionPool.account.serviceName];
+    self.title = [_groupName shortGroupName];
 }
 
 #pragma mark - View lifecycle
@@ -100,7 +100,7 @@
     [refreshControl addTarget:self
                        action:@selector(refresh:)
              forControlEvents:UIControlEventValueChanged];
-    [self setRefreshControl:refreshControl];
+    self.refreshControl = refreshControl;
 
     // At the moment we have the default white background, whereas iOS Mail
     // app has a nicer light grey background
@@ -129,7 +129,7 @@
     
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     NSDictionary *dict = [userDefaults dictionaryForKey:_groupName];
-    threadTypeDisplay = [[dict objectForKey:THREAD_DISPLAY_KEY] integerValue];
+    threadTypeDisplay = [dict[THREAD_DISPLAY_KEY] integerValue];
 
     _operationQueue = [[NSOperationQueue alloc] init];
 
@@ -160,11 +160,11 @@
     else
         activeTableView = self.tableView;
     
-    NSIndexPath *selectedIndexPath = [activeTableView indexPathForSelectedRow];
+    NSIndexPath *selectedIndexPath = activeTableView.indexPathForSelectedRow;
     if (selectedIndexPath)
     {
         [activeTableView deselectRowAtIndexPath:selectedIndexPath animated:animated];
-        [activeTableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:selectedIndexPath]
+        [activeTableView reloadRowsAtIndexPaths:@[selectedIndexPath]
                                withRowAnimation:NO];
     }
 }
@@ -197,11 +197,11 @@
     else
         activeTableView = self.tableView;
     
-    NSIndexPath *selectedIndexPath = [activeTableView indexPathForSelectedRow];
+    NSIndexPath *selectedIndexPath = activeTableView.indexPathForSelectedRow;
     [activeTableView deselectRowAtIndexPath:selectedIndexPath animated:NO];
 
     // Update any read/unread info display
-    NSArray *indexPaths = [activeTableView indexPathsForVisibleRows];
+    NSArray *indexPaths = activeTableView.indexPathsForVisibleRows;
     [activeTableView reloadRowsAtIndexPaths:indexPaths
                            withRowAnimation:NO];
     
@@ -215,9 +215,9 @@
 
     if (paths.count > 0)
     {
-        if (index < [[paths objectAtIndex:0] row])
+        if (index < [paths[0] row])
             scrollPosition = UITableViewScrollPositionTop;
-        else if (index > [[paths objectAtIndex:paths.count - 1] row])
+        else if (index > [paths[paths.count - 1] row])
             scrollPosition = UITableViewScrollPositionBottom;
     }
     else
@@ -233,8 +233,8 @@
 - (void)returningFromThreadView
 {
     // Update any read/unread info display
-    NSArray *indexPaths = [[self tableView] indexPathsForVisibleRows];
-    [[self tableView] reloadRowsAtIndexPaths:indexPaths
+    NSArray *indexPaths = self.tableView.indexPathsForVisibleRows;
+    [self.tableView reloadRowsAtIndexPaths:indexPaths
                             withRowAnimation:NO];
 }
 
@@ -243,17 +243,17 @@
 - (NSInteger)tableView:(UITableView *)aTableView numberOfRowsInSection:(NSInteger)section
 {
     // Return the number of rows in the section.
-    if (aTableView == [[self searchDisplayController] searchResultsTableView])
+    if (aTableView == self.searchDisplayController.searchResultsTableView)
     {
         // We're showing search results
         id <NSFetchedResultsSectionInfo> sectionInfo =
-        [[searchFetchedResultsController sections] objectAtIndex:section];
-        return [sectionInfo numberOfObjects];
+        searchFetchedResultsController.sections[section];
+        return sectionInfo.numberOfObjects;
     }
     else
     {
         // If we're displaying no articles, hide the "Load more" cell also
-        NSUInteger count = [[self activeThreads] count];
+        NSUInteger count = [self activeThreads].count;
         return count ? count + 1 : 0;
     }
 }
@@ -261,34 +261,34 @@
 - (UITableViewCell *)tableView:(UITableView *)aTableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     // If this row is beyond the end of the list, show a "load more" cell
-    if ([indexPath row] >= [[self activeThreads] count])
+    if (indexPath.row >= [self activeThreads].count)
         return [aTableView dequeueReusableCellWithIdentifier:@"LoadMoreCell"];
 
     Thread *thread;
 
-    if (aTableView == [[self searchDisplayController] searchResultsTableView])
+    if (aTableView == self.searchDisplayController.searchResultsTableView)
     {
         // We're showing search results
         Article *article = [searchFetchedResultsController objectAtIndexPath:indexPath];
         thread = [[Thread alloc] initWithArticle:article];
     }
     else
-        thread = [[self activeThreads] objectAtIndex:indexPath.row];
+        thread = [self activeThreads][indexPath.row];
 
     ThreadListTableViewCell *cell;
-    NSUInteger count = [[thread articles] count];
+    NSUInteger count = thread.articles.count;
     if (count > 1)
         cell = [aTableView dequeueReusableCellWithIdentifier:@"ThreadCell"];
     else
         cell = [aTableView dequeueReusableCellWithIdentifier:@"ArticleCell"];
 
-    UILabel *dateLabel = [cell dateLabel];
-    UILabel *subjectLabel = [cell detailTextLabel];
-    UILabel *authorLabel = [cell textLabel];
-    UIImageView *imageView = [cell imageView];
+    UILabel *dateLabel = cell.dateLabel;
+    UILabel *subjectLabel = cell.detailTextLabel;
+    UILabel *authorLabel = cell.textLabel;
+    UIImageView *imageView = cell.imageView;
 
-    [authorLabel setText:[emailAddressFormatter stringForObjectValue:[thread initialAuthor]]];
-    [subjectLabel setText:[thread subject]];
+    authorLabel.text = [emailAddressFormatter stringForObjectValue:thread.initialAuthor];
+    subjectLabel.text = thread.subject;
     
 //    if (count > 1)
 //    {
@@ -298,29 +298,29 @@
 //    else
 //        [[cell threadCountLabel] setHidden:YES];
 
-    [dateLabel setText:[dateFormatter stringFromDate:[thread latestDate]]];
+    dateLabel.text = [dateFormatter stringFromDate:thread.latestDate];
 
-    if (count == 1 && [thread hasAllParts] == NO)
+    if (count == 1 && thread.hasAllParts == NO)
     {
-        [imageView setImage:incompleteIconImage];
-        [imageView setAlpha:1.0];
+        imageView.image = incompleteIconImage;
+        imageView.alpha = 1.0;
     }
     else
     {
         NSUInteger readCount = [self articlesReadInThread:thread];
         if (readCount == 0)
         {
-            [imageView setImage:unreadIconImage];
-            [imageView setAlpha:1.0];
+            imageView.image = unreadIconImage;
+            imageView.alpha = 1.0;
         }
         else if (readCount < thread.articles.count)
         {
     //        [[cell imageView] setImage:partReadIconImage];
-            [imageView setImage:unreadIconImage];
-            [imageView setAlpha:0.5];
+            imageView.image = unreadIconImage;
+            imageView.alpha = 0.5;
         }
         else
-            [imageView setImage:readIconImage];
+            imageView.image = readIconImage;
     }
 
     return cell;
@@ -402,23 +402,23 @@
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
-    if ([[segue identifier] isEqualToString:@"SelectThread"])
+    if ([segue.identifier isEqualToString:@"SelectThread"])
     {
-        Thread *thread = [[self activeThreads] objectAtIndex:[[[self tableView] indexPathForSelectedRow] row]];
-        ThreadViewController *viewController = [segue destinationViewController];
-        [viewController setConnectionPool:_connectionPool];
-        [viewController setArticles:[thread sortedArticles]];
-        [viewController setThreadTitle:[thread subject]];
-        [viewController setGroupName:_groupName];
-        [viewController setThreadDate:[thread latestDate]];
+        Thread *thread = [self activeThreads][self.tableView.indexPathForSelectedRow.row];
+        ThreadViewController *viewController = segue.destinationViewController;
+        viewController.connectionPool = _connectionPool;
+        viewController.articles = thread.sortedArticles;
+        viewController.threadTitle = thread.subject;
+        viewController.groupName = _groupName;
+        viewController.threadDate = thread.latestDate;
     }
-    else if ([[segue identifier] isEqualToString:@"SelectArticle"])
+    else if ([segue.identifier isEqualToString:@"SelectArticle"])
     {
-        ArticleViewController *viewController = [segue destinationViewController];
-        [viewController setConnectionPool:_connectionPool];
-        [viewController setArticleSource:threadIterator];
-        [viewController setArticleIndex:[threadIterator articleIndexOfThreadIndex:[[[self tableView] indexPathForSelectedRow] row]]];
-        [viewController setGroupName:_groupName];
+        ArticleViewController *viewController = segue.destinationViewController;
+        viewController.connectionPool = _connectionPool;
+        viewController.articleSource = threadIterator;
+        viewController.articleIndex = [threadIterator articleIndexOfThreadIndex:self.tableView.indexPathForSelectedRow.row];
+        viewController.groupName = _groupName;
     }
 }
 
@@ -447,10 +447,10 @@
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Article"
                                               inManagedObjectContext:context];
-    [fetchRequest setEntity:entity];
+    fetchRequest.entity = entity;
     NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO];
-    NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:sortDescriptor, nil];
-    [fetchRequest setSortDescriptors:sortDescriptors];
+    NSArray *sortDescriptors = @[sortDescriptor];
+    fetchRequest.sortDescriptors = sortDescriptors;
 
     NSString *format = nil;
     switch (searchBar.selectedScopeButtonIndex)
@@ -535,14 +535,13 @@
             threadTypeDisplay = DISPLAY_MESSAGE_THREADS;
         }
         threadIterator = [[ThreadIterator alloc] initWithThreads:[self activeThreads]];
-        [[self tableView] reloadData];
+        [self.tableView reloadData];
         
         NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
         NSMutableDictionary *dict = [[userDefaults dictionaryForKey:_groupName] mutableCopy];
         if (!dict)
             dict = [[NSMutableDictionary alloc] initWithCapacity:1];
-        [dict setObject:[NSNumber numberWithInteger:threadTypeDisplay]
-                 forKey:THREAD_DISPLAY_KEY];
+        dict[THREAD_DISPLAY_KEY] = @(threadTypeDisplay);
         [userDefaults setObject:dict forKey:_groupName];
     }
 }
@@ -593,12 +592,12 @@
 - (void)composeButtonPressed:(id)sender
 {
     NewArticleViewController *viewController;
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
+    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad)
         viewController = [[NewArticleViewController alloc] initWithNibName:@"NewArticleView" bundle:nil];
     else
         viewController = [[NewArticleViewController alloc] initWithNibName:@"NewArticleView" bundle:nil];
-    [viewController setConnectionPool:_connectionPool];
-    [viewController setDelegate:self];
+    viewController.connectionPool = _connectionPool;
+    viewController.delegate = self;
     [viewController setGroupName:_groupName];
 
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
@@ -615,7 +614,7 @@
 
     dispatch_async(dispatch_get_main_queue(), ^{
         NSLog(@"(merging)");
-        [[_store managedObjectContext] mergeChangesFromContextDidSaveNotification:notification];
+        [_store.managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
         [self updateThreads];
     });
 
@@ -673,7 +672,7 @@
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Article"
                                               inManagedObjectContext:context];
-    [fetchRequest setEntity:entity];
+    fetchRequest.entity = entity;
 
     NSError *error;
     NSArray *articles = [context executeFetchRequest:fetchRequest
@@ -685,7 +684,7 @@
     // Sort into decending date order
     NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"latestDate"
                                                                    ascending:NO];
-    threads = [threads sortedArrayUsingDescriptors:[NSArray arrayWithObject:sortDescriptor]];
+    threads = [threads sortedArrayUsingDescriptors:@[sortDescriptor]];
 
     // Update the thread iterator
     threadIterator = [[ThreadIterator alloc] initWithThreads:[self activeThreads]];
@@ -707,7 +706,7 @@
 
     //    progressView.updatedDate = stack.group.lastUpdate;
     //    progressView.status = ProgressViewStatusUpdated;
-    [self setStatusUpdatedDate:[_store lastUpdate]];
+    [self setStatusUpdatedDate:_store.lastUpdate];
     silentlyFailConnection = NO;
 }
 
@@ -724,7 +723,7 @@
         {
             NSMutableArray *array = [NSMutableArray array];
             for (Thread *thread in threads)
-                if ([thread threadType] == ThreadTypeFile)
+                if (thread.threadType == ThreadTypeFile)
                     [array addObject:thread];
             fileThreads = [array copy];
         }
@@ -736,7 +735,7 @@
         {
             NSMutableArray *array = [NSMutableArray array];
             for (Thread *thread in threads)
-                if ([thread threadType] == ThreadTypeMessage)
+                if (thread.threadType == ThreadTypeMessage)
                     [array addObject:thread];
             messageThreads = [array copy];
         }
@@ -752,27 +751,27 @@
     // Find all the articles that are the first in a thread
     for (Article *article in articles)
     {
-        if (![article references])
+        if (!article.references)
         {
-            NSString *messageId = [article.messageIds objectAtIndex:0];
+            NSString *messageId = (article.messageIds)[0];
             Thread *thread = [[Thread alloc] init];
-            [thread setSubject:[article subject]];
-            [thread setInitialAuthor:[article from]];
-            [thread setEarliestDate:[article date]];
-            [thread setLatestDate:[article date]];
-            [[thread articles] addObject:article];
+            thread.subject = article.subject;
+            thread.initialAuthor = article.from;
+            thread.earliestDate = article.date;
+            thread.latestDate = article.date;
+            [thread.articles addObject:article];
 
-            [thread setMessageID:messageId];
-            [dict setObject:thread forKey:messageId];
+            thread.messageID = messageId;
+            dict[messageId] = thread;
             
             // TESTING
-            NSString *subject = [article subject];
-            if ([subject length] >= 3
+            NSString *subject = article.subject;
+            if (subject.length >= 3
                 && [subject compare:@"re:"
                             options:NSCaseInsensitiveSearch
                               range:NSMakeRange(0, 3)] == 0)
             {
-                NSLog(@"FOLLOW UP WITHOUT REFERENCES: %@", [article subject]);
+                NSLog(@"FOLLOW UP WITHOUT REFERENCES: %@", article.subject);
             }
         }
     }
@@ -780,16 +779,16 @@
     // Thread all articles that contain references
     for (Article *article in articles)
     {
-        if ([article references])
+        if (article.references)
         {
             NSArray *references = [article.references componentsSeparatedByString:@" "];
-            NSString *messageId = [references objectAtIndex:0];
+            NSString *messageId = references[0];
         
-            Thread *thread = [dict objectForKey:messageId];
+            Thread *thread = dict[messageId];
             if (thread)
             {
-                [thread setLatestDate:[[thread latestDate] laterDate:[article date]]];
-                [[thread articles] addObject:article];
+                thread.latestDate = [thread.latestDate laterDate:article.date];
+                [thread.articles addObject:article];
             }
             else
             {
@@ -797,13 +796,13 @@
                 
                 thread = [[Thread alloc] init];
                 thread.subject = article.subject;
-                [thread setInitialAuthor:[article from]];
-                [thread setEarliestDate:[article date]];
+                thread.initialAuthor = article.from;
+                thread.earliestDate = article.date;
                 thread.latestDate = article.date;
                 [thread.articles addObject:article];
                 
-                [thread setMessageID:messageId];
-                [dict setObject:thread forKey:messageId];
+                thread.messageID = messageId;
+                dict[messageId] = thread;
             }
         }
     }
@@ -827,31 +826,31 @@
 {
     NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithCapacity:1];
     
-    for (Thread *thread in [threadDict allValues])
+    for (Thread *thread in threadDict.allValues)
     {
-        if ([self fileNameInSubject:[thread subject]])
+        if ([self fileNameInSubject:thread.subject])
         {
-            NSString *matchString = [[thread subject] stringByReplacingOccurrencesOfNumbersWithString:@"~"];
-            Thread *groupThread = [dict objectForKey:matchString];
+            NSString *matchString = [thread.subject stringByReplacingOccurrencesOfNumbersWithString:@"~"];
+            Thread *groupThread = dict[matchString];
             if (groupThread)
             {
-                [[groupThread articles] addObjectsFromArray:[thread articles]];
-                if ([[groupThread latestDate] compare:[thread latestDate]] == NSOrderedAscending)
+                [groupThread.articles addObjectsFromArray:thread.articles];
+                if ([groupThread.latestDate compare:thread.latestDate] == NSOrderedAscending)
                 {
-                    [groupThread setLatestDate:[thread latestDate]];
+                    groupThread.latestDate = thread.latestDate;
                 }
-                else if ([[groupThread earliestDate] compare:[thread latestDate]] == NSOrderedDescending)
+                else if ([groupThread.earliestDate compare:thread.latestDate] == NSOrderedDescending)
                 {
                     // Get the earliest subject name of this file group
-                    [groupThread setEarliestDate:[thread latestDate]];
-                    [groupThread setSubject:[thread subject]];
+                    groupThread.earliestDate = thread.latestDate;
+                    groupThread.subject = thread.subject;
                 }
-                [threadDict removeObjectForKey:[thread messageID]];
+                [threadDict removeObjectForKey:thread.messageID];
             }
             else
             {
-                [thread setThreadType:ThreadTypeFile];
-                [dict setObject:thread forKey:matchString];
+                thread.threadType = ThreadTypeFile;
+                dict[matchString] = thread;
                 NSLog(@"FILE GROUP: %@", matchString);
             }
         }
@@ -861,7 +860,7 @@
 - (void)downloadArticlesWithMode:(ArticleOverviewsMode)mode
 {
     [self setStatusMessage:@"Checking for News..."];
-    [[self refreshControl] beginRefreshing];
+    [self.refreshControl beginRefreshing];
     [self toolbarEnabled:NO];
 
     NSUInteger maxCount = [[NSUserDefaults standardUserDefaults] integerForKey:MAX_ARTICLE_COUNT_KEY];
@@ -875,21 +874,21 @@
                                                                                           groupStore:_store
                                                                                                 mode:mode
                                                                                      maxArticleCount:maxCount];
-    [operation setCompletionBlock:^{
+    operation.completionBlock = ^{
         dispatch_async(dispatch_get_main_queue(), ^{
-            [[self refreshControl] endRefreshing];
+            [self.refreshControl endRefreshing];
             [self toolbarEnabled:YES];
         });
-    }];
+    };
     [_operationQueue addOperation:operation];
 }
 
 - (void)toolbarEnabled:(BOOL)enabled
 {
     // Set the enabled state of all items except UILabels
-    for (UIBarButtonItem *item in [self toolbarItems])
-        if ([[item customView] isKindOfClass:[UILabel class]] == NO)
-            [item setEnabled:enabled];
+    for (UIBarButtonItem *item in self.toolbarItems)
+        if ([item.customView isKindOfClass:[UILabel class]] == NO)
+            item.enabled = enabled;
 }
 
 - (void)buildThreadListToolbar
@@ -910,19 +909,19 @@
 //                                    action:@selector(infoButtonPressed:)];
 
     _statusLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-    [_statusLabel setFont:[UIFont systemFontOfSize:11.0]];
+    _statusLabel.font = [UIFont systemFontOfSize:11.0];
     [_statusLabel setOpaque:NO];
-    [_statusLabel setBackgroundColor:[UIColor clearColor]];
-    [_statusLabel setTextColor:[UIColor toolbarTextColor]];
+    _statusLabel.backgroundColor = [UIColor clearColor];
+    _statusLabel.textColor = [UIColor toolbarTextColor];
     UIBarButtonItem *statusItem = [[UIBarButtonItem alloc] initWithCustomView:_statusLabel];
 
     // If we're on an iPad, then the article view controller handles the toolbar commands
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
+    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad)
     {
 //        [_statusLabel setShadowColor:[UIColor whiteColor]];
 //        [_statusLabel setShadowOffset:CGSizeMake(0, 1)];
 
-        [self setToolbarItems:@[flexibleSpaceButtonItem1, statusItem, flexibleSpaceButtonItem2]];
+        self.toolbarItems = @[flexibleSpaceButtonItem1, statusItem, flexibleSpaceButtonItem2];
     }
     else
     {
@@ -936,12 +935,11 @@
         [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCompose
                                                       target:self
                                                       action:@selector(composeButtonPressed:)];
-        [self setToolbarItems:
-         @[actionButtonItem,
+        self.toolbarItems = @[actionButtonItem,
          flexibleSpaceButtonItem1,
          statusItem,
          flexibleSpaceButtonItem2,
-         composeButtonItem]];
+         composeButtonItem];
     }
 }
 
@@ -975,7 +973,7 @@
 //    [_statusLabel setAttributedText:text];
 //    [_statusLabel sizeToFit];
 
-    NSTimeInterval timeInterval = [date timeIntervalSinceNow];
+    NSTimeInterval timeInterval = date.timeIntervalSinceNow;
 
     NSString *message;
     if (timeInterval < 60)
@@ -997,25 +995,25 @@
         message = [NSString stringWithFormat:@"Updated %@", str];
     }
 
-    [_statusLabel setText:message];
+    _statusLabel.text = message;
     [_statusLabel sizeToFit];
 }
 
 - (void)setStatusMessage:(NSString *)message
 {
-    [_statusLabel setText:message];
+    _statusLabel.text = message;
 //    [_statusLabel setFont:[UIFont systemFontOfSize:12.0]];
     [_statusLabel sizeToFit];
 }
 
 - (NSUInteger)articlesReadInThread:(Thread *)thread
 {
-    NNNewsrc *newsrc = [[_connectionPool account] newsrc];
+    NNNewsrc *newsrc = _connectionPool.account.newsrc;
     NSUInteger readCount = 0;
-    for (Article *article in [thread articles])
+    for (Article *article in thread.articles)
     {
-        ArticlePart *part = [[article parts] anyObject];
-        NSUInteger number = [[part articleNumber] integerValue];
+        ArticlePart *part = [article.parts anyObject];
+        NSUInteger number = part.articleNumber.integerValue;
         if ([newsrc isReadForGroupName:_groupName articleNumber:number])
             ++readCount;
     }

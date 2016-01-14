@@ -24,8 +24,9 @@
 
 + (BOOL)containsUUEncodedData:(NSData *)data;
 
-- (id)initWithData:(NSData *)encodedData;
+- (instancetype)initWithData:(NSData *)encodedData NS_DESIGNATED_INITIALIZER;
+- (instancetype)init __attribute__((unavailable));
 
-- (NSData *)decode;
+@property (NS_NONATOMIC_IOSONLY, readonly, copy) NSData *decode;
 
 @end

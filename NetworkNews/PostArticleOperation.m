@@ -21,8 +21,8 @@
 
 @implementation PostArticleOperation
 
-- (id)initWithConnectionPool:(NewsConnectionPool *)connectionPool
-                        data:(NSData *)data
+- (instancetype)initWithConnectionPool:(NewsConnectionPool *)connectionPool
+                                  data:(NSData *)data
 {
     self = [super init];
     if (self)
@@ -41,15 +41,15 @@
         NewsConnection *newsConnection = [_connectionPool dequeueConnection];
 
         NewsResponse *response = [newsConnection postData:_data];
-        if ([response statusCode] == 240)
+        if (response.statusCode == 240)
         {
             // Article received
         }
-        else if ([response statusCode] == 440)
+        else if (response.statusCode == 440)
         {
             // Posting not permitted
         }
-        else if ([response statusCode] == 441)
+        else if (response.statusCode == 441)
         {
             // Posting failed
         }

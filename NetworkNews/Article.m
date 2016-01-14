@@ -30,13 +30,13 @@
     if (dateFormatter1 == nil)
     {
         dateFormatter1 = [[NSDateFormatter alloc] init];
-        [dateFormatter1 setDateFormat:@"dd MMM yyyy HH:mm:ss Z"];
+        dateFormatter1.dateFormat = @"dd MMM yyyy HH:mm:ss Z";
         
         dateFormatter2 = [[NSDateFormatter alloc] init];
-        [dateFormatter2 setDateFormat:@"dd MMM yyyy HH:mm:ss zzz"];
+        dateFormatter2.dateFormat = @"dd MMM yyyy HH:mm:ss zzz";
         
         dateFormatter3 = [[NSDateFormatter alloc] init];
-        [dateFormatter3 setDateFormat:@"dd MMM yyyy HH:mm:ss"];
+        dateFormatter3.dateFormat = @"dd MMM yyyy HH:mm:ss";
     }
     
     NSRange range = NSMakeRange(0, dateString.length);

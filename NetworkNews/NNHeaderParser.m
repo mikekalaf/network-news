@@ -11,7 +11,7 @@
 
 @interface NNHeaderParser (Private)
 
-- (BOOL)needToUnfold;
+@property (NS_NONATOMIC_IOSONLY, readonly) BOOL needToUnfold;
 - (void)unfold;
 - (void)parseEntries;
 
@@ -22,7 +22,7 @@
 @synthesize length;
 @synthesize entries;
 
-- (id)initWithData:(NSData *)articleData
+- (instancetype)initWithData:(NSData *)articleData
 {
     self = [super init];
     if (self)
