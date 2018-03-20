@@ -44,7 +44,7 @@
 
     // We need to do this just to have the back button show "Thread" rather than the title
     UIBarButtonItem *backButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Thread"
-                                                                       style:UIBarButtonItemStyleBordered
+                                                                       style:UIBarButtonItemStylePlain
                                                                       target:nil
                                                                       action:nil];
     self.navigationItem.backBarButtonItem = backButtonItem;

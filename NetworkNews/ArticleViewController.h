@@ -18,8 +18,8 @@
 @interface ArticleViewController : UIViewController <
     NewArticleDelegate,
     UIActionSheetDelegate,
-    UIPopoverControllerDelegate,
-    UISplitViewControllerDelegate,
+//    UIPopoverControllerDelegate,
+//    UISplitViewControllerDelegate,
     MFMailComposeViewControllerDelegate
 >
 

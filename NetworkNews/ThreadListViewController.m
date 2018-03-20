@@ -41,7 +41,6 @@
 
 @interface ThreadListViewController () <
     UISearchBarDelegate,
-    UIActionSheetDelegate,
     GroupInfoDelegate,
     NewArticleDelegate
 >
@@ -512,40 +511,6 @@
 //    [fileManager removeItemAtPath:path error:NULL];
 }
 
-#pragma mark - UIActionSheetDelegate Methods
-
-- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
-{
-    if (buttonIndex == actionSheet.cancelButtonIndex)
-    {
-        // NOP
-    }
-    else
-    {
-        if (buttonIndex == 0)
-        {
-            threadTypeDisplay = DISPLAY_ALL_THREADS;
-        }
-        else if (buttonIndex == 1)
-        {
-            threadTypeDisplay = DISPLAY_FILE_THREADS;
-        }
-        else if (buttonIndex == 2)
-        {
-            threadTypeDisplay = DISPLAY_MESSAGE_THREADS;
-        }
-        threadIterator = [[ThreadIterator alloc] initWithThreads:[self activeThreads]];
-        [self.tableView reloadData];
-        
-        NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-        NSMutableDictionary *dict = [[userDefaults dictionaryForKey:_groupName] mutableCopy];
-        if (!dict)
-            dict = [[NSMutableDictionary alloc] initWithCapacity:1];
-        dict[THREAD_DISPLAY_KEY] = @(threadTypeDisplay);
-        [userDefaults setObject:dict forKey:_groupName];
-    }
-}
-
 #pragma mark - NewArticleDelegate Methods
 
 - (void)newArticleViewController:(NewArticleViewController *)controller
@@ -569,15 +534,43 @@
     //[self toolbarEnabled:NO];
 }
 
+- (void)changeThreadTypeDisplay
+{
+    threadIterator = [[ThreadIterator alloc] initWithThreads:[self activeThreads]];
+    [self.tableView reloadData];
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSMutableDictionary *dict = [[userDefaults dictionaryForKey:_groupName] mutableCopy];
+    if (!dict)
+        dict = [[NSMutableDictionary alloc] initWithCapacity:1];
+    dict[THREAD_DISPLAY_KEY] = @(threadTypeDisplay);
+    [userDefaults setObject:dict forKey:_groupName];
+}
+
 - (void)actionButtonPressed:(id)sender
 {
     // Show an action sheet with our various action options
-    UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:nil
-                                                             delegate:self
-                                                    cancelButtonTitle:@"Cancel"
-                                               destructiveButtonTitle:nil
-                                                    otherButtonTitles:@"Show All", @"Show Files", @"Show Messages", nil];
-    [actionSheet showFromToolbar:self.navigationController.toolbar];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil
+                                                                   message:nil
+                                                            preferredStyle:UIAlertControllerStyleActionSheet];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Show All"
+                                              style:UIAlertActionStyleDefault
+                                            handler:^(UIAlertAction *action) {
+                                                threadTypeDisplay = DISPLAY_ALL_THREADS;
+                                                [self changeThreadTypeDisplay];
+                                            }]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Show Files"
+                                              style:UIAlertActionStyleDefault
+                                            handler:^(UIAlertAction *action) {
+                                                threadTypeDisplay = DISPLAY_FILE_THREADS;
+                                                [self changeThreadTypeDisplay];
+                                            }]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Show Messages"
+                                              style:UIAlertActionStyleDefault
+                                            handler:^(UIAlertAction *action) {
+                                                threadTypeDisplay = DISPLAY_MESSAGE_THREADS;
+                                                [self changeThreadTypeDisplay];
+                                            }]];
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 - (void)infoButtonPressed:(id)sender

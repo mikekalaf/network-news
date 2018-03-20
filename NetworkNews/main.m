@@ -34,29 +34,33 @@ int main(int argc, char *argv[])
     }
 }
 
-void AlertViewFailedConnection(NSString *hostName)
-{
-    NSString *errorString = [NSString stringWithFormat:
-                             @"The connection to the server \"%@\" failed.",
-                             hostName];
-    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Cannot Get News"
-                                                        message:errorString
-                                                       delegate:nil
-                                              cancelButtonTitle:@"OK"
-                                              otherButtonTitles:nil];
-    [alertView show];
-}
-
-void AlertViewFailedConnectionWithMessage(NSString *hostName, NSString *message)
-{
-    NSString *errorString = [NSString stringWithFormat:
-                             @"The connection to the server \"%@\" failed with message \"%@\".",
-                             hostName,
-                             message];
-    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Cannot Get News"
-                                                        message:errorString
-                                                       delegate:nil
-                                              cancelButtonTitle:@"OK"
-                                              otherButtonTitles:nil];
-    [alertView show];
-}
+//void AlertViewFailedConnection(NSString *hostName)
+//{
+//    NSString *errorString = [NSString stringWithFormat:
+//                             @"The connection to the server \"%@\" failed.",
+//                             hostName];
+//    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Cannot Get News"
+//                                                                   message:errorString
+//                                                            preferredStyle:UIAlertControllerStyleAlert];
+//    UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"OK"
+//                                                            style:UIAlertActionStyleDefault
+//                                                          handler:^(UIAlertAction *action) {}];
+//    [alert addAction:defaultAction];
+//    [self presentViewController:alert animated:YES completion:nil];
+//}
+//
+//void AlertViewFailedConnectionWithMessage(NSString *hostName, NSString *message)
+//{
+//    NSString *errorString = [NSString stringWithFormat:
+//                             @"The connection to the server \"%@\" failed with message \"%@\".",
+//                             hostName,
+//                             message];
+//    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Cannot Get News"
+//                                                                   message:errorString
+//                                                            preferredStyle:UIAlertControllerStyleAlert];
+//    UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"OK"
+//                                                            style:UIAlertActionStyleDefault
+//                                                          handler:^(UIAlertAction *action) {}];
+//    [alert addAction:defaultAction];
+//    [self presentViewController:alert animated:YES completion:nil];
+//}

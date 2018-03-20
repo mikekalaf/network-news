@@ -275,25 +275,16 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
     if (!isModified)
     {
         NSString *alertMessage = @"This account may not be able to send or receive news articles. Are you sure you want to save?";
-
-        if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad)
-        {
-            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"New Account"
-                                                                message:alertMessage
-                                                               delegate:self
-                                                      cancelButtonTitle:@"Save"
-                                                      otherButtonTitles:@"Edit", nil];
-            [alertView show];
-        }
-        else
-        {
-            UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:alertMessage
-                                                                     delegate:self
-                                                            cancelButtonTitle:@"Edit"
-                                                       destructiveButtonTitle:nil
-                                                            otherButtonTitles:@"Save", nil];
-            [actionSheet showInView:self.view];
-        }
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:alertMessage
+                                                                       message:@""
+                                                                preferredStyle:UIAlertControllerStyleActionSheet];
+        UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"OK"
+                                                                style:UIAlertActionStyleDefault
+                                                              handler:^(UIAlertAction *action) {
+            [_delegate accountSettingsViewController:self modifiedAccount:_account];
+        }];
+        [alert addAction:defaultAction];
+        [self presentViewController:alert animated:YES completion:nil];
     }
     else if (!isVerified)
     {
@@ -336,13 +327,15 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
                     errorString = [NSString stringWithFormat:
                                    @"There was an unknown problem with \"%@\"",
                                    _account.hostName];
-                UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Cannot Get News"
-                                                                    message:errorString
-                                                                   delegate:nil
-                                                          cancelButtonTitle:@"OK"
-                                                          otherButtonTitles:nil];
-                [alertView show];
-                
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Cannot Get News"
+                                                                               message:errorString
+                                                                        preferredStyle:UIAlertControllerStyleAlert];
+                UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"OK"
+                                                                        style:UIAlertActionStyleDefault
+                                                                      handler:^(UIAlertAction *action) {}];
+                [alert addAction:defaultAction];
+                [self presentViewController:alert animated:YES completion:nil];
+
                 // Restore UI elements for verification
                 if (cancelButtonItem)
                     self.navigationItem.leftBarButtonItem = cancelButtonItem;
@@ -420,7 +413,9 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 
 - (IBAction)linkTouchUp:(id)sender
 {
-    [[UIApplication sharedApplication] openURL:_account.supportURL];
+    [[UIApplication sharedApplication] openURL:_account.supportURL
+                                       options:@{}
+                             completionHandler:^(BOOL success) {}];
 }
 
 #pragma mark - UITextFieldDelegate Methods
@@ -445,28 +440,6 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
         [self saveButtonPressed:self];
 
     return YES;
-}
-
-#pragma mark - UIActionSheetDelegate Methods
-
-- (void)actionSheet:(UIActionSheet *)actionSheet
-didDismissWithButtonIndex:(NSInteger)buttonIndex
-{
-    if (buttonIndex == 0)
-    {
-        [_delegate accountSettingsViewController:self modifiedAccount:_account];
-    }
-}
-
-#pragma mark - UIAlertViewDelegate Methods
-
-- (void)alertView:(UIAlertView *)alertView
-didDismissWithButtonIndex:(NSInteger)buttonIndex
-{
-    if (buttonIndex == 0)
-    {
-        [_delegate accountSettingsViewController:self modifiedAccount:_account];
-    }
 }
 
 #pragma mark - Private Methods

@@ -24,5 +24,5 @@ extern NSString *const MOST_RECENT_GROUP_SEARCH_SCOPE;
 extern NSString *const MOST_RECENT_ARTICLE_SEARCH;
 extern NSString *const MOST_RECENT_ARTICLE_SEARCH_SCOPE;
 
-void AlertViewFailedConnection(NSString *hostName);
-void AlertViewFailedConnectionWithMessage(NSString *hostName, NSString *message);
+//void AlertViewFailedConnection(NSString *hostName);
+//void AlertViewFailedConnectionWithMessage(NSString *hostName, NSString *message);

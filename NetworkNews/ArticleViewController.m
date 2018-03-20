@@ -36,8 +36,6 @@
 
 @interface ArticleViewController ()
 {
-    UIPopoverController *_popoverController;
-
     //UISegmentedControl *_navigationSegmentedControl;
     UIProgressView *_progressView;
 
@@ -244,9 +242,6 @@
 
 - (void)updateArticle
 {
-    if (_popoverController)
-        [_popoverController dismissPopoverAnimated:YES];
-    
     [self loadArticle];
 }
 
@@ -305,75 +300,6 @@
         // Email
         [self replyViaEmail];
     }
-}
-
-#pragma mark - UISplitViewControllerDelegate Methods
-
-- (void)splitViewController:(UISplitViewController *)svc
-     willHideViewController:(UIViewController *)aViewController
-          withBarButtonItem:(UIBarButtonItem *)barButtonItem
-       forPopoverController:(UIPopoverController *)pc
-{
-//    barButtonItem.title = @"Articles";
-//
-//    _popoverController = pc;
-//
-////    if (toolbarSetForPortrait)
-////        return;
-////
-//    // Navigation up and down buttons
-//    NSArray *itemArray = [NSArray arrayWithObjects:
-//                          [UIImage imageNamed:@"icon-triangle-up.png"],
-//                          [UIImage imageNamed:@"icon-triangle-down.png"],
-//                          nil];
-//    _navigationSegmentedControl = [[UISegmentedControl alloc] initWithItems:itemArray];
-//    _navigationSegmentedControl.tintColor = [UIColor colorWithWhite:0.66 alpha:1.0];
-//    [_navigationSegmentedControl setMomentary:YES];
-//    _navigationSegmentedControl.segmentedControlStyle = UISegmentedControlStyleBar;
-//    [_navigationSegmentedControl setWidth:44 forSegmentAtIndex:0];
-//    [_navigationSegmentedControl setWidth:44 forSegmentAtIndex:1];
-//    [_navigationSegmentedControl addTarget:self
-//                                   action:@selector(articleNavigation:)
-//                         forControlEvents:UIControlEventValueChanged];
-//    
-//    UIBarButtonItem *segmentBarItem = [[UIBarButtonItem alloc] initWithCustomView:_navigationSegmentedControl];
-////    self.navigationItem.rightBarButtonItem = segmentBarItem;
-//
-//    [barButtonItem setWidth:110];
-//
-//    // Insert the split view controller's bar button item, and the navigation
-//    // segmented control, at the beginning of the toolbar
-//    NSMutableArray *items = [NSMutableArray arrayWithArray:[_toolbar items]];
-//    [items insertObject:barButtonItem atIndex:0];
-//    [items insertObject:segmentBarItem atIndex:1];
-//    [_toolbar setItems:items animated:YES];
-//    
-////    toolbarSetForPortrait = YES;
-//
-////    [[self navigationItem] setLeftBarButtonItems:@[barButtonItem, segmentBarItem] animated:YES];
-}
-
-- (void)splitViewController:(UISplitViewController *)svc
-     willShowViewController:(UIViewController *)aViewController
-  invalidatingBarButtonItem:(UIBarButtonItem *)barButtonItem
-{
-    // Remove the split view controller's bar button item, and the navigation
-    // segmented controller, from the toolbar
-    NSMutableArray *items = [NSMutableArray arrayWithArray:_toolbar.items];
-    [items removeObjectAtIndex:0];
-    [items removeObjectAtIndex:0];
-    [_toolbar setItems:items animated:YES];
-
-    //[self.navigationItem setLeftBarButtonItem:nil animated:YES];
-
-//    NSArray *leftBarButtonItems = [[self navigationItem] leftBarButtonItems];
-//    [[self navigationItem] setLeftBarButtonItems:@[leftBarButtonItems[1]] animated:YES];
-
-//    [[self navigationItem] setLeftBarButtonItems:nil animated:YES];
-
-    _popoverController = nil;
-
-    //toolbarSetForPortrait = NO;
 }
 
 #pragma mark - Actions
