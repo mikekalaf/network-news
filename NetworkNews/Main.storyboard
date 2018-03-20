@@ -4,8 +4,8 @@
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
-        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -32,9 +32,9 @@
         <!--Accounts-->
         <scene sceneID="qHJ-4N-DKK">
             <objects>
-                <tableViewController id="I1o-gR-0zS" customClass="AccountsViewController" sceneMemberID="viewController">
+                <tableViewController clearsSelectionOnViewWillAppear="NO" id="I1o-gR-0zS" customClass="AccountsViewController" sceneMemberID="viewController">
                     <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="6mD-G9-t9d">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="641"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <prototypes>
@@ -61,7 +61,6 @@
                             <outlet property="delegate" destination="I1o-gR-0zS" id="bbX-Mk-h92"/>
                         </connections>
                     </tableView>
-                    <extendedEdge key="edgesForExtendedLayout"/>
                     <toolbarItems>
                         <barButtonItem style="plain" systemItem="flexibleSpace" id="KsZ-IF-RBU"/>
                     </toolbarItems>
@@ -80,9 +79,9 @@
         <!--Groups-->
         <scene sceneID="KQX-ku-ObA">
             <objects>
-                <tableViewController id="ojb-eO-6ga" customClass="FavouriteGroupsViewController" sceneMemberID="viewController">
+                <tableViewController title="Groups" clearsSelectionOnViewWillAppear="NO" id="ojb-eO-6ga" customClass="FavouriteGroupsViewController" sceneMemberID="viewController">
                     <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="R1V-F3-MSf">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="641"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <prototypes>
@@ -112,7 +111,6 @@
                             <outlet property="delegate" destination="ojb-eO-6ga" id="MI1-tN-EgL"/>
                         </connections>
                     </tableView>
-                    <extendedEdge key="edgesForExtendedLayout"/>
                     <toolbarItems>
                         <barButtonItem systemItem="action" id="mo3-fk-hu2">
                             <connections>
@@ -136,9 +134,9 @@
         <!--Threads-->
         <scene sceneID="6QM-NR-cCe">
             <objects>
-                <tableViewController id="nCd-TS-7j6" customClass="ThreadListViewController" sceneMemberID="viewController">
+                <tableViewController title="Threads" clearsSelectionOnViewWillAppear="NO" id="nCd-TS-7j6" customClass="ThreadListViewController" sceneMemberID="viewController">
                     <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="78" sectionHeaderHeight="22" sectionFooterHeight="22" id="q7W-ks-tSk">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="641"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <prototypes>
@@ -219,7 +217,6 @@
                             <outlet property="delegate" destination="nCd-TS-7j6" id="nhl-Nq-8Zq"/>
                         </connections>
                     </tableView>
-                    <extendedEdge key="edgesForExtendedLayout"/>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" title="Threads" id="nHm-Sk-Eoz"/>
                     <connections>
@@ -241,9 +238,9 @@
         <!--Thread-->
         <scene sceneID="rSx-7G-UG6">
             <objects>
-                <tableViewController id="QKf-Mr-mCo" customClass="ThreadViewController" sceneMemberID="viewController">
+                <tableViewController title="Thread" clearsSelectionOnViewWillAppear="NO" id="QKf-Mr-mCo" customClass="ThreadViewController" sceneMemberID="viewController">
                     <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="78" sectionHeaderHeight="22" sectionFooterHeight="22" id="vnU-A3-HHc">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="641"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <prototypes>
@@ -280,7 +277,6 @@
                             <outlet property="delegate" destination="QKf-Mr-mCo" id="FLi-cw-ddC"/>
                         </connections>
                     </tableView>
-                    <extendedEdge key="edgesForExtendedLayout"/>
                     <navigationItem key="navigationItem" title="Thread" id="Zbk-DN-3XS"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="CzE-zX-2OZ" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -290,17 +286,16 @@
         <!--Article-->
         <scene sceneID="mNe-hQ-lid">
             <objects>
-                <viewController id="STc-Ql-pWw" customClass="ArticleViewController" sceneMemberID="viewController">
+                <viewController title="Article" id="STc-Ql-pWw" customClass="ArticleViewController" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="k9e-jm-csg"/>
                         <viewControllerLayoutGuide type="bottom" id="x3Q-CF-iSs"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="U2Q-LD-4GJ">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="641"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </view>
-                    <extendedEdge key="edgesForExtendedLayout"/>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" title="Article" id="ggy-8J-3Wj"/>
                 </viewController>
@@ -311,11 +306,11 @@
         <!--Select Groups-->
         <scene sceneID="p3H-12-FeV">
             <objects>
-                <tableViewController id="ERq-rk-wgg" customClass="SearchGroupsViewController" sceneMemberID="viewController">
+                <tableViewController title="Select Groups" clearsSelectionOnViewWillAppear="NO" id="ERq-rk-wgg" customClass="SearchGroupsViewController" sceneMemberID="viewController">
                     <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="O3k-th-TjJ">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <searchBar key="tableHeaderView" contentMode="redraw" placeholder="Group name" backgroundImage="Default" scopeBarBackgroundImage="Default" showsScopeBar="YES" id="xad-BU-YNR">
                             <rect key="frame" x="0.0" y="0.0" width="375" height="100"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
@@ -360,7 +355,6 @@
                             <outlet property="delegate" destination="ERq-rk-wgg" id="ffd-mO-HDe"/>
                         </connections>
                     </tableView>
-                    <extendedEdge key="edgesForExtendedLayout"/>
                     <navigationItem key="navigationItem" title="Select Groups" id="tIB-xv-vsQ">
                         <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="ZKC-Gf-fmW">
                             <connections>
@@ -385,8 +379,7 @@
         <!--Navigation Controller-->
         <scene sceneID="zYU-Bj-k5G">
             <objects>
-                <navigationController definesPresentationContext="YES" toolbarHidden="NO" id="CnJ-Fz-JJk" sceneMemberID="viewController">
-                    <extendedEdge key="edgesForExtendedLayout"/>
+                <navigationController toolbarHidden="NO" id="CnJ-Fz-JJk" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="pFT-pY-3ia">
                         <rect key="frame" x="0.0" y="44" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -406,9 +399,9 @@
         <!--Add Account-->
         <scene sceneID="3ti-kK-0yp">
             <objects>
-                <tableViewController id="43Y-mb-9su" customClass="WelcomeViewController" sceneMemberID="viewController">
+                <tableViewController title="Add Account" clearsSelectionOnViewWillAppear="NO" id="43Y-mb-9su" customClass="WelcomeViewController" sceneMemberID="viewController">
                     <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="66" sectionHeaderHeight="10" sectionFooterHeight="10" id="ESo-FS-0Mq">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="641"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                         <prototypes>
@@ -419,11 +412,16 @@
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="65.666666666666671"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <imageView userInteractionEnabled="NO" tag="1" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tGT-ic-oLQ">
-                                            <rect key="frame" x="49" y="1" width="223" height="64"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <imageView userInteractionEnabled="NO" tag="1" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="tGT-ic-oLQ">
+                                            <rect key="frame" x="73" y="0.0" width="228" height="64"/>
                                         </imageView>
                                     </subviews>
+                                    <constraints>
+                                        <constraint firstItem="tGT-ic-oLQ" firstAttribute="top" secondItem="eqM-8c-Cpt" secondAttribute="top" id="Smw-yN-sxD"/>
+                                        <constraint firstItem="tGT-ic-oLQ" firstAttribute="centerX" secondItem="eqM-8c-Cpt" secondAttribute="centerX" id="T2B-4c-EOR"/>
+                                        <constraint firstItem="tGT-ic-oLQ" firstAttribute="centerY" secondItem="eqM-8c-Cpt" secondAttribute="centerY" id="YtR-U8-yOn"/>
+                                        <constraint firstItem="tGT-ic-oLQ" firstAttribute="leading" secondItem="eqM-8c-Cpt" secondAttribute="leadingMargin" constant="57" id="vMK-Rb-dDJ"/>
+                                    </constraints>
                                 </tableViewCellContentView>
                                 <connections>
                                     <segue destination="9N4-MX-8RM" kind="modal" id="rRm-Pm-yog"/>
@@ -435,19 +433,18 @@
                             <outlet property="delegate" destination="43Y-mb-9su" id="9de-5l-IxQ"/>
                         </connections>
                     </tableView>
-                    <extendedEdge key="edgesForExtendedLayout"/>
                     <navigationItem key="navigationItem" title="Add Account" id="akv-az-Lxl"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="C1E-W4-jEn" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2352" y="-1664"/>
         </scene>
-        <!--Account Settings View Controller-->
+        <!--Account Settings-->
         <scene sceneID="tjr-0b-E7D">
             <objects>
-                <tableViewController id="hn6-CG-N2c" customClass="AccountSettingsViewController" sceneMemberID="viewController">
+                <tableViewController title="Account Settings" clearsSelectionOnViewWillAppear="NO" id="hn6-CG-N2c" customClass="AccountSettingsViewController" sceneMemberID="viewController">
                     <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="hdb-hG-T8s">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <prototypes>
@@ -465,7 +462,6 @@
                             <outlet property="delegate" destination="hn6-CG-N2c" id="gWz-vn-yUn"/>
                         </connections>
                     </tableView>
-                    <extendedEdge key="edgesForExtendedLayout"/>
                     <navigationItem key="navigationItem" id="n6X-DZ-90i"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="1wW-Z7-P81" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -476,7 +472,6 @@
         <scene sceneID="8fa-Mr-AN2">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="9qv-we-8PY" sceneMemberID="viewController">
-                    <extendedEdge key="edgesForExtendedLayout"/>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" id="6Iq-Fx-CSI"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="NUH-RK-FtL">
@@ -496,7 +491,6 @@
         <scene sceneID="sMN-TD-iQ5">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="9N4-MX-8RM" sceneMemberID="viewController">
-                    <extendedEdge key="edgesForExtendedLayout"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="Fj2-HY-1mH">
                         <rect key="frame" x="0.0" y="44" width="375" height="44"/>

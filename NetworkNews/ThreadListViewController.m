@@ -61,7 +61,6 @@
     NSFormatter *emailAddressFormatter;
     UIImage *incompleteIconImage;
     UIImage *unreadIconImage;
-    UIImage *partReadIconImage;
     UIImage *readIconImage;
     NSArray *fileExtensions;
     NSOperationQueue *_operationQueue;
@@ -109,7 +108,6 @@
     dateFormatter = [[ExtendedDateFormatter alloc] init];
     emailAddressFormatter = [[EmailAddressFormatter alloc] init];
     unreadIconImage = [UIImage imageNamed:@"unread-dot-blue"];
-    partReadIconImage = [UIImage imageNamed:@"icon-dot-partread.png"];
     readIconImage = [UIImage imageNamed:@"icon-blank.png"];
     incompleteIconImage = [UIImage imageNamed:@"icon-dot-incomplete.png"];
 
@@ -314,7 +312,6 @@
         }
         else if (readCount < thread.articles.count)
         {
-    //        [[cell imageView] setImage:partReadIconImage];
             imageView.image = unreadIconImage;
             imageView.alpha = 0.5;
         }

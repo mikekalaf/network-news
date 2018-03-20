@@ -17,7 +17,9 @@ static NSInteger __count = 0;
     @synchronized ([UIApplication sharedApplication])
     {
         if (__count == 0)
-            [self setNetworkActivityIndicatorVisible:YES];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self setNetworkActivityIndicatorVisible:YES];
+            });
         ++__count;
     }
 }
@@ -29,7 +31,9 @@ static NSInteger __count = 0;
         --__count;
         if (__count <= 0)
         {
-            [self setNetworkActivityIndicatorVisible:NO];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self setNetworkActivityIndicatorVisible:NO];
+            });
             __count = 0;
         }
     }

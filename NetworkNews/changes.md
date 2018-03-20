@@ -2,6 +2,11 @@
 CHANGES
 =======
 
+Version 1.0 Build 8:
+--------------------
+* Transitioned to iOS 11
+* Preparation for first App Store release (after 8 years)
+
 Version 1.0 Build 7:
 --------------------
 * Transitioned to iOS 7

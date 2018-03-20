@@ -33,7 +33,7 @@
 {
     [super viewDidLoad];
 
-    _templateAccounts = @[[NewsAccount accountWithTemplate:AccountTemplateGiganews],
+    _templateAccounts = @[[NewsAccount accountWithTemplate:AccountTemplateEternalSeptember],
                           [NewsAccount accountWithTemplate:AccountTemplateDefault]];
 }
 

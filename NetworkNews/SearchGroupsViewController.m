@@ -32,14 +32,14 @@
 {
     [super viewDidLoad];
 
-    //[self setTitle:@"Add Groups"];
-    
     // Restore the search scope button
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     searchScope = [userDefaults integerForKey:MOST_RECENT_GROUP_SEARCH_SCOPE];
     
-    _searchBar.text = searchText;
-    _searchBar.selectedScopeButtonIndex = searchScope;
+    self.searchBar.autocapitalizationType = UITextAutocapitalizationTypeNone;
+    self.searchBar.text = searchText;
+    self.searchBar.selectedScopeButtonIndex = searchScope;
+    [self.searchBar becomeFirstResponder];
     
     // Create an activity indicator
     activityIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
@@ -79,29 +79,16 @@
     return 1;
 }
 
-
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    if (_foundGroupList)
-        return _foundGroupList.count;
-    else
-        return 0;
+    return _foundGroupList ? _foundGroupList.count : 0;
 }
-
 
 // Customize the appearance of table view cells.
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     static NSString *CellIdentifier = @"Cell";
-    
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-//    if (cell == nil)
-//    {
-//        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle
-//                                       reuseIdentifier:CellIdentifier];
-//        cell.textLabel.lineBreakMode = NSLineBreakByTruncatingMiddle;
-//    }
-
     GroupListing *listing = _foundGroupList[indexPath.row];
     NSString *groupName = listing.name;
 //    long long articleCount = listInfo.high - listInfo.low + 1;
@@ -131,8 +118,7 @@
     return cell;
 }
 
-#pragma mark -
-#pragma mark Table view delegate
+#pragma mark - Table view delegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -156,8 +142,7 @@
 }
 
 
-#pragma mark -
-#pragma mark Memory management
+#pragma mark - Memory management
 
 - (void)didReceiveMemoryWarning {
     // Releases the view if it doesn't have a superview.
@@ -211,9 +196,10 @@
 
     GroupListSearchOperation *operation = [[GroupListSearchOperation alloc] initWithConnectionPool:_connectionPool
                                                                                            wildmat:wildmat];
-    GroupListSearchOperation __weak* weakRef = operation;
     operation.completionBlock = ^{
-        [self cacheGroupList:weakRef.groups];
+        NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"count"
+                                                                       ascending:NO];
+        _foundGroupList = [operation.groups sortedArrayUsingDescriptors:@[sortDescriptor]];
         dispatch_async(dispatch_get_main_queue(), ^{
             [activityIndicatorView stopAnimating];
             [self.tableView reloadData];
@@ -231,20 +217,6 @@
     // Clear the results list
     _foundGroupList = nil;
     [self.tableView reloadData];
-}
-
-#pragma mark - Private Methods
-
-- (void)cacheGroupList:(NSArray *)groupList
-{
-    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"count"
-                                                                   ascending:NO];
-    _foundGroupList = [groupList sortedArrayUsingDescriptors:@[sortDescriptor]];
-
-//    // Cache the results
-//    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-//    NSString *path = [appDelegate.cacheRootDir stringByAppendingPathComponent:@"search_results.archive"];
-//    [NSKeyedArchiver archiveRootObject:foundGroupList toFile:path];
 }
 
 @end

@@ -24,7 +24,6 @@
 		634191E316D0D6590069B528 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 634191E116D0D6590069B528 /* InfoPlist.strings */; };
 		634191E616D0D6590069B528 /* NetworkNewsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 634191E516D0D6590069B528 /* NetworkNewsTests.m */; };
 		6341926016D0D8800069B528 /* ArticleViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 634191F416D0D87F0069B528 /* ArticleViewController.m */; };
-		6341926516D0D8800069B528 /* changes.txt in Resources */ = {isa = PBXBuildFile; fileRef = 634191F916D0D87F0069B528 /* changes.txt */; };
 		6341926616D0D8800069B528 /* EditableTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 634191FB16D0D87F0069B528 /* EditableTableViewCell.m */; };
 		6341926B16D0D8800069B528 /* EditableTextTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6341920416D0D8800069B528 /* EditableTextTableViewCell.xib */; };
 		6341926D16D0D8800069B528 /* GroupInfoView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6341920816D0D8800069B528 /* GroupInfoView.xib */; };
@@ -44,7 +43,6 @@
 		6341929D16D0D8800069B528 /* ThreadSectionHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6341925216D0D8800069B528 /* ThreadSectionHeaderView.m */; };
 		6341929E16D0D8800069B528 /* ThreadTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6341925416D0D8800069B528 /* ThreadTableViewCell.m */; };
 		6341929F16D0D8800069B528 /* ThreadViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6341925616D0D8800069B528 /* ThreadViewController.m */; };
-		634192A016D0D8800069B528 /* todo.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6341925716D0D8800069B528 /* todo.txt */; };
 		634192A316D0D8800069B528 /* WelcomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6341925B16D0D8800069B528 /* WelcomeViewController.m */; };
 		634192F116D0DAEE0069B528 /* Article.m in Sources */ = {isa = PBXBuildFile; fileRef = 634192A816D0DAEC0069B528 /* Article.m */; };
 		634192F416D0DAEE0069B528 /* ArticlePart.m in Sources */ = {isa = PBXBuildFile; fileRef = 634192AD16D0DAEC0069B528 /* ArticlePart.m */; };
@@ -72,12 +70,10 @@
 		6341931B16D0DC0B0069B528 /* EmailAddressFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 6341931A16D0DC0B0069B528 /* EmailAddressFormatter.m */; };
 		6341931E16D0DDE30069B528 /* SizeFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 6341931D16D0DDE30069B528 /* SizeFormatter.m */; };
 		63442698170E59E800483FC4 /* UIColor+NewsAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 63442697170E59E800483FC4 /* UIColor+NewsAdditions.m */; };
-		6344269A170E72D900483FC4 /* ThreadListView_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 63442699170E72D900483FC4 /* ThreadListView_iPad.xib */; };
 		63529AA416FDB31C0089E65E /* AssemblePartsOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 63529AA316FDB31C0089E65E /* AssemblePartsOperation.m */; };
 		63529AA716FEB5320089E65E /* PostArticleOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 63529AA616FEB5320089E65E /* PostArticleOperation.m */; };
 		63529AAA16FEC7A60089E65E /* UIApplication+NewsAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 63529AA916FEC7A60089E65E /* UIApplication+NewsAdditions.m */; };
 		6398525816D0FBEA009303E2 /* LineIterator.m in Sources */ = {isa = PBXBuildFile; fileRef = 6398525716D0FBEA009303E2 /* LineIterator.m */; };
-		639F5EC617039A1B004BA972 /* ArticleView_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 639F5EC517039A1B004BA972 /* ArticleView_iPad.xib */; };
 		63A7205216F32B6B000AC69C /* FetchArticleOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 63A7205116F32B6B000AC69C /* FetchArticleOperation.m */; };
 		63C3011C1769707A00F8B6FE /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 63C3011B1769707A00F8B6FE /* Images.xcassets */; };
 		63C3011E176972B300F8B6FE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 63C3011D176972B300F8B6FE /* Main.storyboard */; };
@@ -109,6 +105,7 @@
 /* Begin PBXFileReference section */
 		03148F3A1C47348400BAFED3 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		03ECA37C206081C600A44D65 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		03F4771C2060D71B00E1A55B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		6302EF0C178D8E7800BBC68E /* ExtendedLayoutManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtendedLayoutManager.h; sourceTree = "<group>"; };
 		6302EF0D178D8E7800BBC68E /* ExtendedLayoutManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExtendedLayoutManager.m; sourceTree = "<group>"; };
 		631CBA691893CB2400B9421A /* ArticleRange.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ArticleRange.m; sourceTree = "<group>"; };
@@ -133,7 +130,7 @@
 		634191E516D0D6590069B528 /* NetworkNewsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NetworkNewsTests.m; sourceTree = "<group>"; };
 		634191F316D0D87F0069B528 /* ArticleViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ArticleViewController.h; sourceTree = "<group>"; };
 		634191F416D0D87F0069B528 /* ArticleViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ArticleViewController.m; sourceTree = "<group>"; };
-		634191F916D0D87F0069B528 /* changes.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = changes.txt; path = NetworkNews/changes.txt; sourceTree = "<group>"; };
+		634191F916D0D87F0069B528 /* changes.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = changes.md; path = NetworkNews/changes.md; sourceTree = "<group>"; };
 		634191FA16D0D87F0069B528 /* EditableTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditableTableViewCell.h; sourceTree = "<group>"; };
 		634191FB16D0D87F0069B528 /* EditableTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EditableTableViewCell.m; sourceTree = "<group>"; };
 		6341920516D0D8800069B528 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/EditableTextTableViewCell.xib; sourceTree = "<group>"; };
@@ -226,7 +223,6 @@
 		6341931D16D0DDE30069B528 /* SizeFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SizeFormatter.m; sourceTree = "<group>"; };
 		63442696170E59E800483FC4 /* UIColor+NewsAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+NewsAdditions.h"; sourceTree = "<group>"; };
 		63442697170E59E800483FC4 /* UIColor+NewsAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+NewsAdditions.m"; sourceTree = "<group>"; };
-		63442699170E72D900483FC4 /* ThreadListView_iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ThreadListView_iPad.xib; sourceTree = "<group>"; };
 		63529AA216FDB31C0089E65E /* AssemblePartsOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AssemblePartsOperation.h; sourceTree = "<group>"; };
 		63529AA316FDB31C0089E65E /* AssemblePartsOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AssemblePartsOperation.m; sourceTree = "<group>"; };
 		63529AA516FEB5320089E65E /* PostArticleOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PostArticleOperation.h; sourceTree = "<group>"; };
@@ -235,7 +231,6 @@
 		63529AA916FEC7A60089E65E /* UIApplication+NewsAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIApplication+NewsAdditions.m"; sourceTree = "<group>"; };
 		6398525616D0FBEA009303E2 /* LineIterator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LineIterator.h; sourceTree = "<group>"; };
 		6398525716D0FBEA009303E2 /* LineIterator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LineIterator.m; sourceTree = "<group>"; };
-		639F5EC517039A1B004BA972 /* ArticleView_iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ArticleView_iPad.xib; sourceTree = "<group>"; };
 		63A6063A16F2D2080089CF4A /* ArticleRange.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ArticleRange.h; sourceTree = "<group>"; };
 		63A7205016F32B6B000AC69C /* FetchArticleOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FetchArticleOperation.h; sourceTree = "<group>"; };
 		63A7205116F32B6B000AC69C /* FetchArticleOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FetchArticleOperation.m; sourceTree = "<group>"; };
@@ -295,12 +290,13 @@
 		634191A816D0D6590069B528 = {
 			isa = PBXGroup;
 			children = (
+				03F4771C2060D71B00E1A55B /* README.md */,
+				634191F916D0D87F0069B528 /* changes.md */,
+				6341925716D0D8800069B528 /* todo.txt */,
 				634191BA16D0D6590069B528 /* NetworkNews */,
 				634191DE16D0D6590069B528 /* NetworkNewsTests */,
 				634191B316D0D6590069B528 /* Frameworks */,
 				634191B216D0D6590069B528 /* Products */,
-				634191F916D0D87F0069B528 /* changes.txt */,
-				6341925716D0D8800069B528 /* todo.txt */,
 			);
 			indentWidth = 4;
 			sourceTree = "<group>";
@@ -485,8 +481,6 @@
 				6341922116D0D8800069B528 /* FieldView.m */,
 				6341922816D0D8800069B528 /* GroupInfoViewController.h */,
 				6341922916D0D8800069B528 /* GroupInfoViewController.m */,
-				639F5EC517039A1B004BA972 /* ArticleView_iPad.xib */,
-				63442699170E72D900483FC4 /* ThreadListView_iPad.xib */,
 				03ECA37C206081C600A44D65 /* LaunchScreen.storyboard */,
 			);
 			name = UI;
@@ -637,16 +631,12 @@
 			files = (
 				634191BF16D0D6590069B528 /* InfoPlist.strings in Resources */,
 				63C3011C1769707A00F8B6FE /* Images.xcassets in Resources */,
-				6341926516D0D8800069B528 /* changes.txt in Resources */,
 				6341926B16D0D8800069B528 /* EditableTextTableViewCell.xib in Resources */,
 				6341926D16D0D8800069B528 /* GroupInfoView.xib in Resources */,
 				6341926F16D0D8800069B528 /* AccountSettingsView.xib in Resources */,
 				6341927016D0D8800069B528 /* NewArticleView.xib in Resources */,
-				634192A016D0D8800069B528 /* todo.txt in Resources */,
-				639F5EC617039A1B004BA972 /* ArticleView_iPad.xib in Resources */,
 				03ECA37D206081C600A44D65 /* LaunchScreen.storyboard in Resources */,
 				63C3011E176972B300F8B6FE /* Main.storyboard in Resources */,
-				6344269A170E72D900483FC4 /* ThreadListView_iPad.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -915,7 +905,7 @@
 				GCC_PREFIX_HEADER = "NetworkNews/NetworkNews-Prefix.pch";
 				INFOPLIST_FILE = "NetworkNews/NetworkNews-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "net.synchroma.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_BUNDLE_IDENTIFIER = com.typista.NetworkNews;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				TARGETED_DEVICE_FAMILY = 1;
@@ -933,7 +923,7 @@
 				GCC_PREFIX_HEADER = "NetworkNews/NetworkNews-Prefix.pch";
 				INFOPLIST_FILE = "NetworkNews/NetworkNews-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "net.synchroma.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_BUNDLE_IDENTIFIER = com.typista.NetworkNews;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				TARGETED_DEVICE_FAMILY = 1;

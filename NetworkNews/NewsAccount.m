@@ -26,12 +26,12 @@
 
     switch (accountTemplate)
     {
-        case AccountTemplateGiganews:
-            account.accountTemplate = AccountTemplateGiganews;
-            account.serviceName = @"Giganews";
-            account.supportURL = [NSURL URLWithString:@"http://www.giganews.com/?c=gn1113881"];
-            account.iconName = @"gn";
-            account.hostName = @"news.giganews.com";
+        case AccountTemplateEternalSeptember:
+            account.accountTemplate = AccountTemplateEternalSeptember;
+            account.serviceName = @"Eternal September";
+            account.supportURL = [NSURL URLWithString:@"https://www.eternal-september.org"];
+            account.iconName = @"es";
+            account.hostName = @"news.eternal-september.org";
             [account setSecure:YES];
             account.port = 563;
             break;

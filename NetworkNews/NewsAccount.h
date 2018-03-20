@@ -11,7 +11,7 @@
 typedef NS_ENUM(unsigned int, AccountTemplate)
 {
     AccountTemplateDefault = 0,
-    AccountTemplateGiganews
+    AccountTemplateEternalSeptember
 };
 
 @class NNNewsrc;
