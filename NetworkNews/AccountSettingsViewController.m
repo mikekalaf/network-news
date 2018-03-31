@@ -281,7 +281,7 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
         UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"OK"
                                                                 style:UIAlertActionStyleDefault
                                                               handler:^(UIAlertAction *action) {
-            [_delegate accountSettingsViewController:self modifiedAccount:_account];
+                                                                  [self->_delegate accountSettingsViewController:self modifiedAccount:self->_account];
         }];
         [alert addAction:defaultAction];
         [self presentViewController:alert animated:YES completion:nil];
@@ -296,8 +296,8 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 
         [ConnectionVerifier verifyWithAccount:_account completion:^(BOOL connected, BOOL authenticated, BOOL verified) {
 
-            isVerified = verified;
-            isModified = NO;
+            self->isVerified = verified;
+            self->isModified = NO;
 
             // Remove the "verifying" title
             [self.navigationItem setTitleView:nil];
@@ -309,7 +309,7 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
                 //        passwordCell.accessoryType = UITableViewCellAccessoryCheckmark;
 
                 // Report our success
-                [_delegate accountSettingsViewController:self modifiedAccount:_account];
+                [self->_delegate accountSettingsViewController:self modifiedAccount:self->_account];
             }
             else
             {
@@ -318,15 +318,15 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
                 if (!connected)
                     errorString = [NSString stringWithFormat:
                                    @"The connection to \"%@\" failed",
-                                   _account.hostName];
+                                   self->_account.hostName];
                 else if (!authenticated)
                     errorString = [NSString stringWithFormat:
                                    @"The user name or password for \"%@\" is incorrect",
-                                   _account.hostName];
+                                   self->_account.hostName];
                 else
                     errorString = [NSString stringWithFormat:
                                    @"There was an unknown problem with \"%@\"",
-                                   _account.hostName];
+                                   self->_account.hostName];
                 UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Cannot Get News"
                                                                                message:errorString
                                                                         preferredStyle:UIAlertControllerStyleAlert];
@@ -337,9 +337,9 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
                 [self presentViewController:alert animated:YES completion:nil];
 
                 // Restore UI elements for verification
-                if (cancelButtonItem)
-                    self.navigationItem.leftBarButtonItem = cancelButtonItem;
-                self.navigationItem.rightBarButtonItem = saveButtonItem;
+                if (self->cancelButtonItem)
+                    self.navigationItem.leftBarButtonItem = self->cancelButtonItem;
+                self.navigationItem.rightBarButtonItem = self->saveButtonItem;
                 [self tableViewEnable:YES];
             }
         }];

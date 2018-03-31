@@ -15,22 +15,7 @@
 #import "NetworkNews.h"
 #import "NSString+NewsAdditions.h"
 
-//#define RETURN_SYMBOL_CHAR      L'\u23ce'
-//#define RETURN_SYMBOL_STR       @"\u23ce"
-//#define RETURN_SYMBOL_LF_STR    @"\u23ce\n"
-//
-//#define PILCROW_SIGN_CHAR       L'\u00b6'
-//#define PILCROW_SIGN_STR        @"\u00b6"
-//#define PILCROW_SIGN_LF_STR     @"\u00b6\n"
-//
-//#define PARAGRAPH_SIGN_CHAR     PILCROW_SIGN_CHAR
-//#define PARAGRAPH_SIGN_STR      PILCROW_SIGN_STR
-//#define PARAGRAPH_SIGN_LF_STR   PILCROW_SIGN_LF_STR
-#define EMPTY_STR               @""
-//#define LF_STR                  @"\n"
-//#define CR_STR                  @"\r"
-//
-//#define CACHE_FILE_NAME         @"new_post.txt"
+#define EMPTY_STR @""
 
 @interface NewArticleViewController () <UITextFieldDelegate, UITextViewDelegate>
 {
@@ -42,13 +27,9 @@
     NSString *_references;
     NSString *_messageBody;
     BOOL keyboardShown;
-    BOOL restoringText;
-    NSRange restoredSelectedRange;
     NSOperationQueue *_operationQueue;
 }
 
-@property(nonatomic, weak) IBOutlet UIView *toView;
-@property(nonatomic, weak) IBOutlet UIView *subjectView;
 @property(nonatomic, weak) IBOutlet UILabel *toLabel;
 @property(nonatomic, weak) IBOutlet UITextField *subjectTextField;
 
@@ -116,27 +97,11 @@
     [self.view addSubview:activityIndicatorView];
     activityIndicatorView.center = self.view.center;
     
-    // Set up the text view
-    [self.view addSubview:_toView];
-    [self.view addSubview:_subjectView];
-
-    CGRect frame = _toView.frame;
-    frame.origin.y = -100;
-    frame.size.width = self.view.frame.size.width;
-    _toView.frame = frame;
-    _toView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-
-    frame = _subjectView.frame;
-    frame.origin.y = -100 + _toView.frame.size.height;
-    frame.size.width = self.view.frame.size.width;
-    _subjectView.frame = frame;
-    _subjectView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-
     _toLabel.text = _groupName;
     _subjectTextField.text = _subject;
 
-    [self textView].contentInset = UIEdgeInsetsMake(100, 0, 0, 0);
-    
+    [self textView].textContainerInset = UIEdgeInsetsMake(100, 0, 8, 0);
+
     // Do we have body text to load?
     if (_messageBody)
     {
@@ -151,27 +116,17 @@
     }
 
 //    textView.text = @"\n\n\nAndnowasinglelinewithoutwordbreaksandwehavetohandlethissituationalsoespeciallywhenitcomestolinks.  This is a whole load of test text so we can test the word wrapping function.  Lets add a whole lot more to test things out.\n\nThis is a new paragraph.\nAndnowasinglelinewithoutwordbreaksandwehavetohandlethissituationalsoespeciallywhenitcomestolinks.\n";
-//    textView.text = @"\n\n\nLorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+    self.textView.text = @"Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nLorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nLorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 
-    if (restoringText == NO)
+    // Append any default signature
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSString *sigText = [userDefaults stringForKey:@"Signature"];
+    if (sigText && [sigText isEqualToString:EMPTY_STR] == NO)
     {
-        // Append any default signature
-        NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-        NSString *sigText = [userDefaults stringForKey:@"Signature"];
-        if (sigText && [sigText isEqualToString:EMPTY_STR] == NO)
-        {
-            NSString *signature = [NSString stringWithFormat:@"\n-- \n%@", sigText];
-//            signature = [signature stringByReplacingOccurrencesOfString:LF_STR
-//                                                             withString:PARAGRAPH_SIGN_LF_STR];
-            [self textView].text = [[self textView].text stringByAppendingString:signature];
-        }
+        NSString *signature = [NSString stringWithFormat:@"\n-- \n%@", sigText];
+        [self textView].text = [[self textView].text stringByAppendingString:signature];
     }
-//    else
-//    {
-//        [textView becomeFirstResponder];
-//        textView.selectedRange = restoredSelectedRange;
-//    }
-    
+
     // Notifications we're interested in
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc addObserver:self
@@ -187,7 +142,7 @@
                name:UIKeyboardDidHideNotification
              object:nil];
 
-    if (_subjectTextField.text == nil)
+    if (_subjectTextField.text.length == 0)
         sendButtonItem.enabled = NO;
 }
 
@@ -196,37 +151,16 @@
     [super viewDidAppear:animated];
 
     // Set the subject field as the first responder
-//    if (_subject == nil || [_subject isEqualToString:EMPTY_STR])
-//        [_subjectTextField becomeFirstResponder];
-//    else
-//        [[self view] becomeFirstResponder];
+    if (_subject == nil || [_subject isEqualToString:EMPTY_STR])
+        [_subjectTextField becomeFirstResponder];
+    else
+        [self.view becomeFirstResponder];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
-
     [_operationQueue cancelAllOperations];
-
-//    // Cache any text
-//    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-//    [userDefaults setObject:subjectTextField.text
-//                     forKey:@"MostRecentNewArticleSubject"];
-//    [userDefaults setInteger:textView.selectedRange.location
-//                      forKey:@"MostRecentNewArticleSelectedRangeLocation"];
-//    
-//    // Chop off the hacky three CRs at the beginning of the text
-//    NSString *articleText = [textView.text substringFromIndex:3];
-//
-//    // Strip-out instances of paragraph sign
-//    articleText = [articleText stringByReplacingOccurrencesOfString:PARAGRAPH_SIGN_STR
-//                                                         withString:EMPTY_STR];
-//
-//    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-//    NSString *path = [appDelegate.cacheRootDir stringByAppendingPathComponent:CACHE_FILE_NAME];
-//    [articleText writeToFile:path atomically:NO
-//                    encoding:NSUTF8StringEncoding
-//                       error:NULL];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -452,8 +386,8 @@
                                                                                       data:articleData];
     operation.completionBlock = ^{
         dispatch_async(dispatch_get_main_queue(), ^{
-            [activityIndicatorView stopAnimating];
-            [_delegate newArticleViewController:self didSend:YES];
+            [self->activityIndicatorView stopAnimating];
+            [self->_delegate newArticleViewController:self didSend:YES];
         });
     };
     [_operationQueue addOperation:operation];
@@ -514,7 +448,7 @@
     NSDictionary *info = notification.userInfo;
     
     // Get the size of the keyboard
-    NSValue *value = info[UIKeyboardBoundsUserInfoKey];
+    NSValue *value = info[UIKeyboardFrameEndUserInfoKey];
     CGSize keyboardSize = value.CGRectValue.size;
     
     // Resize the text view
@@ -530,7 +464,7 @@
     NSDictionary *info = notification.userInfo;
     
     // Get the size of the keyboard
-    NSValue *value = info[UIKeyboardBoundsUserInfoKey];
+    NSValue *value = info[UIKeyboardFrameEndUserInfoKey];
     CGSize keyboardSize = value.CGRectValue.size;
     
     // Reset the height of the scroll view to its original value

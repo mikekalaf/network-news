@@ -199,9 +199,9 @@
     operation.completionBlock = ^{
         NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"count"
                                                                        ascending:NO];
-        _foundGroupList = [operation.groups sortedArrayUsingDescriptors:@[sortDescriptor]];
+        self->_foundGroupList = [operation.groups sortedArrayUsingDescriptors:@[sortDescriptor]];
         dispatch_async(dispatch_get_main_queue(), ^{
-            [activityIndicatorView stopAnimating];
+            [self->activityIndicatorView stopAnimating];
             [self.tableView reloadData];
         });
     };

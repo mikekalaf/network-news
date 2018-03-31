@@ -28,7 +28,6 @@
 		6341926B16D0D8800069B528 /* EditableTextTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6341920416D0D8800069B528 /* EditableTextTableViewCell.xib */; };
 		6341926D16D0D8800069B528 /* GroupInfoView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6341920816D0D8800069B528 /* GroupInfoView.xib */; };
 		6341926F16D0D8800069B528 /* AccountSettingsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6341920C16D0D8800069B528 /* AccountSettingsView.xib */; };
-		6341927016D0D8800069B528 /* NewArticleView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6341920E16D0D8800069B528 /* NewArticleView.xib */; };
 		6341927616D0D8800069B528 /* ExtendedDateFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 6341921B16D0D8800069B528 /* ExtendedDateFormatter.m */; };
 		6341927816D0D8800069B528 /* FavouriteGroupsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6341921F16D0D8800069B528 /* FavouriteGroupsViewController.m */; };
 		6341927916D0D8800069B528 /* FieldView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6341922116D0D8800069B528 /* FieldView.m */; };
@@ -136,7 +135,6 @@
 		6341920516D0D8800069B528 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/EditableTextTableViewCell.xib; sourceTree = "<group>"; };
 		6341920916D0D8800069B528 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/GroupInfoView.xib; sourceTree = "<group>"; };
 		6341920D16D0D8800069B528 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/AccountSettingsView.xib; sourceTree = "<group>"; };
-		6341920F16D0D8800069B528 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/NewArticleView.xib; sourceTree = "<group>"; };
 		6341921A16D0D8800069B528 /* ExtendedDateFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtendedDateFormatter.h; sourceTree = "<group>"; };
 		6341921B16D0D8800069B528 /* ExtendedDateFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExtendedDateFormatter.m; sourceTree = "<group>"; };
 		6341921E16D0D8800069B528 /* FavouriteGroupsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FavouriteGroupsViewController.h; sourceTree = "<group>"; };
@@ -474,7 +472,6 @@
 				6341920416D0D8800069B528 /* EditableTextTableViewCell.xib */,
 				6341920816D0D8800069B528 /* GroupInfoView.xib */,
 				6341920C16D0D8800069B528 /* AccountSettingsView.xib */,
-				6341920E16D0D8800069B528 /* NewArticleView.xib */,
 				6341921E16D0D8800069B528 /* FavouriteGroupsViewController.h */,
 				6341921F16D0D8800069B528 /* FavouriteGroupsViewController.m */,
 				6341922016D0D8800069B528 /* FieldView.h */,
@@ -598,7 +595,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastTestingUpgradeCheck = 0510;
-				LastUpgradeCheck = 0920;
+				LastUpgradeCheck = 0930;
 				ORGANIZATIONNAME = "David Schweinsberg";
 				TargetAttributes = {
 					634191B016D0D6590069B528 = {
@@ -634,7 +631,6 @@
 				6341926B16D0D8800069B528 /* EditableTextTableViewCell.xib in Resources */,
 				6341926D16D0D8800069B528 /* GroupInfoView.xib in Resources */,
 				6341926F16D0D8800069B528 /* AccountSettingsView.xib in Resources */,
-				6341927016D0D8800069B528 /* NewArticleView.xib in Resources */,
 				03ECA37D206081C600A44D65 /* LaunchScreen.storyboard in Resources */,
 				63C3011E176972B300F8B6FE /* Main.storyboard in Resources */,
 			);
@@ -795,14 +791,6 @@
 			name = AccountSettingsView.xib;
 			sourceTree = "<group>";
 		};
-		6341920E16D0D8800069B528 /* NewArticleView.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				6341920F16D0D8800069B528 /* en */,
-			);
-			name = NewArticleView.xib;
-			sourceTree = "<group>";
-		};
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
@@ -817,11 +805,13 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
@@ -865,11 +855,13 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;

@@ -11,29 +11,17 @@
 #import "NewArticleViewController.h"
 
 @protocol ArticleSource;
-
 @class Article;
 @class NewsConnectionPool;
 
-@interface ArticleViewController : UIViewController <
-    NewArticleDelegate,
-    UIActionSheetDelegate,
-//    UIPopoverControllerDelegate,
-//    UISplitViewControllerDelegate,
-    MFMailComposeViewControllerDelegate
->
+@interface ArticleViewController : UIViewController
 
 @property (nonatomic) NewsConnectionPool *connectionPool;
-
 @property(nonatomic, weak) id <ArticleSource> articleSource;
-
 @property(nonatomic) NSInteger articleIndex;
-
 @property(nonatomic, weak) NSString *groupName;
 
 - (void)updateArticle;
-
-- (void)showWelcomeView;
 
 @end
 

@@ -15,8 +15,6 @@
 #import "NNNewsrc.h"
 #import "NetworkNews.h"
 
-//static NSString *MostRecentGroupName = @"MostRecentGroupName";
-
 @interface FavouriteGroupsViewController ()
 {
     NewsAccount *_account;
@@ -30,8 +28,7 @@
 {
     [super viewDidLoad];
 
-    self.navigationItem.leftBarButtonItem = [self editButtonItem];
-
+    self.navigationItem.leftBarButtonItem = self.editButtonItem;
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -46,11 +43,13 @@
     {
         AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
         for (NewsAccount *account in appDelegate.accounts)
+        {
             if ([selectedServiceName isEqualToString:account.serviceName])
             {
                 selectedAccount = account;
                 break;
             }
+        }
     }
 
     BOOL connect = NO;
@@ -138,8 +137,6 @@
     return cell;
 }
 
-#pragma mark - UITableViewDelegate Methods
-
 -  (void)tableView:(UITableView *)tableView
 commitEditingStyle:(UITableViewCellEditingStyle)editingStyle
  forRowAtIndexPath:(NSIndexPath *)indexPath
@@ -191,6 +188,20 @@ moveRowAtIndexPath:(NSIndexPath *)fromIndexPath
     NSString *groupName = _groupNames[fromIndexPath.row];
     [_groupNames removeObjectAtIndex:fromIndexPath.row];
     [_groupNames insertObject:groupName atIndex:toIndexPath.row];
+    [_connectionPool.account.newsrc setSubscribedGroupNames:_groupNames];
+    [_connectionPool.account.newsrc sync];
+}
+
+#pragma mark - UITableViewDelegate Methods
+
+- (void)tableView:(UITableView *)tableView willBeginEditingRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSLog(@"tableView:willBeginEditingRowAtIndexPath:");
+}
+
+- (void)tableView:(UITableView *)tableView didEndEditingRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSLog(@"tableView:didEndEditingRowAtIndexPath:");
 }
 
 #pragma mark - Actions

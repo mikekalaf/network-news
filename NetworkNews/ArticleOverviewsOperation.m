@@ -103,9 +103,9 @@ static BOOL PartNumber(NSString *subject,
 @implementation ArticleOverviewsOperation
 
 - (instancetype)initWithConnectionPool:(NewsConnectionPool *)connectionPool
-                  groupStore:(GroupStore *)groupStore
-                        mode:(ArticleOverviewsMode)mode
-             maxArticleCount:(NSUInteger)maxArticleCount
+                            groupStore:(GroupStore *)groupStore
+                                  mode:(ArticleOverviewsMode)mode
+                       maxArticleCount:(NSUInteger)maxArticleCount
 {
     self = [super init];
     if (self)
@@ -169,7 +169,7 @@ static BOOL PartNumber(NSString *subject,
                     if (high == ArticleRangeMax(storedRange))
                     {
                         NSLog(@"Already have latest articles");
-                        return;
+                        low = high + 1;  // Force article range to have a length of zero
                     }
 
                     if (storedRange.length == 0)

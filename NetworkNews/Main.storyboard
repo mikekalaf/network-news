@@ -8,6 +8,11 @@
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
+    <customFonts key="customFonts">
+        <array key="Helvetica.ttc">
+            <string>Helvetica</string>
+        </array>
+    </customFonts>
     <scenes>
         <!--Navigation Controller-->
         <scene sceneID="Dve-q2-J4i">
@@ -119,7 +124,8 @@
                         </barButtonItem>
                         <barButtonItem style="plain" systemItem="flexibleSpace" id="zkl-3S-D1e"/>
                     </toolbarItems>
-                    <navigationItem key="navigationItem" title="Groups" id="Boo-gK-ow0">
+                    <navigationItem key="navigationItem" title="Newsgroups" id="Boo-gK-ow0">
+                        <barButtonItem key="backBarButtonItem" title="Groups" id="ZoD-PJ-ajM"/>
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="9ld-tK-Cak">
                             <connections>
                                 <segue destination="9qv-we-8PY" kind="modal" identifier="EditGroups" id="G6G-Bd-1zO"/>
@@ -217,10 +223,26 @@
                             <outlet property="delegate" destination="nCd-TS-7j6" id="nhl-Nq-8Zq"/>
                         </connections>
                     </tableView>
-                    <toolbarItems/>
+                    <toolbarItems>
+                        <barButtonItem systemItem="action" id="SXe-j1-cv3">
+                            <connections>
+                                <action selector="actionButtonPressed:" destination="nCd-TS-7j6" id="plZ-ZD-5nm"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem style="plain" systemItem="flexibleSpace" id="YpE-Nw-LwI"/>
+                        <barButtonItem title="Item" id="vPu-vm-a72"/>
+                        <barButtonItem style="plain" systemItem="flexibleSpace" id="5Gj-HX-G9R"/>
+                        <barButtonItem systemItem="compose" id="zjF-S7-n3C">
+                            <connections>
+                                <segue destination="OSu-XW-ncU" kind="modal" identifier="NewArticle" id="Zfg-Gf-CDl"/>
+                            </connections>
+                        </barButtonItem>
+                    </toolbarItems>
                     <navigationItem key="navigationItem" title="Threads" id="nHm-Sk-Eoz"/>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="searchDisplayController" destination="muG-Uf-B8w" id="9BG-N8-7wM"/>
+                        <outlet property="statusBarButtonItem" destination="vPu-vm-a72" id="NZt-D5-ciU"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="1ey-h0-VuC" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -234,6 +256,84 @@
                 </searchDisplayController>
             </objects>
             <point key="canvasLocation" x="1622" y="77"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="L9S-N4-OAx">
+            <objects>
+                <navigationController id="OSu-XW-ncU" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="G0Q-se-M5r">
+                        <rect key="frame" x="0.0" y="44" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="KYO-IE-ebS" kind="relationship" relationship="rootViewController" id="N80-ok-Dqj"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="e7J-VQ-OK0" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1616" y="1535"/>
+        </scene>
+        <!--New Article View Controller-->
+        <scene sceneID="bfI-We-IZA">
+            <objects>
+                <viewController modalPresentationStyle="overCurrentContext" id="KYO-IE-ebS" customClass="NewArticleViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="hL7-bf-pRD"/>
+                        <viewControllerLayoutGuide type="bottom" id="Vtp-me-fTw"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="Z8m-mn-L3X" customClass="UITextView">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="To:" lineBreakMode="tailTruncation" minimumFontSize="10" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cBY-5m-Api">
+                                <rect key="frame" x="15.999999999999998" y="8" width="20.333333333333329" height="17"/>
+                                <fontDescription key="fontDescription" name="Helvetica" family="Helvetica" pointSize="15"/>
+                                <color key="textColor" red="0.60000002379999995" green="0.60000002379999995" blue="0.60000002379999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="750" text="Newsgroup" lineBreakMode="tailTruncation" minimumFontSize="10" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZFS-wM-NCv">
+                                <rect key="frame" x="79" y="8" width="76" height="17"/>
+                                <fontDescription key="fontDescription" name="Helvetica" family="Helvetica" pointSize="15"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Subject:" lineBreakMode="tailTruncation" minimumFontSize="10" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4Ga-nt-OKG">
+                                <rect key="frame" x="16" y="33" width="55" height="17.333333333333329"/>
+                                <fontDescription key="fontDescription" name="Helvetica" family="Helvetica" pointSize="15"/>
+                                <color key="textColor" red="0.60000002379999995" green="0.60000002379999995" blue="0.60000002379999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textField autoresizesSubviews="NO" opaque="NO" clipsSubviews="YES" contentMode="left" contentHorizontalAlignment="left" contentVerticalAlignment="center" adjustsFontSizeToFit="NO" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="mSL-Va-itf">
+                                <rect key="frame" x="79" y="29" width="280" height="18"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="280" id="5FR-DP-nea"/>
+                                </constraints>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <fontDescription key="fontDescription" name="Helvetica" family="Helvetica" pointSize="15"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences" enablesReturnKeyAutomatically="YES"/>
+                            </textField>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="4Ga-nt-OKG" firstAttribute="top" secondItem="cBY-5m-Api" secondAttribute="bottom" constant="8" id="5SN-dT-4yB"/>
+                            <constraint firstItem="cBY-5m-Api" firstAttribute="leading" secondItem="Z8m-mn-L3X" secondAttribute="leadingMargin" id="AhA-6B-ekX"/>
+                            <constraint firstItem="4Ga-nt-OKG" firstAttribute="leading" secondItem="Z8m-mn-L3X" secondAttribute="leadingMargin" id="Fri-Yx-7yp"/>
+                            <constraint firstItem="ZFS-wM-NCv" firstAttribute="top" secondItem="Z8m-mn-L3X" secondAttribute="topMargin" constant="8" id="KWJ-Re-r6d"/>
+                            <constraint firstItem="mSL-Va-itf" firstAttribute="top" secondItem="ZFS-wM-NCv" secondAttribute="bottom" constant="4" id="MhL-mg-gqa"/>
+                            <constraint firstItem="mSL-Va-itf" firstAttribute="leading" secondItem="4Ga-nt-OKG" secondAttribute="trailing" constant="8" id="P5Y-Me-ZTg"/>
+                            <constraint firstItem="cBY-5m-Api" firstAttribute="top" secondItem="Z8m-mn-L3X" secondAttribute="topMargin" constant="8" id="dfX-C2-Lz5"/>
+                            <constraint firstItem="ZFS-wM-NCv" firstAttribute="leading" secondItem="cBY-5m-Api" secondAttribute="trailing" constant="42.670000000000002" id="oPu-O1-gTC"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="N0j-s1-KxX"/>
+                    <connections>
+                        <outlet property="subjectTextField" destination="mSL-Va-itf" id="NGd-Di-rdK"/>
+                        <outlet property="toLabel" destination="ZFS-wM-NCv" id="KY9-TN-PgZ"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="W0u-hB-As7" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2084.5" y="1535"/>
         </scene>
         <!--Thread-->
         <scene sceneID="rSx-7G-UG6">
@@ -277,7 +377,7 @@
                             <outlet property="delegate" destination="QKf-Mr-mCo" id="FLi-cw-ddC"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Thread" id="Zbk-DN-3XS"/>
+                    <navigationItem key="navigationItem" title="Thread" largeTitleDisplayMode="never" id="Zbk-DN-3XS"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="CzE-zX-2OZ" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -297,7 +397,10 @@
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </view>
                     <toolbarItems/>
-                    <navigationItem key="navigationItem" title="Article" id="ggy-8J-3Wj"/>
+                    <navigationItem key="navigationItem" title="Article" largeTitleDisplayMode="never" id="ggy-8J-3Wj"/>
+                    <connections>
+                        <segue destination="OSu-XW-ncU" kind="modal" identifier="NewArticle" id="3sH-cC-xc4"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="JQM-Yc-cb7" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -380,8 +483,8 @@
         <scene sceneID="zYU-Bj-k5G">
             <objects>
                 <navigationController toolbarHidden="NO" id="CnJ-Fz-JJk" sceneMemberID="viewController">
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="pFT-pY-3ia">
-                        <rect key="frame" x="0.0" y="44" width="375" height="44"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="pFT-pY-3ia">
+                        <rect key="frame" x="0.0" y="44" width="375" height="96"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="gYP-j8-SrI">
@@ -510,6 +613,7 @@
         <image name="Default" width="320" height="480"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="SO7-25-V3r"/>
+        <segue reference="qlP-Jf-LRj"/>
+        <segue reference="Zfg-Gf-CDl"/>
     </inferredMetricsTieBreakers>
 </document>

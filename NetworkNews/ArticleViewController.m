@@ -34,11 +34,9 @@
 #import "ExtendedLayoutManager.h"
 #import "NNNewsrc.h"
 
-@interface ArticleViewController ()
+@interface ArticleViewController () <NewArticleDelegate, MFMailComposeViewControllerDelegate>
 {
-    //UISegmentedControl *_navigationSegmentedControl;
     UIProgressView *_progressView;
-
     Article *_article;
     NSOperationQueue *_operationQueue;
     NSURL *_cacheURL;
@@ -46,19 +44,13 @@
     NSArray *_headEntries;
     NSData *_bodyTextDataTop;
     NSData *_bodyTextDataBottom;
-    //BOOL toolbarSetForPortrait;
     NSTextAttachment *_textAttachment;
 }
 
-@property(nonatomic, weak) IBOutlet UIToolbar *toolbar;
 @property(nonatomic) UITextView *textView;
-@property(nonatomic, weak) IBOutlet UIBarButtonItem *replyButtonItem;
-@property(nonatomic, weak) IBOutlet UIBarButtonItem *composeButtonItem;
-@property(nonatomic, weak) IBOutlet UISegmentedControl *navigationSegmentedControl;
-//@property(nonatomic, weak) IBOutlet UIProgressView *progressView;
+@property(nonatomic, readonly, copy) NSString *bodyTextForFollowUp;
 
 - (NSURL *)cacheURLForMessageId:(NSString *)messageId extension:(NSString *)extension;
-@property (NS_NONATOMIC_IOSONLY, readonly, copy) NSString *bodyTextForFollowUp;
 - (void)followUpToGroup;
 - (void)replyViaEmail;
 - (NSString *)headerValueWithName:(NSString *)name;
@@ -68,12 +60,10 @@
 - (void)updateTitle;
 - (void)updateNavigationControls;
 - (void)disableNavigationControls;
-//- (void)showProgressToolbar;
-//- (void)showArticleToolbar;
+- (void)showProgressToolbar;
+- (void)showArticleToolbar;
 
-//- (IBAction)articleNavigation:(id)sender;
 - (IBAction)replyButtonPressed:(id)sender;
-- (IBAction)composeButtonPressed:(id)sender;
 
 @end
 
@@ -91,17 +81,15 @@
 
     // Add a text view with our own layout manager
     NSTextStorage *textStorage = [[NSTextStorage alloc] init];
-
     NSLayoutManager *layoutManager = [[ExtendedLayoutManager alloc] init];
     [textStorage addLayoutManager:layoutManager];
-
-    NSTextContainer *textContainer = [[NSTextContainer alloc] initWithSize:self.view.bounds.size];
+    NSTextContainer *textContainer = [[NSTextContainer alloc] initWithSize:CGSizeZero];
     [layoutManager addTextContainer:textContainer];
 
     self.textView = [[UITextView alloc] initWithFrame:self.view.bounds
                                         textContainer:textContainer];
-    [self.textView setEditable:NO];
-    [self.textView setTranslatesAutoresizingMaskIntoConstraints:NO];
+    self.textView.editable = NO;
+    self.textView.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:self.textView];
 
     NSDictionary *views = NSDictionaryOfVariableBindings(_textView);
@@ -120,38 +108,17 @@
     _operationQueue = [[NSOperationQueue alloc] init];
     _operationQueue.maxConcurrentOperationCount = 1;
     
-    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone)
-    {
-        UIBarButtonItem *nextButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"button-down-arrow"]
+    UIBarButtonItem *nextButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"button-down-arrow"]
+                                                                   style:UIBarButtonItemStylePlain
+                                                                  target:self
+                                                                  action:@selector(nextArticlePressed:)];
+    UIBarButtonItem *previousButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"button-up-arrow"]
                                                                        style:UIBarButtonItemStylePlain
                                                                       target:self
-                                                                      action:@selector(nextArticlePressed:)];
-        UIBarButtonItem *previousButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"button-up-arrow"]
-                                                                           style:UIBarButtonItemStylePlain
-                                                                          target:self
-                                                                          action:@selector(previousArticlePressed:)];
-        self.navigationItem.rightBarButtonItems = @[nextButton, previousButton];
-
-//        // Navigation up and down buttons for the right-hand side
-//        NSArray *itemArray = [NSArray arrayWithObjects:
-//                              [UIImage imageNamed:@"icon-triangle-up.png"],
-//                              [UIImage imageNamed:@"icon-triangle-down.png"],
-//                              nil];
-//        _navigationSegmentedControl = [[UISegmentedControl alloc] initWithItems:itemArray];
-//        [_navigationSegmentedControl setMomentary:YES];
-//        _navigationSegmentedControl.segmentedControlStyle = UISegmentedControlStyleBar;
-//        [_navigationSegmentedControl setWidth:44 forSegmentAtIndex:0];
-//        [_navigationSegmentedControl setWidth:44 forSegmentAtIndex:1];
-//        [_navigationSegmentedControl addTarget:self
-//                                       action:@selector(articleNavigation:)
-//                             forControlEvents:UIControlEventValueChanged];
-//        
-//        UIBarButtonItem *segmentBarItem = [[UIBarButtonItem alloc] initWithCustomView:_navigationSegmentedControl];
-//        self.navigationItem.rightBarButtonItem = segmentBarItem;
-    }
+                                                                      action:@selector(previousArticlePressed:)];
+    self.navigationItem.rightBarButtonItems = @[nextButton, previousButton];
 
     [self updateTitle];
-//    [self updateNavigationControls];
     [self disableNavigationControls];
 
     // Create a progress view to use with the toolbar
@@ -245,36 +212,12 @@
     [self loadArticle];
 }
 
-- (void)showWelcomeView
-{
-    WelcomeViewController *viewController = [[WelcomeViewController alloc] init];
-//    viewController.delegate = self;
-    UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
-
-    [self.splitViewController presentViewController:navigationController animated:NO completion:NULL];
-    //[self presentModalViewController:navigationController animated:NO];
-}
-
 #pragma mark - NewArticleDelegate Methods
 
 - (void)newArticleViewController:(NewArticleViewController *)controller
                          didSend:(BOOL)send
 {
     [self dismissViewControllerAnimated:YES completion:NULL];
-}
-
-#pragma mark - WelcomeDelegate Methods
-
-- (void)welcomeViewControllerFinished:(WelcomeViewController *)controller
-{
-    NSLog(@"New user welcomed");
-    
-    [self dismissViewControllerAnimated:YES completion:NULL];
-
-    // Establish a connection to the newly specified server
-    // TODO: Rework how this happens on the iPad
-//    NetworkNewsAppDelegate *appDelegate = (NetworkNewsAppDelegate *)[[UIApplication sharedApplication] delegate];
-//    [appDelegate establishConnection];
 }
 
 #pragma mark - MFMailComposeViewControllerDelegate Methods
@@ -286,48 +229,7 @@
     [self dismissViewControllerAnimated:YES completion:NULL];
 }
 
-#pragma mark - UIActionSheetDelegate Methods
-
-- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
-{
-    if (buttonIndex == 0)
-    {
-        // Follow-up
-        [self followUpToGroup];
-    }
-    else if (buttonIndex == 1)
-    {
-        // Email
-        [self replyViaEmail];
-    }
-}
-
 #pragma mark - Actions
-
-//- (IBAction)articleNavigation:(id)sender
-//{
-//    NSUInteger index = _navigationSegmentedControl.selectedSegmentIndex;
-//    if (index == 0)
-//    {
-//        // Up Article
-//        if (_articleIndex > 0)
-//        {
-//            --_articleIndex;
-//            [self loadArticle];
-//        }
-//    }
-//    else if (index == 1)
-//    {
-//        // Down Article
-//        if (_articleIndex < [_articleSource articleCount] - 1)
-//        {
-//            ++_articleIndex;
-//            [self loadArticle];
-//        }
-//    }
-//
-//    [self updateTitle];
-//}
 
 - (IBAction)nextArticlePressed:(id)sender
 {
@@ -360,31 +262,24 @@
     }
 
     // Show an action sheet to ask if this should be an email or a followup
-    UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:nil
-                                                             delegate:self
-                                                    cancelButtonTitle:@"Cancel"
-                                               destructiveButtonTitle:nil
-                                                    otherButtonTitles:@"Follow-up to group", @"Reply via email", nil];
-    if (_replyButtonItem)
-        [actionSheet showFromBarButtonItem:_replyButtonItem animated:YES];
-    else
-        [actionSheet showFromToolbar:self.navigationController.toolbar];
-}
-
-- (IBAction)composeButtonPressed:(id)sender
-{
-    NewArticleViewController *viewController;
-    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad)
-        viewController = [[NewArticleViewController alloc] initWithNibName:@"NewArticleView" bundle:nil];
-    else
-        viewController = [[NewArticleViewController alloc] initWithNibName:@"NewArticleView" bundle:nil];
-    viewController.connectionPool = _connectionPool;
-    viewController.delegate = self;
-    [viewController setGroupName:_groupName];
-
-    UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
-    navigationController.modalPresentationStyle = UIModalPresentationPageSheet;
-    [self presentViewController:navigationController animated:YES completion:NULL];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil
+                                                                   message:nil
+                                                            preferredStyle:UIAlertControllerStyleActionSheet];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel"
+                                              style:UIAlertActionStyleCancel
+                                            handler:^(UIAlertAction *action) {
+                                            }]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Follow-up to group"
+                                              style:UIAlertActionStyleDefault
+                                            handler:^(UIAlertAction *action) {
+                                                [self followUpToGroup];
+                                            }]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Reply via email"
+                                              style:UIAlertActionStyleDefault
+                                            handler:^(UIAlertAction *action) {
+                                                [self replyViaEmail];
+                                            }]];
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 #pragma mark - Notifications
@@ -405,7 +300,7 @@
 //    {
 //        NSLog(@"Incomplete parts");
 //    }
-//    
+//
 //    [self updateContent];
 //    [_webView loadHTMLString:htmlString baseURL:nil];
 //    [self updateNavigationControls];
@@ -432,13 +327,13 @@
 //- (void)articleUnavailable:(NSNotification *)notification
 //{
 //    // Clear the body
-//    [self beginHTML];
-//    [self appendHeadFromArticle];
-//    
-//    [htmlString appendString:@"<p class=\"status\">Article Unavailable</p>"];
-//    
-//    [self endHTML];
-//    [_webView loadHTMLString:htmlString baseURL:nil];
+////    [self beginHTML];
+////    [self appendHeadFromArticle];
+////
+////    [htmlString appendString:@"<p class=\"status\">Article Unavailable</p>"];
+////
+////    [self endHTML];
+////    [_webView loadHTMLString:htmlString baseURL:nil];
 //    [self updateNavigationControls];
 //    [self showArticleToolbar];
 //
@@ -451,7 +346,7 @@
 //
 //- (void)articleError:(NSNotification *)notification
 //{
-//    AlertViewFailedConnection(currentTask.connection.hostName);
+////    AlertViewFailedConnection(currentTask.connection.hostName);
 //    [self articleLoaded:notification];
 //}
 
@@ -472,6 +367,35 @@
     else
     {
         
+    }
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
+    if ([segue.identifier isEqualToString:@"NewArticle"])
+    {
+        // Collect the references, and add this messageId
+        NSMutableString *references = [NSMutableString stringWithCapacity:1];
+        if (_article.references)
+        {
+            [references appendString:_article.references];
+            [references appendString:@" "];
+        }
+        [references appendString:_article.firstMessageId];
+
+        // Make sure we follow-up to the requested group
+        NSString *followupTo = [self headerValueWithName:@"Followup-To"];
+        if (!followupTo)
+            followupTo = _groupName;
+
+        UINavigationController *navigationController = segue.destinationViewController;
+        NewArticleViewController *viewController = (NewArticleViewController *)navigationController.topViewController;
+        viewController.connectionPool = _connectionPool;
+        viewController.delegate = self;
+        viewController.groupName = followupTo;
+        viewController.subject = _article.reSubject;
+        viewController.references = references;
+        viewController.messageBody = self.bodyTextForFollowUp;
     }
 }
 
@@ -519,35 +443,7 @@
 
 - (void)followUpToGroup
 {
-    // Collect the references, and add this messageId
-    NSMutableString *references = [NSMutableString stringWithCapacity:1];
-    if (_article.references)
-    {
-        [references appendString:_article.references];
-        [references appendString:@" "];
-    }
-    [references appendString:_article.firstMessageId];
-    
-    // Make sure we follow-up to the requested group
-    NSString *followupTo = [self headerValueWithName:@"Followup-To"];
-    if (!followupTo)
-        followupTo = _groupName;
-
-    NewArticleViewController *viewController;
-    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad)
-        viewController = [[NewArticleViewController alloc] initWithNibName:@"NewArticleView" bundle:nil];
-    else
-        viewController = [[NewArticleViewController alloc] initWithNibName:@"NewArticleView" bundle:nil];
-    viewController.connectionPool = _connectionPool;
-    viewController.delegate = self;
-    [viewController setGroupName:followupTo];
-    [viewController setSubject:_article.reSubject];
-    [viewController setReferences:references];
-    [viewController setMessageBody:[self bodyTextForFollowUp]];
-
-    UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
-    navigationController.modalPresentationStyle = UIModalPresentationPageSheet;
-    [self presentViewController:navigationController animated:YES completion:NULL];
+    [self performSegueWithIdentifier:@"NewArticle" sender:self];
 }
 
 - (void)replyViaEmail
@@ -570,62 +466,6 @@
     [self presentViewController:mailViewController
                        animated:YES
                      completion:NULL];
-}
-
-- (NSData *)htmlEscapedData:(NSData *)unescapedData
-{
-    const char *amp = "&amp;";
-    const char *lt = "&lt;";
-    const char *gt = "&gt;";
-    const char *quot = "&quot;";
-    const char *single_quot = "&#039;";
-    
-    NSMutableData *escapedData = [NSMutableData dataWithCapacity:unescapedData.length];
-    
-    const char *bytes = unescapedData.bytes;
-    NSUInteger len = unescapedData.length;
-    for (NSUInteger i = 0; i < len; ++i)
-    {
-        switch (bytes[i])
-        {
-            case '&':
-                [escapedData appendBytes:amp length:5];
-                break;
-            case '<':
-                [escapedData appendBytes:lt length:4];
-                break;
-            case '>':
-                [escapedData appendBytes:gt length:4];
-                break;
-            case '"':
-                [escapedData appendBytes:quot length:6];
-                break;
-            case '\'':
-                [escapedData appendBytes:single_quot length:6];
-                break;
-            default:
-                [escapedData appendBytes:bytes + i length:1];
-        }
-    }
-    
-    return escapedData;
-}
-
-- (NSString *)htmlEscapedString:(NSString *)unescapedString
-{
-    NSData *unescapedData = [unescapedString dataUsingEncoding:NSUTF8StringEncoding
-                                          allowLossyConversion:NO];
-//    if (unescapedData == nil)
-//        unescapedData = [unescapedString dataUsingEncoding:NSISOLatin1StringEncoding
-//                                      allowLossyConversion:YES];
-    if (unescapedData == nil)
-    {
-        NSLog(@"Failed to encode '%@' as UTF-8", unescapedString);
-        return nil;
-    }
-    
-    NSData *escapedData = [self htmlEscapedData:unescapedData];
-    return [[NSString alloc] initWithData:escapedData encoding:NSUTF8StringEncoding];
 }
 
 - (NSString *)headerValueWithName:(NSString *)name
@@ -702,8 +542,8 @@
     BOOL flowed = [self isFlowed];
 
     // Append the text preceeding any attachment (might be all the text)
-    //[attrString appendNewsHead:_headEntries];
-    [attrString appendShortNewsHead:_headEntries];
+    [attrString appendNewsHead:_headEntries];
+//    [attrString appendShortNewsHead:_headEntries];
     [attrString appendNewsBody:_bodyTextDataTop flowed:flowed];
 
     if (_attachmentURL)
@@ -837,7 +677,7 @@
         // Display the cached copy
         [self updateContent];
         [self updateNavigationControls];
-        //[self showArticleToolbar];
+        [self showArticleToolbar];
 
         // Mark as read all the article parts that make this article
         for (ArticlePart *part in _article.parts)
@@ -851,7 +691,7 @@
     {
         // Download from the server
         [self disableNavigationControls];
-        //[self showProgressToolbar];
+        [self showProgressToolbar];
         _progressView.progress = 0;
         _progressView.hidden = NO;
         
@@ -876,7 +716,7 @@
                                                          progress:^(NSUInteger bytesReceived) {
                                                              bytesFetchedSoFar += bytesReceived;
                                                              dispatch_async(dispatch_get_main_queue(), ^{
-                                                                 _progressView.progress = (float)bytesFetchedSoFar / totalBytes;
+                                                                 self->_progressView.progress = (float)bytesFetchedSoFar / totalBytes;
                                                              });
                                                          }];
             [_operationQueue addOperation:operation];
@@ -894,11 +734,6 @@
 - (void)updateNavigationControls
 {
     // Enable/disable the navigation controls
-//    [_navigationSegmentedControl setEnabled:(_articleIndex > 0)
-//                         forSegmentAtIndex:0];
-//    [_navigationSegmentedControl setEnabled:(_articleIndex < [_articleSource articleCount] - 1)
-//                         forSegmentAtIndex:1];
-
     (self.navigationItem.rightBarButtonItems[0]).enabled = (_articleIndex < [_articleSource articleCount] - 1);
     (self.navigationItem.rightBarButtonItems[1]).enabled = (_articleIndex > 0);
 }
@@ -906,53 +741,42 @@
 - (void)disableNavigationControls
 {
     // Enable/disable the navigation controls
-//    [_navigationSegmentedControl setEnabled:NO forSegmentAtIndex:0];
-//    [_navigationSegmentedControl setEnabled:NO forSegmentAtIndex:1];
-
     [self.navigationItem.rightBarButtonItems[0] setEnabled:NO];
     [self.navigationItem.rightBarButtonItems[1] setEnabled:NO];
 }
 
-//- (void)showProgressToolbar
-//{
-//    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
-//        return;
-//
-//    // Set up iPhone toolbar
-//    UIBarButtonItem *flexibleSpaceButtonItem =
-//    [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
-//                                                  target:nil
-//                                                  action:nil];
-//    
-//    UIBarButtonItem *progressItem = [[UIBarButtonItem alloc] initWithCustomView:_progressView];
-//    
-//    self.toolbarItems = [NSArray arrayWithObjects:
-//                         flexibleSpaceButtonItem,
-//                         progressItem,
-//                         flexibleSpaceButtonItem,
-//                         nil];
-//}
-//
-//- (void)showArticleToolbar
-//{
-//    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
-//        return;
-//
-//    // Set up iPhone toolbar
-//    UIBarButtonItem *flexibleSpaceButtonItem =
-//    [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
-//                                                  target:nil
-//                                                  action:nil];
-//    
-//    UIBarButtonItem *aReplyButtonItem =
-//    [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemReply
-//                                                  target:self
-//                                                  action:@selector(replyButtonPressed:)];
-//    
-//    self.toolbarItems = [NSArray arrayWithObjects:
-//                         flexibleSpaceButtonItem,
-//                         aReplyButtonItem,
-//                         nil];
-//}
+- (void)showProgressToolbar
+{
+    UIBarButtonItem *flexibleSpaceButtonItem =
+    [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+                                                  target:nil
+                                                  action:nil];
+
+    UIBarButtonItem *progressItem = [[UIBarButtonItem alloc] initWithCustomView:_progressView];
+
+    self.toolbarItems = [NSArray arrayWithObjects:
+                         flexibleSpaceButtonItem,
+                         progressItem,
+                         flexibleSpaceButtonItem,
+                         nil];
+}
+
+- (void)showArticleToolbar
+{
+    UIBarButtonItem *flexibleSpaceButtonItem =
+    [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+                                                  target:nil
+                                                  action:nil];
+
+    UIBarButtonItem *aReplyButtonItem =
+    [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemReply
+                                                  target:self
+                                                  action:@selector(replyButtonPressed:)];
+
+    self.toolbarItems = [NSArray arrayWithObjects:
+                         flexibleSpaceButtonItem,
+                         aReplyButtonItem,
+                         nil];
+}
 
 @end

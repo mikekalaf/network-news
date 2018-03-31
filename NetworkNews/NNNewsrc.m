@@ -152,26 +152,69 @@
 
 - (void)setSubscribedGroupNames:(NSArray *)groupNames
 {
-    NSMutableArray *groupNamesChecklist = [groupNames mutableCopy];
+    // Tentatively unsubscribe from all groups
     for (NNNewsrcItem *item in _groups)
-        if ([groupNamesChecklist containsObject:item.groupName])
+        item.subscribed = NO;
+
+    // Rebuild the list of group in the order of the array of names
+    NSMutableArray *rebuiltGroups = [NSMutableArray arrayWithCapacity:groupNames.count];
+    for (NSString *name in groupNames)
+    {
+        // Find an existing group of this name
+        NNNewsrcItem *existingItem = nil;
+        for (NNNewsrcItem *item in _groups)
         {
-            item.subscribed = YES;
-            [groupNamesChecklist removeObject:item.groupName];
+            if ([item.groupName isEqualToString:name])
+            {
+                existingItem = item;
+                break;
+            }
+        }
+
+        if (existingItem)
+        {
+            existingItem.subscribed = YES;
+            [rebuiltGroups addObject:existingItem];
         }
         else
-            item.subscribed = NO;
-
-    // Add any remaining checklist names, as they must be new
-    for (NSString *name in groupNamesChecklist)
-    {
-        NNNewsrcItem *item = [[NNNewsrcItem alloc] init];
-        item.groupName = name;
-        item.articleRanges = [[NSMutableArray alloc] init];
-        item.subscribed = YES;
-        [_groups addObject:item];
-        _groupsDictionary[item.groupName] = item;
+        {
+            // Create a new group for this name
+            NNNewsrcItem *item = [[NNNewsrcItem alloc] init];
+            item.groupName = name;
+            item.articleRanges = [[NSMutableArray alloc] init];
+            item.subscribed = YES;
+            [rebuiltGroups addObject:item];
+            _groupsDictionary[item.groupName] = item;
+        }
     }
+
+    // Add the unsubscribed groups to the rebuild list
+    for (NNNewsrcItem *item in _groups)
+        if (!item.subscribed)
+            [rebuiltGroups addObject:item];
+
+    _groups = rebuiltGroups;
+
+//    NSMutableArray *groupNamesChecklist = [groupNames mutableCopy];
+//    for (NNNewsrcItem *item in _groups)
+//        if ([groupNamesChecklist containsObject:item.groupName])
+//        {
+//            item.subscribed = YES;
+//            [groupNamesChecklist removeObject:item.groupName];
+//        }
+//        else
+//            item.subscribed = NO;
+//
+//    // Add any remaining checklist names, as they must be new
+//    for (NSString *name in groupNamesChecklist)
+//    {
+//        NNNewsrcItem *item = [[NNNewsrcItem alloc] init];
+//        item.groupName = name;
+//        item.articleRanges = [[NSMutableArray alloc] init];
+//        item.subscribed = YES;
+//        [_groups addObject:item];
+//        _groupsDictionary[item.groupName] = item;
+//    }
 
     changed = YES;
 }

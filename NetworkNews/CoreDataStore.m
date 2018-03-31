@@ -114,7 +114,7 @@
     NSPersistentStoreCoordinator *coordinator = self.persistentStoreCoordinator;
     if (coordinator != nil)
     {
-        _managedObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSConfinementConcurrencyType];
+        _managedObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
         _managedObjectContext.persistentStoreCoordinator = coordinator;
     }
     return _managedObjectContext;

@@ -144,7 +144,9 @@
 {
     NSCharacterSet *charSet = [NSCharacterSet characterSetWithCharactersInString:@"<>"];
     NSString *str = [self stringByTrimmingCharactersInSet:charSet];
-    str = [str stringByAddingPercentEscapesUsingEncoding:NSASCIIStringEncoding];
+    NSMutableCharacterSet *pathCharSet = [NSCharacterSet.URLPathAllowedCharacterSet mutableCopy];
+    [pathCharSet removeCharactersInString:@"/"];
+    str = [str stringByAddingPercentEncodingWithAllowedCharacters:pathCharSet];
     return str;
 }
 
