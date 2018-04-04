@@ -160,6 +160,7 @@
 
 - (void)viewWillLayoutSubviews
 {
+    [_textView setContentOffset:CGPointMake(0, -_textView.adjustedContentInset.top) animated:NO];
     if (_textAttachment)
     {
         UIImage *image = _textAttachment.image;
@@ -672,7 +673,7 @@
             }
         }
 
-        [_textView setContentOffset:CGPointZero animated:NO];
+        [_textView setContentOffset:CGPointMake(0, -_textView.adjustedContentInset.top) animated:NO];
 
         // Display the cached copy
         [self updateContent];

@@ -64,13 +64,12 @@
 
 - (GroupStore *)concurrentGroupStore
 {
-//    NSManagedObjectContext *context = [self managedObjectContext];
-
     // Create a new store with the same persistent store coordinator, but a
     // new managed object context
     GroupStore *groupStore = [[GroupStore alloc] initWithStoreName:self.groupName
                                                        inDirectory:self.dirPath
-                                    withPersistentStoreCoordinator:self.persistentStoreCoordinator];
+                                    withPersistentStoreCoordinator:self.persistentStoreCoordinator
+                                                      isMainThread:NO];
 
     return groupStore;
 }

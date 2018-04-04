@@ -11,10 +11,9 @@
 
 @interface CoreDataStore ()
 {
-//    NSString *_dirPath;
     NSManagedObjectModel *_managedObjectModel;
-//    NSPersistentStoreCoordinator *_persistentStoreCoordinator;
     NSManagedObjectContext *_managedObjectContext;
+    BOOL _isMainThread;
 }
 
 @end
@@ -25,6 +24,7 @@
 - (instancetype)initWithStoreName:(NSString *)aStoreName
                       inDirectory:(NSString *)aDirPath
    withPersistentStoreCoordinator:(NSPersistentStoreCoordinator *)persistentStoreCoordinator
+                     isMainThread:(BOOL)isMainThread
 {
     self = [super init];
     if (self)
@@ -32,13 +32,17 @@
         _storeName = [aStoreName copy];
         _dirPath = [aDirPath copy];
         _persistentStoreCoordinator = persistentStoreCoordinator;
+        _isMainThread = isMainThread;
     }
     return self;
 }
 
 - (instancetype)initWithStoreName:(NSString *)aStoreName inDirectory:(NSString *)aDirPath
 {
-    self = [self initWithStoreName:aStoreName inDirectory:aDirPath withPersistentStoreCoordinator:nil];
+    self = [self initWithStoreName:aStoreName
+                       inDirectory:aDirPath
+    withPersistentStoreCoordinator:nil
+                      isMainThread:YES];
     if (self)
     {
         [self initPersistentStoreCoordinator];
@@ -114,7 +118,10 @@
     NSPersistentStoreCoordinator *coordinator = self.persistentStoreCoordinator;
     if (coordinator != nil)
     {
-        _managedObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
+        if (_isMainThread)
+            _managedObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
+        else
+            _managedObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
         _managedObjectContext.persistentStoreCoordinator = coordinator;
     }
     return _managedObjectContext;
