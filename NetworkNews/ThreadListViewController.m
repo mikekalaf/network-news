@@ -265,9 +265,9 @@
         cell = [aTableView dequeueReusableCellWithIdentifier:@"ArticleCell"];
 
     UILabel *dateLabel = cell.dateLabel;
-    UILabel *subjectLabel = cell.detailTextLabel;
-    UILabel *authorLabel = cell.textLabel;
-    UIImageView *imageView = cell.imageView;
+    UILabel *subjectLabel = cell.previewLabel;
+    UILabel *authorLabel = cell.titleLabel;
+    UIImageView *imageView = cell.readStatusImage;
 
     authorLabel.text = [emailAddressFormatter stringForObjectValue:thread.initialAuthor];
     subjectLabel.text = thread.subject;

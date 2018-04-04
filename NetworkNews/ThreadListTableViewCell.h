@@ -11,11 +11,11 @@
 
 @interface ThreadListTableViewCell : UITableViewCell
 {
-    UILabel *dateLabel;
-    UILabel *threadCountLabel;
 }
 
-@property(nonatomic, retain, readonly) UILabel *dateLabel;
-@property(nonatomic, retain, readonly) UILabel *threadCountLabel;
+@property(nonatomic) IBOutlet UIImageView *readStatusImage;
+@property(nonatomic) IBOutlet UILabel *titleLabel;
+@property(nonatomic) IBOutlet UILabel *previewLabel;
+@property(nonatomic) IBOutlet UILabel *dateLabel;
 
 @end
