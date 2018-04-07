@@ -41,7 +41,6 @@
         // Does the entry have MIME encoded-word data?  If so, we need
         // to decode it
         NSString *entryValue = [encodedWordDecoder decodeString:entry.value];
-        
         NSString *rawString = [NSString stringWithFormat:@"%@: %@\n",
                                entry.name,
                                entryValue];
@@ -55,27 +54,6 @@
         [self appendAttributedString:attrString];
         headerRange.length += attrString.length;
     }
-
-    // Add some space after the header
-    NSAttributedString *space = [[NSAttributedString alloc] initWithString:@"\n\n"];
-    [self appendAttributedString:space];
-    headerRange.length += 2;
-    
-    // Header Paragraph Attributes
-    // - Two tab stops, the first with right-aligned text
-//    NSMutableParagraphStyle *ps = [[NSMutableParagraphStyle alloc] init];
-//    NSArray *headerTabStops = [NSArray arrayWithObjects:
-//                               [[NSTextTab alloc] initWithType:NSRightTabStopType location:85.0],
-//                               [[NSTextTab alloc] initWithType:NSLeftTabStopType location:90.0],
-////                               [[[NSTextTab alloc] initWithType:NSRightTabStopType location:155.0] autorelease],
-////                               [[[NSTextTab alloc] initWithType:NSLeftTabStopType location:160.0] autorelease],
-//                               nil];
-//    [ps setTabStops:headerTabStops];
-////    [ps setParagraphSpacingBefore:20.0];
-//
-//    NSDictionary *paragraphAttributes = [NSDictionary dictionaryWithObject:ps
-//                                                                    forKey:NSParagraphStyleAttributeName];
-//    [self addAttributes:paragraphAttributes range:headerRange];
 }
 
 - (void)appendShortNewsHead:(NSArray *)entries
@@ -83,7 +61,7 @@
     [self appendNewsHead:[self shortHeadersFromHeaders:entries]];
 }
 
-- (void)appendBodyData:(NSData *)data quoteLevel:(NSUInteger)level
+- (void)appendBodyData:(NSData *)data quoteLevel:(NSUInteger)level firstInBody:(BOOL)first
 {
     NSString *str = [[NSString alloc] initWithData:data
                                           encoding:NSUTF8StringEncoding];
@@ -92,11 +70,11 @@
                                     encoding:NSISOLatin1StringEncoding];
     if (str)
     {
-        //NSLog(@"Level: %d {%@}", level, str);
-
         NSMutableParagraphStyle *ps = [[NSMutableParagraphStyle alloc] init];
         ps.firstLineHeadIndent = LEVEL_INDENT * level;
         ps.headIndent = LEVEL_INDENT * level;
+        if (first)
+            ps.paragraphSpacingBefore = 20;
         NSDictionary *attributes = @{NSParagraphStyleAttributeName: ps,
                                     NSForegroundColorAttributeName: [Preferences colorForQuoteLevel:level]};
 
@@ -120,35 +98,6 @@
     return mutableArray;
 }
 
-/*
-- (void)appendNewsData:(NSData *)data
-{
-    if (data == nil)
-        return;
-
-    // Append the visible headers
-    NNHeaderParser *hp = [[NNHeaderParser alloc] initWithData:data];
-    NSArray *entries = [self shortHeadersFromHeaders:hp.entries];
-    [self appendHeaders:entries];
-    
-    // Append the body
-    NSRange bodyRange = NSMakeRange(hp.length, data.length - hp.length);
-    NSData *bodyData = [data subdataWithRange:bodyRange];
-    
-    NNQuoteLevelParser *qlp = [[NNQuoteLevelParser alloc] initWithData:bodyData];
-    NSArray *quoteLevels = qlp.quoteLevels;
-    [qlp release];
-    
-    for (NNQuoteLevel *quoteLevel in quoteLevels)
-    {
-        NSData *lineData = [bodyData subdataWithRange:quoteLevel.range];
-        [self appendBodyData:lineData quoteLevel:quoteLevel.level];
-    }
-
-    [hp release];
-}
-*/
-
 - (void)appendNewsBody:(NSData *)data flowed:(BOOL)isFlowed
 {
     if (data == nil)
@@ -157,11 +106,12 @@
     NNQuoteLevelParser *qlp = [[NNQuoteLevelParser alloc] initWithData:data
                                                                 flowed:isFlowed];
     NSArray *quoteLevels = qlp.quoteLevels;
-
+    BOOL first = YES;
     for (NNQuoteLevel *quoteLevel in quoteLevels)
     {
         NSData *lineData = [data subdataWithRange:quoteLevel.range];
-        [self appendBodyData:lineData quoteLevel:quoteLevel.level];
+        [self appendBodyData:lineData quoteLevel:quoteLevel.level firstInBody:first];
+        first = NO;
     }
 }
 

@@ -54,7 +54,6 @@
 - (void)followUpToGroup;
 - (void)replyViaEmail;
 - (NSString *)headerValueWithName:(NSString *)name;
-- (void)updateWithPlaceholder;
 - (void)loadArticle;
 - (void)updateContent;
 - (void)updateTitle;
@@ -521,18 +520,6 @@
             encoding = kCFStringEncodingASCII;
     }
     return CFStringConvertEncodingToNSStringEncoding(encoding);
-}
-
-- (void)updateWithPlaceholder
-{
-    // No article has been selected, so put a placeholder here - this will
-    // happen on the iPad when the article view is displayed with no
-    // selected article
-//    [self beginHTML];
-//    [htmlString appendString:@"<p class=\"status\">No selected article</p>"];
-//    [self endHTML];
-//    [_webView loadHTMLString:htmlString baseURL:nil];
-    [self updateNavigationControls];
 }
 
 - (void)updateContent

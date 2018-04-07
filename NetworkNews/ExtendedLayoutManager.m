@@ -31,20 +31,20 @@
         // Draw quotes marks for each quote level >0
         if (attribute)
         {
+            CGContextRef context = UIGraphicsGetCurrentContext();
+            NSTextContainer *container = [self textContainerForGlyphAtIndex:attributeGlyphRange.location
+                                                             effectiveRange:NULL];
+            CGRect paraRect = [self boundingRectForGlyphRange:attributeGlyphRange
+                                              inTextContainer:container];
             NSParagraphStyle *paragraphStyle = attribute;
             CGFloat indent = paragraphStyle.headIndent;
             if (indent > 0)
             {
-                NSTextContainer *container = [self textContainerForGlyphAtIndex:attributeGlyphRange.location
-                                                                 effectiveRange:NULL];
-                CGRect paraRect = [self boundingRectForGlyphRange:attributeGlyphRange
-                                                  inTextContainer:container];
 
                 NSUInteger level = indent / LEVEL_INDENT;
                 for (NSUInteger i = 0; i < level; ++i)
                 {
-                    CGContextRef context = UIGraphicsGetCurrentContext();
-                    
+
                     UIColor *color = [Preferences colorForQuoteLevel:i + 1];
                     CGFloat redComponent;
                     CGFloat greenComponent;
@@ -56,7 +56,6 @@
                                              greenComponent,
                                              blueComponent,
                                              alphaComponent);
-
                     CGRect rect = {
                         {LEVEL_INDENT * i + 5, paraRect.origin.y + 8},
                         {2, paraRect.size.height}
@@ -64,29 +63,24 @@
                     CGContextFillRect(context, rect);
                 }
             }
+
+            // Draw a divider between the header and the body
+            CGFloat spacing = paragraphStyle.paragraphSpacingBefore;
+            if (spacing > 0)
+            {
+                CGContextSetRGBFillColor(context, 0.75, 0.75, 0.75, 1.0);
+                CGRect rect = {
+                    {5, paraRect.origin.y - 5},
+                    {paraRect.size.width, 1}
+                };
+                CGContextFillRect(context, rect);
+            }
         }
 
         // Draw the glyphs
         [super drawGlyphsForGlyphRange:attributeGlyphRange
                                atPoint:origin];
-        
-        // Is this the end of the headers section?
-        if (glyphRange.location == 0)
-        {
-            NSTextContainer *container = [self textContainerForGlyphAtIndex:attributeGlyphRange.location
-                                                             effectiveRange:NULL];
-            CGRect paraRect = [self boundingRectForGlyphRange:attributeGlyphRange
-                                              inTextContainer:container];
-            CGContextRef context = UIGraphicsGetCurrentContext();
-            CGContextSetRGBFillColor(context, 0.75, 0.75, 0.75, 1.0);
-            
-            CGRect rect = {
-                {5, paraRect.size.height - 12},
-                {paraRect.size.width - 5, 1}
-            };
-            CGContextFillRect(context, rect);
-        }
-        
+
         glyphRange.length = NSMaxRange(glyphRange) - NSMaxRange(attributeGlyphRange);
         glyphRange.location = NSMaxRange(attributeGlyphRange);
     }

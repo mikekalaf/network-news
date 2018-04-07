@@ -91,7 +91,7 @@
                        action:@selector(refresh:)
              forControlEvents:UIControlEventValueChanged];
     self.refreshControl = refreshControl;
-    self.navigationItem.searchController = [[UISearchController alloc] initWithSearchResultsController:nil];
+//    self.navigationItem.searchController = [[UISearchController alloc] initWithSearchResultsController:nil];
 
     dateFormatter = [[ExtendedDateFormatter alloc] init];
     emailAddressFormatter = [[EmailAddressFormatter alloc] init];

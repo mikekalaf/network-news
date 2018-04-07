@@ -25,7 +25,6 @@
 		634191E616D0D6590069B528 /* NetworkNewsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 634191E516D0D6590069B528 /* NetworkNewsTests.m */; };
 		6341926016D0D8800069B528 /* ArticleViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 634191F416D0D87F0069B528 /* ArticleViewController.m */; };
 		6341926616D0D8800069B528 /* EditableTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 634191FB16D0D87F0069B528 /* EditableTableViewCell.m */; };
-		6341926B16D0D8800069B528 /* EditableTextTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6341920416D0D8800069B528 /* EditableTextTableViewCell.xib */; };
 		6341926D16D0D8800069B528 /* GroupInfoView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6341920816D0D8800069B528 /* GroupInfoView.xib */; };
 		6341926F16D0D8800069B528 /* AccountSettingsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6341920C16D0D8800069B528 /* AccountSettingsView.xib */; };
 		6341927616D0D8800069B528 /* ExtendedDateFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 6341921B16D0D8800069B528 /* ExtendedDateFormatter.m */; };
@@ -132,7 +131,6 @@
 		634191F916D0D87F0069B528 /* changes.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = changes.md; path = NetworkNews/changes.md; sourceTree = "<group>"; };
 		634191FA16D0D87F0069B528 /* EditableTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditableTableViewCell.h; sourceTree = "<group>"; };
 		634191FB16D0D87F0069B528 /* EditableTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EditableTableViewCell.m; sourceTree = "<group>"; };
-		6341920516D0D8800069B528 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/EditableTextTableViewCell.xib; sourceTree = "<group>"; };
 		6341920916D0D8800069B528 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/GroupInfoView.xib; sourceTree = "<group>"; };
 		6341920D16D0D8800069B528 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/AccountSettingsView.xib; sourceTree = "<group>"; };
 		6341921A16D0D8800069B528 /* ExtendedDateFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtendedDateFormatter.h; sourceTree = "<group>"; };
@@ -469,7 +467,6 @@
 				634191F416D0D87F0069B528 /* ArticleViewController.m */,
 				634191FA16D0D87F0069B528 /* EditableTableViewCell.h */,
 				634191FB16D0D87F0069B528 /* EditableTableViewCell.m */,
-				6341920416D0D8800069B528 /* EditableTextTableViewCell.xib */,
 				6341920816D0D8800069B528 /* GroupInfoView.xib */,
 				6341920C16D0D8800069B528 /* AccountSettingsView.xib */,
 				6341921E16D0D8800069B528 /* FavouriteGroupsViewController.h */,
@@ -628,7 +625,6 @@
 			files = (
 				634191BF16D0D6590069B528 /* InfoPlist.strings in Resources */,
 				63C3011C1769707A00F8B6FE /* Images.xcassets in Resources */,
-				6341926B16D0D8800069B528 /* EditableTextTableViewCell.xib in Resources */,
 				6341926D16D0D8800069B528 /* GroupInfoView.xib in Resources */,
 				6341926F16D0D8800069B528 /* AccountSettingsView.xib in Resources */,
 				03ECA37D206081C600A44D65 /* LaunchScreen.storyboard in Resources */,
@@ -765,14 +761,6 @@
 				634191E216D0D6590069B528 /* en */,
 			);
 			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-		6341920416D0D8800069B528 /* EditableTextTableViewCell.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				6341920516D0D8800069B528 /* en */,
-			);
-			name = EditableTextTableViewCell.xib;
 			sourceTree = "<group>";
 		};
 		6341920816D0D8800069B528 /* GroupInfoView.xib */ = {
