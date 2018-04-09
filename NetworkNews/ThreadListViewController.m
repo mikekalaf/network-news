@@ -17,6 +17,7 @@
 #import "EmailAddressFormatter.h"
 #import "NSString+NewsAdditions.h"
 #import "ThreadListTableViewCell.h"
+#import "LoadMoreTableViewCell.h"
 #import "ThreadIterator.h"
 #import "NetworkNews.h"
 #import "NewsConnectionPool.h"
@@ -244,7 +245,12 @@
 {
     // If this row is beyond the end of the list, show a "load more" cell
     if (indexPath.row >= [self activeThreads].count)
-        return [aTableView dequeueReusableCellWithIdentifier:@"LoadMoreCell"];
+    {
+        [self downloadArticlesWithMode:ArticleOverviewsMore];
+        LoadMoreTableViewCell *cell = [aTableView dequeueReusableCellWithIdentifier:@"LoadMoreCell"];
+        [cell.activityIndicatorView startAnimating];
+        return cell;
+    }
 
     Thread *thread;
 

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		03148F3B1C47348400BAFED3 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 03148F3A1C47348400BAFED3 /* libz.tbd */; };
+		03457BA1207BD2220047BAA8 /* LoadMoreTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 03457BA0207BD2220047BAA8 /* LoadMoreTableViewCell.m */; };
 		03ECA37D206081C600A44D65 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 03ECA37C206081C600A44D65 /* LaunchScreen.storyboard */; };
 		6302EF0E178D8E7800BBC68E /* ExtendedLayoutManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 6302EF0D178D8E7800BBC68E /* ExtendedLayoutManager.m */; };
 		631CBA6A1893CB2400B9421A /* ArticleRange.m in Sources */ = {isa = PBXBuildFile; fileRef = 631CBA691893CB2400B9421A /* ArticleRange.m */; };
@@ -102,6 +103,8 @@
 
 /* Begin PBXFileReference section */
 		03148F3A1C47348400BAFED3 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+		03457B9F207BD2220047BAA8 /* LoadMoreTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LoadMoreTableViewCell.h; sourceTree = "<group>"; };
+		03457BA0207BD2220047BAA8 /* LoadMoreTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LoadMoreTableViewCell.m; sourceTree = "<group>"; };
 		03ECA37C206081C600A44D65 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		03F4771C2060D71B00E1A55B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		6302EF0C178D8E7800BBC68E /* ExtendedLayoutManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtendedLayoutManager.h; sourceTree = "<group>"; };
@@ -453,6 +456,8 @@
 				6341924C16D0D8800069B528 /* ThreadIterator.m */,
 				6341924D16D0D8800069B528 /* ThreadListTableViewCell.h */,
 				6341924E16D0D8800069B528 /* ThreadListTableViewCell.m */,
+				03457B9F207BD2220047BAA8 /* LoadMoreTableViewCell.h */,
+				03457BA0207BD2220047BAA8 /* LoadMoreTableViewCell.m */,
 				6341924F16D0D8800069B528 /* ThreadListViewController.h */,
 				6341925016D0D8800069B528 /* ThreadListViewController.m */,
 				6341925116D0D8800069B528 /* ThreadSectionHeaderView.h */,
@@ -679,6 +684,7 @@
 				6341929616D0D8800069B528 /* AccountsViewController.m in Sources */,
 				6341929A16D0D8800069B528 /* ThreadIterator.m in Sources */,
 				6341929B16D0D8800069B528 /* ThreadListTableViewCell.m in Sources */,
+				03457BA1207BD2220047BAA8 /* LoadMoreTableViewCell.m in Sources */,
 				6341929C16D0D8800069B528 /* ThreadListViewController.m in Sources */,
 				6341929D16D0D8800069B528 /* ThreadSectionHeaderView.m in Sources */,
 				6341929E16D0D8800069B528 /* ThreadTableViewCell.m in Sources */,
