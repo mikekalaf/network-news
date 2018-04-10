@@ -143,32 +143,12 @@ commitEditingStyle:(UITableViewCellEditingStyle)editingStyle
 {
     if (editingStyle == UITableViewCellEditingStyleDelete)
     {
-//        // Delete the cache
-        NSFileManager *fileManager = [NSFileManager defaultManager];
-        NSString *name = _groupNames[indexPath.row];
+//        NSString *name = _groupNames[indexPath.row];
+
+        // Delete the cache
+//        NSFileManager *fileManager = [NSFileManager defaultManager];
 //        NSURL *cacheURL = [[[_connectionPool account] cacheURL] URLByAppendingPathComponent:name];
 //        [fileManager removeItemAtURL:cacheURL error:NULL];
-
-        // Delete the database
-        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,
-                                                             NSUserDomainMask,
-                                                             YES);
-        NSString *documentDir = paths.lastObject;
-        NSString *serverDir = [documentDir stringByAppendingPathComponent:_connectionPool.account.hostName];
-        NSString *storeNameWithExt = [name stringByAppendingPathExtension:@"sqlite"];
-        NSString *path = [serverDir stringByAppendingPathComponent:storeNameWithExt];
-        NSLog(@"Removing path: %@", path);
-        [fileManager removeItemAtPath:path error:NULL];
-
-        storeNameWithExt = [name stringByAppendingPathExtension:@"sqlite-shm"];
-        path = [serverDir stringByAppendingPathComponent:storeNameWithExt];
-        NSLog(@"Removing path: %@", path);
-        [fileManager removeItemAtPath:path error:NULL];
-
-        storeNameWithExt = [name stringByAppendingPathExtension:@"sqlite-wal"];
-        path = [serverDir stringByAppendingPathComponent:storeNameWithExt];
-        NSLog(@"Removing path: %@", path);
-        [fileManager removeItemAtPath:path error:NULL];
 
         // Remove from the table view
         [_groupNames removeObjectAtIndex:indexPath.row];

@@ -161,7 +161,8 @@
 - (void)viewWillDisappear:(BOOL)animated
 {
 	[super viewWillDisappear:animated];
-    [_operationQueue cancelAllOperations];
+    if (self.movingFromParentViewController)
+        [_operationQueue cancelAllOperations];
 }
 
 - (void)dealloc
