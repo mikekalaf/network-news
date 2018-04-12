@@ -11,6 +11,8 @@
 #import "NewsConnection.h"
 #import "NewsResponse.h"
 
+NSString *PostArticleCompletedNotification = @"PostArticleCompletedNotification";
+
 @interface PostArticleOperation ()
 {
     NewsConnectionPool *_connectionPool;
@@ -53,6 +55,12 @@
         {
             // Posting failed
         }
+        NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+        [nc postNotificationName:PostArticleCompletedNotification
+                          object:self
+                        userInfo:@{@"statusCode": @(response.statusCode),
+                                   @"response": response.string,
+                                   }];
 
         [_connectionPool enqueueConnection:newsConnection];
     }

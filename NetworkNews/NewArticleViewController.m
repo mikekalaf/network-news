@@ -10,10 +10,12 @@
 #import "NNArticleFormatter.h"
 #import "NewsConnectionPool.h"
 #import "NewsConnection.h"
+#import "NewsAccount.h"
 #import "PostArticleOperation.h"
 #import "AppDelegate.h"
 #import "NetworkNews.h"
 #import "NSString+NewsAdditions.h"
+#import "EncodedWordEncoder.h"
 
 #define EMPTY_STR @""
 
@@ -129,6 +131,10 @@
 
     // Notifications we're interested in
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+    [nc addObserver:self
+           selector:@selector(postArticleCompleted:)
+               name:PostArticleCompletedNotification
+             object:nil];
     [nc addObserver:self
            selector:@selector(subjectDidChange:)
                name:UITextFieldTextDidChangeNotification
@@ -337,12 +343,15 @@
     [activityIndicatorView startAnimating];
 
     NNArticleFormatter *formatter = [[NNArticleFormatter alloc] init];
+    EncodedWordEncoder *encoder = [[EncodedWordEncoder alloc] init];
 
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     NSString *name = [userDefaults stringForKey:@"FullName"];
     NSString *email = [userDefaults stringForKey:@"EmailAddress"];
     if (email == nil || [email isEqualToString:EMPTY_STR])
         email = @"unknown_user@invalid.com";
+    name = [encoder encodeString:@"Føø Bår"];
+//    name = [encoder encodeString:@"Tésting"];
     NSString *emailAddress;
     if (name && [name isEqualToString:EMPTY_STR] == NO)
         emailAddress = [NSString stringWithFormat:@"%@ <%@>", name, email];
@@ -357,7 +366,7 @@
     NSString *organization = [userDefaults stringForKey:@"Organization"];
     
     NSString *newsgroups = _toLabel.text;
-    NSString *newSubject = _subjectTextField.text;
+    NSString *newSubject = [encoder encodeString:_subjectTextField.text];
     
     NSArray *headers = [NNArticleFormatter headerArrayWithDate:[NSDate date]
                                                           from:emailAddress
@@ -371,10 +380,6 @@
     // Chop off the hacky three CRs at the beginning of the text
     NSString *articleText = [self textView].text;
     
-    // Strip-out instances of paragraph sign
-//    articleText = [articleText stringByReplacingOccurrencesOfString:PARAGRAPH_SIGN_STR
-//                                                         withString:EMPTY_STR];
-
     // Word-wrap the text at column 78
     articleText = [articleText stringByWrappingWordsAtColumn:78];
 
@@ -387,50 +392,41 @@
     operation.completionBlock = ^{
         dispatch_async(dispatch_get_main_queue(), ^{
             [self->activityIndicatorView stopAnimating];
-            [self->_delegate newArticleViewController:self didSend:YES];
         });
     };
     [_operationQueue addOperation:operation];
 }
 
-#pragma mark -
-#pragma mark Notifications
+#pragma mark - Notifications
 
-//- (void)articleNotPosted:(NSNotification *)notification
-//{
-//    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-//    [nc removeObserver:self name:nil object:currentTask];
-//    
-//    [activityIndicatorView stopAnimating];
-//    sendButtonItem.enabled = YES;
-//    
-//    NSString *errorString = [NSString stringWithFormat:
-//                             @"Posting articles to the server \"%@\" is not allowed.",
-//                             currentTask.connection.hostName];
-//    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Cannot Post"
-//                                                        message:errorString
-//                                                       delegate:nil
-//                                              cancelButtonTitle:@"OK"
-//                                              otherButtonTitles:nil];
-//    [alertView show];
-//
-//    // We've finished our task
-//    currentTask = nil;
-//}
-//
-//- (void)articlePostError:(NSNotification *)notification
-//{
-//    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-//    [nc removeObserver:self name:nil object:currentTask];
-//
-//    [activityIndicatorView stopAnimating];
-//    sendButtonItem.enabled = YES;
-//
-//    AlertViewFailedConnection(currentTask.connection.hostName);
-//
-//    // We've finished our task
-//    currentTask = nil;
-//}
+- (void)postArticleCompleted:(NSNotification *)notification
+{
+    NSInteger statusCode = [notification.userInfo[@"statusCode"] integerValue];
+    if (statusCode == 240)
+    {
+        // Article posted
+        [self->_delegate newArticleViewController:self didSend:YES];
+    }
+    else
+    {
+        NSString *response = notification.userInfo[@"response"];
+        NSString *message = [NSString stringWithFormat:
+                             @"Post failed with message: %@",
+                             response];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error"
+                                                                           message:message
+                                                                    preferredStyle:UIAlertControllerStyleAlert];
+            UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"OK"
+                                                                    style:UIAlertActionStyleDefault
+                                                                  handler:^(UIAlertAction *action) {
+//                                                                      [self->_delegate newArticleViewController:self didSend:NO];
+                                                                 }];
+            [alert addAction:defaultAction];
+            [self presentViewController:alert animated:YES completion:nil];
+        });
+    }
+}
 
 - (void)subjectDidChange:(NSNotification *)notification
 {

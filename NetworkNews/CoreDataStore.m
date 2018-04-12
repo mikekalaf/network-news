@@ -67,32 +67,32 @@
 - (void)initPersistentStoreCoordinator
 {
     // Build up the store URL, ensuring that the containing directory exists
-//    NSFileManager *fileManager = [NSFileManager defaultManager];
-//    NSURL *applicationDocumentsDirectory = [self applicationDocumentsDirectory];
-//    NSURL *storeURL;
-//    if (_dirPath)
-//        storeURL = [applicationDocumentsDirectory URLByAppendingPathComponent:_dirPath];
-//    else
-//        storeURL = applicationDocumentsDirectory;
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSURL *applicationDocumentsDirectory = [self applicationDocumentsDirectory];
+    NSURL *storeURL;
+    if (_dirPath)
+        storeURL = [applicationDocumentsDirectory URLByAppendingPathComponent:_dirPath];
+    else
+        storeURL = applicationDocumentsDirectory;
     NSError *error = nil;
 
-//    if (![fileManager fileExistsAtPath:storeURL.path isDirectory:NULL])
-//    {
-//        if (![fileManager createDirectoryAtURL:storeURL
-//                   withIntermediateDirectories:YES
-//                                    attributes:nil
-//                                         error:&error])
-//        {
-//            NSAssert(NO, ([NSString stringWithFormat:
-//                           @"Failed to create App Support directory %@ : %@",
-//                           storeURL,
-//                           error]));
-//            NSLog(@"Error creating application support directory at %@ : %@",
-//                  storeURL,
-//                  error);
-//            return;
-//        }
-//    }
+    if (![fileManager fileExistsAtPath:storeURL.path isDirectory:NULL])
+    {
+        if (![fileManager createDirectoryAtURL:storeURL
+                   withIntermediateDirectories:YES
+                                    attributes:nil
+                                         error:&error])
+        {
+            NSAssert(NO, ([NSString stringWithFormat:
+                           @"Failed to create App Support directory %@ : %@",
+                           storeURL,
+                           error]));
+            NSLog(@"Error creating application support directory at %@ : %@",
+                  storeURL,
+                  error);
+            return;
+        }
+    }
 
 //    NSString *storeNameWithExt = [_storeName stringByAppendingPathExtension:@"sqlite"];
 //    NSURL *url = [storeURL URLByAppendingPathComponent:storeNameWithExt];

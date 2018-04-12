@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+extern NSString *PostArticleCompletedNotification;
+
 @class NewsConnectionPool;
 
 @interface PostArticleOperation : NSOperation

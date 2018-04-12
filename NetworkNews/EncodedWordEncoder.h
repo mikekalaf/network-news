@@ -10,4 +10,6 @@
 
 @interface EncodedWordEncoder : NSObject
 
+- (nullable NSString *)encodeString:(nonnull NSString *)string;
+
 @end
