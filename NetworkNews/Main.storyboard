@@ -149,7 +149,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Wfl-JD-PiV">
-                                            <rect key="frame" x="2" y="15.5" width="12" height="12"/>
+                                            <rect key="frame" x="2" y="15.666666666666664" width="12" height="12"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="12" id="7OW-xj-W8N"/>
                                                 <constraint firstAttribute="width" constant="12" id="uGi-Ff-LXG"/>
@@ -168,7 +168,7 @@
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="1000" text="Date" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Gc4-Jf-LIc">
-                                            <rect key="frame" x="302.5" y="15" width="30.5" height="17"/>
+                                            <rect key="frame" x="302.66666666666669" y="15" width="30.333333333333314" height="17"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                             <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             <nil key="highlightedColor"/>
@@ -216,13 +216,13 @@
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="1000" text="Date" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eWP-fg-WHA">
-                                            <rect key="frame" x="302.5" y="15" width="30.5" height="17"/>
+                                            <rect key="frame" x="302.66666666666669" y="15" width="30.333333333333314" height="17"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                             <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="PZ4-Rw-JyU">
-                                            <rect key="frame" x="2" y="15.5" width="12" height="12"/>
+                                            <rect key="frame" x="2" y="15.666666666666664" width="12" height="12"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="12" id="6wC-ze-veR"/>
                                                 <constraint firstAttribute="width" constant="12" id="Qg4-gy-8nS"/>
@@ -473,7 +473,7 @@
                         <searchBar key="tableHeaderView" contentMode="redraw" placeholder="Group name" backgroundImage="Default" scopeBarBackgroundImage="Default" showsScopeBar="YES" id="xad-BU-YNR">
                             <rect key="frame" x="0.0" y="0.0" width="375" height="100"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
-                            <textInputTraits key="textInputTraits"/>
+                            <textInputTraits key="textInputTraits" spellCheckingType="no"/>
                             <scopeButtonTitles>
                                 <string>Contains</string>
                                 <string>Begins with</string>

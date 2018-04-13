@@ -11,10 +11,11 @@
 #import "GroupListing.h"
 #import "AppDelegate.h"
 #import "NetworkNews.h"
+#import "LoadingIndicatorView.h"
 
 @interface SearchGroupsViewController () <UISearchBarDelegate>
 {
-    UIActivityIndicatorView *activityIndicatorView;
+    LoadingIndicatorView *loadingIndicatorView;
     NSString *searchText;
     NSInteger searchScope;
     NSArray *_foundGroupList;
@@ -41,11 +42,10 @@
     self.searchBar.selectedScopeButtonIndex = searchScope;
     [self.searchBar becomeFirstResponder];
     
-    // Create an activity indicator
-    activityIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
-    activityIndicatorView.hidesWhenStopped = YES;
-    [self.view addSubview:activityIndicatorView];
-    activityIndicatorView.center = self.view.center;
+    // Create a loading indicator
+    loadingIndicatorView = [[LoadingIndicatorView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
+    loadingIndicatorView.hidden = YES;
+    [self.navigationController.view addSubview:loadingIndicatorView];
 
     _operationQueue = [[NSOperationQueue alloc] init];
 }
@@ -70,6 +70,12 @@
 //        [_checkedGroups writeToFile:path atomically:YES];
 //        modified = NO;
 //    }
+}
+
+- (void)viewDidLayoutSubviews
+{
+    [super viewDidLayoutSubviews];
+    loadingIndicatorView.center = self.navigationController.view.center;
 }
 
 #pragma mark - UITableViewDataSource Methods
@@ -173,8 +179,8 @@
     // Remove the focus from the search field, so the keyboard disappears
     [_searchBar resignFirstResponder];
 
-    [activityIndicatorView startAnimating];
-    
+    loadingIndicatorView.hidden = NO;
+
     // Cache the search request
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     [userDefaults setObject:_searchBar.text forKey:MOST_RECENT_GROUP_SEARCH];
@@ -201,7 +207,7 @@
                                                                        ascending:NO];
         self->_foundGroupList = [operation.groups sortedArrayUsingDescriptors:@[sortDescriptor]];
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self->activityIndicatorView stopAnimating];
+            self->loadingIndicatorView.hidden = YES;
             [self.tableView reloadData];
         });
     };

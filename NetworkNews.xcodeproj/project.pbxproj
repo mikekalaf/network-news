@@ -10,6 +10,7 @@
 		03148F3B1C47348400BAFED3 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 03148F3A1C47348400BAFED3 /* libz.tbd */; };
 		03457BA1207BD2220047BAA8 /* LoadMoreTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 03457BA0207BD2220047BAA8 /* LoadMoreTableViewCell.m */; };
 		03457BA5207BE6E50047BAA8 /* EncodedWordEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 03457BA4207BE6E50047BAA8 /* EncodedWordEncoder.m */; };
+		03714C6920803470006AD9F8 /* LoadingIndicatorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 03714C6820803470006AD9F8 /* LoadingIndicatorView.m */; };
 		03ECA37D206081C600A44D65 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 03ECA37C206081C600A44D65 /* LaunchScreen.storyboard */; };
 		6302EF0E178D8E7800BBC68E /* ExtendedLayoutManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 6302EF0D178D8E7800BBC68E /* ExtendedLayoutManager.m */; };
 		631CBA6A1893CB2400B9421A /* ArticleRange.m in Sources */ = {isa = PBXBuildFile; fileRef = 631CBA691893CB2400B9421A /* ArticleRange.m */; };
@@ -107,6 +108,8 @@
 		03457BA0207BD2220047BAA8 /* LoadMoreTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LoadMoreTableViewCell.m; sourceTree = "<group>"; };
 		03457BA3207BE6E50047BAA8 /* EncodedWordEncoder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EncodedWordEncoder.h; sourceTree = "<group>"; };
 		03457BA4207BE6E50047BAA8 /* EncodedWordEncoder.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EncodedWordEncoder.m; sourceTree = "<group>"; };
+		03714C6720803470006AD9F8 /* LoadingIndicatorView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LoadingIndicatorView.h; sourceTree = "<group>"; };
+		03714C6820803470006AD9F8 /* LoadingIndicatorView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LoadingIndicatorView.m; sourceTree = "<group>"; };
 		03ECA37C206081C600A44D65 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		03F4771C2060D71B00E1A55B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		6302EF0C178D8E7800BBC68E /* ExtendedLayoutManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtendedLayoutManager.h; sourceTree = "<group>"; };
@@ -489,6 +492,8 @@
 				6341922816D0D8800069B528 /* GroupInfoViewController.h */,
 				6341922916D0D8800069B528 /* GroupInfoViewController.m */,
 				03ECA37C206081C600A44D65 /* LaunchScreen.storyboard */,
+				03714C6720803470006AD9F8 /* LoadingIndicatorView.h */,
+				03714C6820803470006AD9F8 /* LoadingIndicatorView.m */,
 			);
 			name = UI;
 			sourceTree = "<group>";
@@ -709,6 +714,7 @@
 				6398525816D0FBEA009303E2 /* LineIterator.m in Sources */,
 				633D9C3E16E1A489008DD64F /* NewsAccount.m in Sources */,
 				63E3A76C16E99BD300BD3D13 /* NewsConnection.m in Sources */,
+				03714C6920803470006AD9F8 /* LoadingIndicatorView.m in Sources */,
 				63E3A76F16EA10C200BD3D13 /* NewsResponse.m in Sources */,
 				63E3A77316EAD01500BD3D13 /* GroupListSearchOperation.m in Sources */,
 				63E3A77616EB6FF900BD3D13 /* NewsConnectionPool.m in Sources */,
