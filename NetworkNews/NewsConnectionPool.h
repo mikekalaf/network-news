@@ -18,7 +18,8 @@
 - (instancetype)initWithAccount:(NewsAccount *)account NS_DESIGNATED_INITIALIZER;
 - (instancetype)init __attribute__((unavailable));
 
-@property (NS_NONATOMIC_IOSONLY, readonly, strong) NewsConnection *dequeueConnection;
+- (NewsConnection *)dequeueConnection;
 - (void)enqueueConnection:(NewsConnection *)connection;
+- (void)closeAllConnections;
 
 @end

@@ -61,7 +61,7 @@
     [self appendNewsHead:[self shortHeadersFromHeaders:entries]];
 }
 
-- (void)appendBodyData:(NSData *)data quoteLevel:(NSUInteger)level firstInBody:(BOOL)first
+- (void)appendBodyData:(NSData *)data quoteLevel:(NNQuoteLevel *)quoteLevel firstInBody:(BOOL)first
 {
     NSString *str = [[NSString alloc] initWithData:data
                                           encoding:NSUTF8StringEncoding];
@@ -70,13 +70,16 @@
                                     encoding:NSISOLatin1StringEncoding];
     if (str)
     {
+//        if (quoteLevel.flowed)
+//            str = [str stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+
         NSMutableParagraphStyle *ps = [[NSMutableParagraphStyle alloc] init];
-        ps.firstLineHeadIndent = LEVEL_INDENT * level;
-        ps.headIndent = LEVEL_INDENT * level;
+        ps.firstLineHeadIndent = LEVEL_INDENT * quoteLevel.level;
+        ps.headIndent = LEVEL_INDENT * quoteLevel.level;
         if (first)
             ps.paragraphSpacingBefore = 20;
         NSDictionary *attributes = @{NSParagraphStyleAttributeName: ps,
-                                    NSForegroundColorAttributeName: [Preferences colorForQuoteLevel:level]};
+                                    NSForegroundColorAttributeName: [Preferences colorForQuoteLevel:quoteLevel.level]};
 
         NSMutableAttributedString *attrStr = [[NSMutableAttributedString alloc] initWithString:str
                                                                                     attributes:attributes];
@@ -110,7 +113,7 @@
     for (NNQuoteLevel *quoteLevel in quoteLevels)
     {
         NSData *lineData = [data subdataWithRange:quoteLevel.range];
-        [self appendBodyData:lineData quoteLevel:quoteLevel.level firstInBody:first];
+        [self appendBodyData:lineData quoteLevel:quoteLevel firstInBody:first];
         first = NO;
     }
 }

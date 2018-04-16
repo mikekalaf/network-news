@@ -50,7 +50,6 @@
 @property(nonatomic) UITextView *textView;
 @property(nonatomic, readonly, copy) NSString *bodyTextForFollowUp;
 
-- (NSURL *)cacheURLForMessageId:(NSString *)messageId extension:(NSString *)extension;
 - (void)followUpToGroup;
 - (void)replyViaEmail;
 - (NSString *)headerValueWithName:(NSString *)name;
@@ -400,12 +399,6 @@
 }
 
 #pragma mark - Private Methods
-
-- (NSURL *)cacheURLForMessageId:(NSString *)messageId extension:(NSString *)extension
-{
-    NSString *fileName = [messageId messageIDFileName];
-    return [_cacheURL URLByAppendingPathComponent:[fileName stringByAppendingPathExtension:extension]];
-}
 
 - (NSString *)bodyTextForFollowUp
 {

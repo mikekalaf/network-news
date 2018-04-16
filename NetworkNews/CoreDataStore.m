@@ -33,21 +33,20 @@
         _dirPath = [aDirPath copy];
         _persistentStoreCoordinator = persistentStoreCoordinator;
         _isMainThread = isMainThread;
+        if (persistentStoreCoordinator == nil)
+        {
+            [self initPersistentStoreCoordinator];
+        }
     }
     return self;
 }
 
 - (instancetype)initWithStoreName:(NSString *)aStoreName inDirectory:(NSString *)aDirPath
 {
-    self = [self initWithStoreName:aStoreName
+    return [self initWithStoreName:aStoreName
                        inDirectory:aDirPath
     withPersistentStoreCoordinator:nil
                       isMainThread:YES];
-    if (self)
-    {
-        [self initPersistentStoreCoordinator];
-    }
-    return self;
 }
 
 - (NSURL *)applicationDocumentsDirectory

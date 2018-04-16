@@ -14,7 +14,6 @@
 @interface NewsConnectionPool ()
 {
     NSMutableArray *_connections;
-//    NewsAccount *_account;
 }
 
 @end
@@ -71,6 +70,14 @@
         }
     }
     [[UIApplication sharedApplication] hideNetworkActivityIndicator];
+}
+
+- (void)closeAllConnections
+{
+    @synchronized(self)
+    {
+        [_connections removeAllObjects];
+    }
 }
 
 @end

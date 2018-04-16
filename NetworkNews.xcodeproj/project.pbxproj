@@ -11,6 +11,10 @@
 		03457BA1207BD2220047BAA8 /* LoadMoreTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 03457BA0207BD2220047BAA8 /* LoadMoreTableViewCell.m */; };
 		03457BA5207BE6E50047BAA8 /* EncodedWordEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 03457BA4207BE6E50047BAA8 /* EncodedWordEncoder.m */; };
 		03714C6920803470006AD9F8 /* LoadingIndicatorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 03714C6820803470006AD9F8 /* LoadingIndicatorView.m */; };
+		03714C6B20816F03006AD9F8 /* NNQuoteLevelParserTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 03714C6A20816F03006AD9F8 /* NNQuoteLevelParserTest.m */; };
+		03714C6D20851D49006AD9F8 /* ArticleOverviewsOperationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 03714C6C20851D49006AD9F8 /* ArticleOverviewsOperationTest.m */; };
+		03714C6E20852337006AD9F8 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63FF913916D1089F0068ADFB /* CoreData.framework */; };
+		03714C7020853BE3006AD9F8 /* FetchArticleOperationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 03714C6F20853BE3006AD9F8 /* FetchArticleOperationTest.m */; };
 		03ECA37D206081C600A44D65 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 03ECA37C206081C600A44D65 /* LaunchScreen.storyboard */; };
 		6302EF0E178D8E7800BBC68E /* ExtendedLayoutManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 6302EF0D178D8E7800BBC68E /* ExtendedLayoutManager.m */; };
 		631CBA6A1893CB2400B9421A /* ArticleRange.m in Sources */ = {isa = PBXBuildFile; fileRef = 631CBA691893CB2400B9421A /* ArticleRange.m */; };
@@ -110,6 +114,9 @@
 		03457BA4207BE6E50047BAA8 /* EncodedWordEncoder.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EncodedWordEncoder.m; sourceTree = "<group>"; };
 		03714C6720803470006AD9F8 /* LoadingIndicatorView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LoadingIndicatorView.h; sourceTree = "<group>"; };
 		03714C6820803470006AD9F8 /* LoadingIndicatorView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LoadingIndicatorView.m; sourceTree = "<group>"; };
+		03714C6A20816F03006AD9F8 /* NNQuoteLevelParserTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NNQuoteLevelParserTest.m; sourceTree = "<group>"; };
+		03714C6C20851D49006AD9F8 /* ArticleOverviewsOperationTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ArticleOverviewsOperationTest.m; sourceTree = "<group>"; };
+		03714C6F20853BE3006AD9F8 /* FetchArticleOperationTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FetchArticleOperationTest.m; sourceTree = "<group>"; };
 		03ECA37C206081C600A44D65 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		03F4771C2060D71B00E1A55B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		6302EF0C178D8E7800BBC68E /* ExtendedLayoutManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtendedLayoutManager.h; sourceTree = "<group>"; };
@@ -281,6 +288,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				03714C6E20852337006AD9F8 /* CoreData.framework in Frameworks */,
 				634191DA16D0D6590069B528 /* UIKit.framework in Frameworks */,
 				634191DB16D0D6590069B528 /* Foundation.framework in Frameworks */,
 			);
@@ -373,6 +381,9 @@
 			isa = PBXGroup;
 			children = (
 				634191E516D0D6590069B528 /* NetworkNewsTests.m */,
+				03714C6A20816F03006AD9F8 /* NNQuoteLevelParserTest.m */,
+				03714C6C20851D49006AD9F8 /* ArticleOverviewsOperationTest.m */,
+				03714C6F20853BE3006AD9F8 /* FetchArticleOperationTest.m */,
 				634191DF16D0D6590069B528 /* Supporting Files */,
 			);
 			path = NetworkNewsTests;
@@ -735,7 +746,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				03714C6B20816F03006AD9F8 /* NNQuoteLevelParserTest.m in Sources */,
+				03714C7020853BE3006AD9F8 /* FetchArticleOperationTest.m in Sources */,
 				634191E616D0D6590069B528 /* NetworkNewsTests.m in Sources */,
+				03714C6D20851D49006AD9F8 /* ArticleOverviewsOperationTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

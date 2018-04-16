@@ -160,7 +160,8 @@ NSString *FetchArticleCompletedNotification = @"FetchArticleCompletedNotificatio
 
 - (void)bytesReceived:(NSNotification *)notification
 {
-    _progressBlock([notification.userInfo[@"byteCount"] integerValue]);
+    if (_progressBlock)
+        _progressBlock([notification.userInfo[@"byteCount"] integerValue]);
 }
 
 - (NSString *)headerValueWithName:(NSString *)name
