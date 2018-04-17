@@ -9,13 +9,9 @@
 #import <Foundation/Foundation.h>
 
 @interface NNHeaderEntry : NSObject
-{
-    NSString *name;
-    NSString *value;
-}
 
-@property (copy, readonly) NSString *name;
-@property (copy, readonly) NSString *value;
+@property(nonatomic, copy, readonly) NSString *name;
+@property(nonatomic, copy, readonly) NSString *value;
 
 - (instancetype)initWithName:(NSString *)aName value:(NSString *)aValue NS_DESIGNATED_INITIALIZER;
 - (instancetype)init __attribute__((unavailable));

@@ -10,14 +10,9 @@
 
 
 @interface NNHeaderParser : NSObject
-{
-    NSData *data;
-    NSUInteger length;
-    NSArray *entries;
-}
 
-@property (readonly) NSUInteger length;
-@property (readonly) NSArray *entries;
+@property(nonatomic, readonly) NSUInteger length;
+@property(nonatomic, readonly) NSArray *entries;
 
 - (instancetype)initWithData:(NSData *)articleData NS_DESIGNATED_INITIALIZER;
 - (instancetype)init __attribute__((unavailable));

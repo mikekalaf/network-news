@@ -11,16 +11,13 @@
 
 @implementation NNHeaderEntry
 
-@synthesize name;
-@synthesize value;
-
 - (instancetype)initWithName:(NSString *)aName value:(NSString *)aValue
 {
     self = [super init];
     if (self)
     {
-        name = [aName copy];
-        value = [aValue copy];
+        _name = [aName copy];
+        _value = [aValue copy];
     }
     return self;
 }

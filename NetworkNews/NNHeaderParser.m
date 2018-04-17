@@ -9,18 +9,18 @@
 #import "NNHeaderParser.h"
 #import "NNHeaderEntry.h"
 
-@interface NNHeaderParser (Private)
+@interface NNHeaderParser ()
+{
+    NSData *data;
+}
 
-@property (NS_NONATOMIC_IOSONLY, readonly) BOOL needToUnfold;
+- (BOOL)needToUnfold;
 - (void)unfold;
 - (void)parseEntries;
 
 @end
 
 @implementation NNHeaderParser
-
-@synthesize length;
-@synthesize entries;
 
 - (instancetype)initWithData:(NSData *)articleData
 {
@@ -44,8 +44,8 @@
             {
                 // Make a note of the length, because this may change if we
                 // need to unfold header entries
-                length = i + 4;
-                NSRange headRange = NSMakeRange(start, i - start);
+                _length = i + 4;
+                NSRange headRange = NSMakeRange(start, i - start + 2);
                 data = [articleData subdataWithRange:headRange];
                 [self unfold];
                 [self parseEntries];
@@ -98,7 +98,7 @@
             start = i + 2;
         }
     }
-    [mutableData appendBytes:bytes + start length:i - start - 2];
+    [mutableData appendBytes:bytes + start length:i - start + 2];
     
     // Replace tabs with spaces
     char *mutableBytes = mutableData.mutableBytes;
@@ -149,13 +149,12 @@
                 NNHeaderEntry *entry = [[NNHeaderEntry alloc] initWithName:name
                                                                      value:value];
                 [mutableArray addObject:entry];
-                //NSLog(@"Added entry: '%@=%@'", entry.name, entry.value);
             }
 
             start = i + 2;
         }
     }
-    entries = mutableArray;
+    _entries = mutableArray;
 }
 
 @end
