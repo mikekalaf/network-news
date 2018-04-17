@@ -88,4 +88,33 @@
               "Unexpected header value");
 }
 
+- (void)testEmptyHeaders {
+    NSString *article = @"220 status line (should this be here?)\r\n"
+    @"Heading-1: Heading Value\r\n"
+    @"Heading-2: \r\n"
+    @"Heading-3:\r\n"
+    @"Heading-4: Heading Value\r\n"
+    @"\r\n"
+    @"Body\r\n";
+    NSData *articleData = [article dataUsingEncoding:NSUTF8StringEncoding];
+    NNHeaderParser *parser = [[NNHeaderParser alloc] initWithData:articleData];
+    XCTAssertEqual(parser.entries.count, 4, "Unexpected number of headers");
+
+    NNHeaderEntry *entry = parser.entries[0];
+    XCTAssert([entry.name isEqualToString:@"Heading-1"], "Unexpected header 1 name");
+    XCTAssert([entry.value isEqualToString:@"Heading Value"], "Unexpected header 1 value");
+
+    entry = parser.entries[1];
+    XCTAssert([entry.name isEqualToString:@"Heading-2"], "Unexpected header 2 name");
+    XCTAssert([entry.value isEqualToString:@""], "Unexpected header 2 value");
+
+    entry = parser.entries[2];
+    XCTAssert([entry.name isEqualToString:@"Heading-3"], "Unexpected header 3 name");
+    XCTAssert([entry.value isEqualToString:@""], "Unexpected header 3 value");
+
+    entry = parser.entries[3];
+    XCTAssert([entry.name isEqualToString:@"Heading-4"], "Unexpected header 4 name");
+    XCTAssert([entry.value isEqualToString:@"Heading Value"], "Unexpected header 4 value");
+}
+
 @end

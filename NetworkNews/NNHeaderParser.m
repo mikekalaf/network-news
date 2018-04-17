@@ -119,9 +119,7 @@
     NSUInteger start = 0;
     for (NSUInteger i = 0; i < articleLength - 1; ++i)
     {
-        if (start >= divider
-            && bytes[i] == ':'
-            && (bytes[i + 1] == ' ' || bytes[i + 1] == '\t'))
+        if (start >= divider && bytes[i] == ':')
         {
             // Note the divider between field name and value
             divider = i;
@@ -137,15 +135,16 @@
                                                 length:divider - start
                                               encoding:NSISOLatin1StringEncoding];
             
-            NSString *value = [[NSString alloc] initWithBytes:bytes + divider + 2
-                                                       length:i - divider - 2
+            NSString *value = [[NSString alloc] initWithBytes:bytes + divider + 1
+                                                       length:i - divider - 1
                                                      encoding:NSUTF8StringEncoding];
             if (!value)
-                value = [[NSString alloc] initWithBytes:bytes + divider + 2
-                                                 length:i - divider - 2
+                value = [[NSString alloc] initWithBytes:bytes + divider + 1
+                                                 length:i - divider - 1
                                                encoding:NSISOLatin1StringEncoding];
             if (name && value)
             {
+                value = [value stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
                 NNHeaderEntry *entry = [[NNHeaderEntry alloc] initWithName:name
                                                                      value:value];
                 [mutableArray addObject:entry];
