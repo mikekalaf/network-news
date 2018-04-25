@@ -44,7 +44,6 @@
 
 - (void)testPostArticle
 {
-    NNArticleFormatter *formatter = [[NNArticleFormatter alloc] init];
     EncodedWordEncoder *encoder = [[EncodedWordEncoder alloc] init];
 
     // Use header entries with non-ASCII characters
@@ -64,9 +63,9 @@
 
     // Generate differing text so we don't get caught out with "duplicate message" errors
     NSString *text = [NSString stringWithFormat:@"Testing at %@", [[NSDate date] description]];
-    NSData *articleData = [formatter articleDataWithHeaders:headers
-                                                       text:text
-                                               formatFlowed:YES];
+    NSData *articleData = [NNArticleFormatter articleDataWithHeaders:headers
+                                                                text:text
+                                                        formatFlowed:YES];
 
     // Test that all characters are in the ASCII range
     const char *ptr = articleData.bytes;
@@ -89,7 +88,6 @@
 
 - (void)testPostUTF8Article
 {
-    NNArticleFormatter *formatter = [[NNArticleFormatter alloc] init];
     EncodedWordEncoder *encoder = [[EncodedWordEncoder alloc] init];
 
     // Use header entries with non-ASCII characters
@@ -109,9 +107,9 @@
 
     // Generate differing text so we don't get caught out with "duplicate message" errors
     NSString *text = [NSString stringWithFormat:@"📱 Testing at %@", [[NSDate date] description]];
-    NSData *articleData = [formatter articleDataWithHeaders:headers
-                                                       text:text
-                                               formatFlowed:YES];
+    NSData *articleData = [NNArticleFormatter articleDataWithHeaders:headers
+                                                                text:text
+                                                        formatFlowed:YES];
 
     // Post to the server and check the response status code
     NewsConnection *newsConnection = [pool dequeueConnection];

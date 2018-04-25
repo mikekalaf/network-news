@@ -9,6 +9,7 @@
 #import "NNArticleFormatter.h"
 #import "NNHeaderEntry.h"
 #import "NewsKit.h"
+#import "NSData+NewsAdditions.h"
 
 @implementation NNArticleFormatter
 
@@ -87,7 +88,7 @@
     return headers;
 }
 
-- (NSData *)articleDataWithHeaders:(NSArray *)headers
++ (NSData *)articleDataWithHeaders:(NSArray *)headers
                               text:(NSString *)text
                       formatFlowed:(BOOL)formatFlowed
 {
@@ -144,27 +145,7 @@
 
     // Append the body text, ensuring each line is terminated with a CRLF
     NSData *encodedTextData = [text dataUsingEncoding:stringEncoding];
-    bytes = encodedTextData.bytes;
-    NSUInteger len = encodedTextData.length;
-    NSUInteger start = 0;
-    NSUInteger i;
-    for (i = 0; i < len; ++i)
-    {
-        if (bytes[i] == 13 && bytes[i + 1] != 10)
-        {
-        }
-        else if (bytes[i] == 10)
-        {
-            [data appendBytes:bytes + start length:i - start];
-            [data appendBytes:"\r\n" length:2];
-            start = i + 1;
-        }
-    }
-    if (i - start > 0)
-    {
-        [data appendBytes:bytes + start length:i - start];
-//        [data appendBytes:"\r\n" length:2];
-    }
+    [data appendData:[encodedTextData dataWithCRLFs]];
 
     return data;
 }

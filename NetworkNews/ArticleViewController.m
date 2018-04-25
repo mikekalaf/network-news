@@ -428,7 +428,10 @@
             NSString *level = [@"" stringByPaddingToLength:quoteLevel.level + 1
                                                 withString:@">"
                                            startingAtIndex:0];
-            [mutableString appendFormat:@"%@ %@", level, str];
+            if (str.length > 0)
+                [mutableString appendFormat:@"%@ %@\n", level, str];
+            else
+                [mutableString appendFormat:@"%@\n", level];
         }
     }
     return mutableString;

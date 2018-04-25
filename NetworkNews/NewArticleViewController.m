@@ -345,7 +345,6 @@
     [[self textView] resignFirstResponder];
     [activityIndicatorView startAnimating];
 
-    NNArticleFormatter *formatter = [[NNArticleFormatter alloc] init];
     EncodedWordEncoder *encoder = [[EncodedWordEncoder alloc] init];
 
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
@@ -353,7 +352,7 @@
     NSString *email = [userDefaults stringForKey:@"EmailAddress"];
     if (email == nil || [email isEqualToString:EMPTY_STR])
         email = @"unknown_user@invalid.com";
-    name = [encoder encodeString:@"Føø Bår"];
+//    name = [encoder encodeString:@"Føø Bår"];
 //    name = [encoder encodeString:@"Tésting"];
     NSString *emailAddress;
     if (name && [name isEqualToString:EMPTY_STR] == NO)
@@ -380,15 +379,14 @@
                                                     newsgroups:newsgroups
                                                        subject:newSubject];
     
-    // Chop off the hacky three CRs at the beginning of the text
     NSString *articleText = [self textView].text;
     
     // Word-wrap the text at column 78
-    articleText = [articleText stringByWrappingWordsAtColumn:78];
+    articleText = [articleText stringByWrappingUnquotedWordsAtColumn:78];
 
-    NSData *articleData = [formatter articleDataWithHeaders:headers
-                                                       text:articleText
-                                               formatFlowed:YES];
+    NSData *articleData = [NNArticleFormatter articleDataWithHeaders:headers
+                                                                text:articleText
+                                                        formatFlowed:YES];
     
     PostArticleOperation *operation = [[PostArticleOperation alloc] initWithConnectionPool:_connectionPool
                                                                                       data:articleData];

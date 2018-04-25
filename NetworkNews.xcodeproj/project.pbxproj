@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		03148F3B1C47348400BAFED3 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 03148F3A1C47348400BAFED3 /* libz.tbd */; };
+		032B48B92090F9B000107B96 /* NSMutableAttributedStringTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 032B48B82090F9B000107B96 /* NSMutableAttributedStringTests.m */; };
 		03457BA1207BD2220047BAA8 /* LoadMoreTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 03457BA0207BD2220047BAA8 /* LoadMoreTableViewCell.m */; };
 		03457BA5207BE6E50047BAA8 /* EncodedWordEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 03457BA4207BE6E50047BAA8 /* EncodedWordEncoder.m */; };
 		03714C6920803470006AD9F8 /* LoadingIndicatorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 03714C6820803470006AD9F8 /* LoadingIndicatorView.m */; };
@@ -16,6 +17,9 @@
 		03714C6E20852337006AD9F8 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63FF913916D1089F0068ADFB /* CoreData.framework */; };
 		03714C7020853BE3006AD9F8 /* FetchArticleOperationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 03714C6F20853BE3006AD9F8 /* FetchArticleOperationTest.m */; };
 		03714C722086918F006AD9F8 /* NNHeaderParserTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 03714C712086918E006AD9F8 /* NNHeaderParserTest.m */; };
+		03714C742086BA9A006AD9F8 /* NNArticleFormatterTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 03714C732086BA9A006AD9F8 /* NNArticleFormatterTest.m */; };
+		03714C762086C5F9006AD9F8 /* NSStringTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 03714C752086C5F9006AD9F8 /* NSStringTests.m */; };
+		03714C782086CED4006AD9F8 /* NSDataTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 03714C772086CED4006AD9F8 /* NSDataTests.m */; };
 		03ECA37D206081C600A44D65 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 03ECA37C206081C600A44D65 /* LaunchScreen.storyboard */; };
 		6302EF0E178D8E7800BBC68E /* ExtendedLayoutManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 6302EF0D178D8E7800BBC68E /* ExtendedLayoutManager.m */; };
 		631CBA6A1893CB2400B9421A /* ArticleRange.m in Sources */ = {isa = PBXBuildFile; fileRef = 631CBA691893CB2400B9421A /* ArticleRange.m */; };
@@ -109,6 +113,7 @@
 
 /* Begin PBXFileReference section */
 		03148F3A1C47348400BAFED3 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+		032B48B82090F9B000107B96 /* NSMutableAttributedStringTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NSMutableAttributedStringTests.m; sourceTree = "<group>"; };
 		03457B9F207BD2220047BAA8 /* LoadMoreTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LoadMoreTableViewCell.h; sourceTree = "<group>"; };
 		03457BA0207BD2220047BAA8 /* LoadMoreTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LoadMoreTableViewCell.m; sourceTree = "<group>"; };
 		03457BA3207BE6E50047BAA8 /* EncodedWordEncoder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EncodedWordEncoder.h; sourceTree = "<group>"; };
@@ -119,6 +124,9 @@
 		03714C6C20851D49006AD9F8 /* ArticleOverviewsOperationTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ArticleOverviewsOperationTest.m; sourceTree = "<group>"; };
 		03714C6F20853BE3006AD9F8 /* FetchArticleOperationTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FetchArticleOperationTest.m; sourceTree = "<group>"; };
 		03714C712086918E006AD9F8 /* NNHeaderParserTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NNHeaderParserTest.m; sourceTree = "<group>"; };
+		03714C732086BA9A006AD9F8 /* NNArticleFormatterTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NNArticleFormatterTest.m; sourceTree = "<group>"; };
+		03714C752086C5F9006AD9F8 /* NSStringTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NSStringTests.m; sourceTree = "<group>"; };
+		03714C772086CED4006AD9F8 /* NSDataTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NSDataTests.m; sourceTree = "<group>"; };
 		03ECA37C206081C600A44D65 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		03F4771C2060D71B00E1A55B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		6302EF0C178D8E7800BBC68E /* ExtendedLayoutManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtendedLayoutManager.h; sourceTree = "<group>"; };
@@ -383,6 +391,10 @@
 			isa = PBXGroup;
 			children = (
 				634191E516D0D6590069B528 /* NetworkNewsTests.m */,
+				03714C752086C5F9006AD9F8 /* NSStringTests.m */,
+				032B48B82090F9B000107B96 /* NSMutableAttributedStringTests.m */,
+				03714C772086CED4006AD9F8 /* NSDataTests.m */,
+				03714C732086BA9A006AD9F8 /* NNArticleFormatterTest.m */,
 				03714C712086918E006AD9F8 /* NNHeaderParserTest.m */,
 				03714C6A20816F03006AD9F8 /* NNQuoteLevelParserTest.m */,
 				03714C6C20851D49006AD9F8 /* ArticleOverviewsOperationTest.m */,
@@ -750,9 +762,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				03714C722086918F006AD9F8 /* NNHeaderParserTest.m in Sources */,
+				03714C762086C5F9006AD9F8 /* NSStringTests.m in Sources */,
+				03714C742086BA9A006AD9F8 /* NNArticleFormatterTest.m in Sources */,
 				03714C6B20816F03006AD9F8 /* NNQuoteLevelParserTest.m in Sources */,
 				03714C7020853BE3006AD9F8 /* FetchArticleOperationTest.m in Sources */,
 				634191E616D0D6590069B528 /* NetworkNewsTests.m in Sources */,
+				03714C782086CED4006AD9F8 /* NSDataTests.m in Sources */,
+				032B48B92090F9B000107B96 /* NSMutableAttributedStringTests.m in Sources */,
 				03714C6D20851D49006AD9F8 /* ArticleOverviewsOperationTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

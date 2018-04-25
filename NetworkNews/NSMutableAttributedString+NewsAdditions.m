@@ -61,7 +61,7 @@
     [self appendNewsHead:[self shortHeadersFromHeaders:entries]];
 }
 
-- (void)appendBodyData:(NSData *)data quoteLevel:(NNQuoteLevel *)quoteLevel firstInBody:(BOOL)first
+- (void)appendBodyLineData:(NSData *)data quoteLevel:(NNQuoteLevel *)quoteLevel firstInBody:(BOOL)first
 {
     NSString *str = [[NSString alloc] initWithData:data
                                           encoding:NSUTF8StringEncoding];
@@ -70,8 +70,8 @@
                                     encoding:NSISOLatin1StringEncoding];
     if (str)
     {
-//        if (quoteLevel.flowed)
-//            str = [str stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+        if (!quoteLevel.flowed)
+            str = [str stringByAppendingString:@"\n"];
 
         NSMutableParagraphStyle *ps = [[NSMutableParagraphStyle alloc] init];
         ps.firstLineHeadIndent = LEVEL_INDENT * quoteLevel.level;
@@ -113,7 +113,7 @@
     for (NNQuoteLevel *quoteLevel in quoteLevels)
     {
         NSData *lineData = [data subdataWithRange:quoteLevel.range];
-        [self appendBodyData:lineData quoteLevel:quoteLevel firstInBody:first];
+        [self appendBodyLineData:lineData quoteLevel:quoteLevel firstInBody:first];
         first = NO;
     }
 }

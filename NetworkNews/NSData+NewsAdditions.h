@@ -12,4 +12,6 @@
 
 @property(readonly) NSUInteger CRC32;
 
+- (NSData *)dataWithCRLFs;
+
 @end

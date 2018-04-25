@@ -34,6 +34,29 @@
     BOOL softLineBreak = NO;
     while (range.location < self.length)
     {
+        // If this line starts with a quote marker, include the line without any
+        // additional line wrapping
+        if ([self characterAtIndex:range.location] == '>')
+        {
+            NSRange rangeUntilEnd = NSMakeRange(range.location, self.length - range.location);
+            NSRange lfRange = [self rangeOfString:@"\n"
+                                          options:0
+                                            range:rangeUntilEnd];
+            if (lfRange.location != NSNotFound)
+            {
+                NSRange lineRange = NSMakeRange(range.location,
+                                                lfRange.location - range.location);
+                [ranges addObject:[NSValue valueWithRange:lineRange]];
+                range.location += lineRange.length + 1;
+                continue;
+            }
+            else
+            {
+                [ranges addObject:[NSValue valueWithRange:rangeUntilEnd]];
+                break;
+            }
+        }
+
         if (softLineBreak)
         {
             // Since we've just had a soft line break, we'll skip any spaces
@@ -122,21 +145,17 @@
     return ranges;
 }
 
-- (NSString *)stringByWrappingWordsAtColumn:(NSUInteger)location
+- (NSString *)stringByWrappingUnquotedWordsAtColumn:(NSUInteger)location
 {
     NSArray *ranges = [self rangesWrappingWordsAtColumn:location];
     NSMutableString *wrappedString = [NSMutableString stringWithCapacity:self.length];
     for (NSValue *rangeValue in ranges)
     {
+        NSRange range = rangeValue.rangeValue;
         if (wrappedString.length > 0)
             [wrappedString appendString:@"\n"];
-
-        NSRange range = rangeValue.rangeValue;
         [wrappedString appendString:[self substringWithRange:range]];
     }
-    
-//    NSLog(@"Wrapped string:\n%@", wrappedString);
-    
     return wrappedString;
 }
 

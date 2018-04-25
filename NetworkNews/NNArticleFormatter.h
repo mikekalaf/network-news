@@ -10,9 +10,6 @@
 
 
 @interface NNArticleFormatter : NSObject
-{
-
-}
 
 + (NSArray *)headerArrayWithDate:(NSDate *)date
                             from:(NSString *)from
@@ -23,7 +20,7 @@
                       newsgroups:(NSString *)newsgroups
                          subject:(NSString *)subject;
 
-- (NSData *)articleDataWithHeaders:(NSArray *)headers
++ (NSData *)articleDataWithHeaders:(NSArray *)headers
                               text:(NSString *)text
                       formatFlowed:(BOOL)formatFlowed;
 

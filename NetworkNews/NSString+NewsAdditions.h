@@ -13,7 +13,8 @@
 
 @property (NS_NONATOMIC_IOSONLY, readonly, copy) NSString *shortGroupName;
 
-- (NSString *)stringByWrappingWordsAtColumn:(NSUInteger)location;
+- (NSArray *)rangesWrappingWordsAtColumn:(NSUInteger)location;
+- (NSString *)stringByWrappingUnquotedWordsAtColumn:(NSUInteger)location;
 
 @property (NS_NONATOMIC_IOSONLY, readonly, copy) NSString *messageIDFileName;
 

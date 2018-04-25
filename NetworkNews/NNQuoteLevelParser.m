@@ -62,7 +62,7 @@
             if (flowed && i > 0 && bytes[i - 1] == 32)
                 lineFlowed = YES;
 
-            NSRange range = NSMakeRange(start, i - start + 2);
+            NSRange range = NSMakeRange(start, i - start);
             NSUInteger offset;
             NSUInteger level = [self quoteLevelOfRange:range offset:&offset];
             range.location += offset;
@@ -70,9 +70,9 @@
             
             // Is this possibly a signature divider?
             BOOL sigDiv = NO;
-            if (level == 0 && range.length == 5)
+            if (level == 0 && range.length == 3)
             {
-                if (memcmp(bytes + range.location, "-- \r\n", 5) == 0)
+                if (memcmp(bytes + range.location, "-- ", 3) == 0)
                 {
                     sigDiv = YES;
                     lineFlowed = NO;
