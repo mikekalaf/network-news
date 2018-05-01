@@ -13,7 +13,7 @@
 #import "EmailAddressFormatter.h"
 #import "AppDelegate.h"
 #import "ThreadListTableViewCell.h"
-//#import "ThreadSectionHeaderView.h"
+#import "ThreadSectionHeaderView.h"
 #import "ArticleViewController.h"
 #import "NewsConnectionPool.h"
 #import "NewsAccount.h"
@@ -263,13 +263,13 @@
 //    }
 //}
 
-//- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
-//{
-//    ThreadSectionHeaderView *view = [[ThreadSectionHeaderView alloc] initWithFrame:CGRectZero];
-//    [[view textLabel] setText:_threadTitle];
-//    [[view dateLabel] setText:[dateFormatter stringFromDate:_threadDate]];
-//    return view;
-//}
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+{
+    ThreadSectionHeaderView *view = [[ThreadSectionHeaderView alloc] initWithFrame:CGRectZero];
+    view.textLabel.text = _threadTitle;
+    view.dateLabel.text = [dateFormatter stringFromDate:_threadDate];
+    return view;
+}
 
 #pragma mark - ArticleSource Methods
 

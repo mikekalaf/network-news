@@ -166,7 +166,7 @@ static BOOL PartNumber(NSString *subject,
 
                 if (_mode == ArticleOverviewsLatest)
                 {
-                    if (high == ArticleRangeMax(storedRange))
+                    if (high == ArticleRangeMax(storedRange) - 1)
                     {
                         NSLog(@"Already have latest articles");
                         low = high + 1;  // Force article range to have a length of zero

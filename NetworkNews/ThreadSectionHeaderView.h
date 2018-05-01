@@ -11,11 +11,6 @@
 @class CAGradientLayer;
 
 @interface ThreadSectionHeaderView : UIView
-{
-    CAGradientLayer *gradientLayer;
-    UILabel *textLabel;
-    UILabel *dateLabel;
-}
 
 @property(nonatomic, retain) UILabel *textLabel;
 @property(nonatomic, retain) UILabel *dateLabel;

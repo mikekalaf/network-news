@@ -11,39 +11,23 @@
 
 @implementation ThreadSectionHeaderView
 
-@synthesize textLabel;
-@synthesize dateLabel;
-
 - (instancetype)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
     if (self)
     {
-        [self setUserInteractionEnabled:NO];
-        [self setOpaque:NO];
-        
-        gradientLayer = [CAGradientLayer layer];
-        gradientLayer.colors = @[(id)[UIColor colorWithRed:0.505 green:0.556 blue:0.596 alpha:0.9].CGColor,
-                                  (id)[UIColor colorWithRed:0.670 green:0.705 blue:0.733 alpha:0.9].CGColor];
-        [self.layer insertSublayer:gradientLayer atIndex:0];
-        
-        textLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-        textLabel.font = [UIFont boldSystemFontOfSize:[UIFont systemFontSize]];
-        textLabel.textColor = [UIColor whiteColor];
-        textLabel.shadowOffset = CGSizeMake(0, 1);
-        textLabel.shadowColor = [UIColor colorWithRed:0.427 green:0.427 blue:0.427 alpha:1.0];
-        textLabel.backgroundColor = [UIColor clearColor];
-        [textLabel setOpaque:NO];
-        [self addSubview:textLabel];
+        self.userInteractionEnabled = NO;
+        self.backgroundColor = [UIColor colorWithWhite:0.97 alpha:1.0];
 
-        dateLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-        dateLabel.font = [UIFont systemFontOfSize:[UIFont systemFontSize]];
-        dateLabel.textColor = [UIColor whiteColor];
-        dateLabel.shadowOffset = CGSizeMake(0, 1);
-        dateLabel.shadowColor = [UIColor colorWithRed:0.427 green:0.427 blue:0.427 alpha:1.0];
-        dateLabel.backgroundColor = [UIColor clearColor];
-        [dateLabel setOpaque:NO];
-        [self addSubview:dateLabel];
+        _textLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+        _textLabel.font = [UIFont boldSystemFontOfSize:[UIFont systemFontSize]];
+        _textLabel.textColor = UIColor.blackColor;
+        [self addSubview:_textLabel];
+
+        _dateLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+        _dateLabel.font = [UIFont systemFontOfSize:[UIFont systemFontSize]];
+        _dateLabel.textColor = UIColor.blackColor;
+        [self addSubview:_dateLabel];
     }
     return self;
 }
@@ -53,22 +37,21 @@
     const int kLeftMargin = 33;
     const int kRightMargin = 28;
     CGRect bounds = self.bounds;
-    gradientLayer.frame = bounds;
 
-    [dateLabel sizeToFit];
-    CGFloat dateWidth = dateLabel.frame.size.width + kRightMargin;
+    [_dateLabel sizeToFit];
+    CGFloat dateWidth = _dateLabel.frame.size.width + kRightMargin;
     
     CGRect textFrame = CGRectMake(kLeftMargin,
                                   0,
                                   bounds.size.width - dateWidth - kLeftMargin,
                                   bounds.size.height);
-    textLabel.frame = textFrame;
+    _textLabel.frame = textFrame;
 
     CGRect dateFrame = CGRectMake(bounds.size.width - dateWidth,
                                   0,
                                   bounds.size.width,
                                   bounds.size.height);
-    dateLabel.frame = dateFrame;
+    _dateLabel.frame = dateFrame;
 }
 
 @end
