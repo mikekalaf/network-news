@@ -245,10 +245,10 @@
            selector:@selector(keyboardWillHide:)
                name:UIKeyboardWillHideNotification
              object:nil];
-//    [nc addObserver:self
-//           selector:@selector(keyboardDidChangeFrame:)
-//               name:UIKeyboardDidChangeFrameNotification
-//             object:nil];
+    [nc addObserver:self
+           selector:@selector(keyboardDidChangeFrame:)
+               name:UIKeyboardDidChangeFrameNotification
+             object:nil];
 
     if (_subjectTextField.text.length == 0)
         sendButtonItem.enabled = NO;
@@ -398,56 +398,56 @@
 
 - (void)keyboardDidShow:(NSNotification *)notification
 {
-    if (keyboardShown)
-        return;
-    
-    NSDictionary *info = notification.userInfo;
-    
-    // Get the size of the keyboard
-    NSValue *value = info[UIKeyboardFrameEndUserInfoKey];
-    CGSize keyboardSize = value.CGRectValue.size;
-    
-    // Resize the text view
-    CGRect frame = self.view.frame;
-    frame.size.height -= keyboardSize.height;
-    self.view.frame = frame;
-    
-    keyboardShown = YES;
+//    UIViewController *parent = self.parentViewController;
+//    CGRect parentFrame = parent.view.frame;
+//
+//    if (keyboardShown)
+//        return;
+//
+//    NSDictionary *info = notification.userInfo;
+//
+//    // Get the size of the keyboard
+//    NSValue *value = info[UIKeyboardFrameEndUserInfoKey];
+//    CGSize keyboardSize = value.CGRectValue.size;
+//
+//    // Resize the text view
+//    CGRect frame = self.view.frame;
+//    frame.size.height -= keyboardSize.height;
+//    self.view.frame = frame;
+//
+//    keyboardShown = YES;
 }
 
 - (void)keyboardWillHide:(NSNotification *)notification
 {
-    NSDictionary *info = notification.userInfo;
-    
-    // Get the size of the keyboard
-    NSValue *value = info[UIKeyboardFrameEndUserInfoKey];
-    CGSize keyboardSize = value.CGRectValue.size;
-    
-    // Reset the height of the scroll view to its original value
-    CGRect frame = self.view.frame;
-    frame.size.height += keyboardSize.height;
-    self.view.frame = frame;
-    
-    keyboardShown = NO;
+//    NSDictionary *info = notification.userInfo;
+//
+//    // Get the size of the keyboard
+//    NSValue *value = info[UIKeyboardFrameEndUserInfoKey];
+//    CGSize keyboardSize = value.CGRectValue.size;
+//
+//    // Reset the height of the scroll view to its original value
+//    CGRect frame = self.view.frame;
+//    frame.size.height += keyboardSize.height;
+//    self.view.frame = frame;
+//
+//    keyboardShown = NO;
 }
 
 - (void)keyboardDidChangeFrame:(NSNotification *)notification
 {
-//    if (keyboardShown)
-//        return;
-
-    NSDictionary *info = notification.userInfo;
+    UIViewController *parent = self.parentViewController;
+    CGRect parentFrame = parent.view.frame;
 
     // Get the size of the keyboard
+    NSDictionary *info = notification.userInfo;
     NSValue *value = info[UIKeyboardFrameEndUserInfoKey];
     CGSize keyboardSize = value.CGRectValue.size;
 
-    // Resize the text view
-    CGRect frame = self.textView.frame;
-    frame.size.height = self.view.frame.size.height - keyboardSize.height;
+    // Resize the root view
+    CGRect frame = self.view.frame;
+    frame.size.height = parentFrame.size.height - keyboardSize.height;
     self.view.frame = frame;
-
-    keyboardShown = YES;
 }
 
 @end
