@@ -1,5 +1,5 @@
 //
-//  LoadingIndicatorView.h
+//  ActivityView.h
 //  NetworkNews
 //
 //  Created by David Schweinsberg on 4/12/18.
@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface LoadingIndicatorView : UIView
+@interface ActivityView : UIView
 
 @property(nonatomic, retain) UIActivityIndicatorView *activityIndicatorView;
 

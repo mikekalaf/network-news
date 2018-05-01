@@ -1,14 +1,14 @@
 //
-//  LoadingIndicatorView.m
+//  ActivityView.m
 //  NetworkNews
 //
 //  Created by David Schweinsberg on 4/12/18.
 //  Copyright © 2018 David Schweinsberg. All rights reserved.
 //
 
-#import "LoadingIndicatorView.h"
+#import "ActivityView.h"
 
-@implementation LoadingIndicatorView
+@implementation ActivityView
 
 - (id)initWithFrame:(CGRect)frame
 {

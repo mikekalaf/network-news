@@ -11,11 +11,11 @@
 #import "GroupListing.h"
 #import "AppDelegate.h"
 #import "NetworkNews.h"
-#import "LoadingIndicatorView.h"
+#import "ActivityView.h"
 
 @interface SearchGroupsViewController () <UISearchBarDelegate>
 {
-    LoadingIndicatorView *loadingIndicatorView;
+    ActivityView *activityView;
     NSString *searchText;
     NSInteger searchScope;
     NSArray *_foundGroupList;
@@ -43,9 +43,9 @@
     [self.searchBar becomeFirstResponder];
     
     // Create a loading indicator
-    loadingIndicatorView = [[LoadingIndicatorView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
-    loadingIndicatorView.hidden = YES;
-    [self.navigationController.view addSubview:loadingIndicatorView];
+    activityView = [[ActivityView alloc] initWithFrame:CGRectMake(0, 0, 80, 80)];
+    activityView.hidden = YES;
+    [self.navigationController.view addSubview:activityView];
 
     _operationQueue = [[NSOperationQueue alloc] init];
 }
@@ -75,7 +75,7 @@
 - (void)viewDidLayoutSubviews
 {
     [super viewDidLayoutSubviews];
-    loadingIndicatorView.center = self.navigationController.view.center;
+    activityView.center = self.navigationController.view.center;
 }
 
 #pragma mark - UITableViewDataSource Methods
@@ -179,7 +179,7 @@
     // Remove the focus from the search field, so the keyboard disappears
     [_searchBar resignFirstResponder];
 
-    loadingIndicatorView.hidden = NO;
+    activityView.hidden = NO;
 
     // Cache the search request
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
@@ -207,7 +207,7 @@
                                                                        ascending:NO];
         self->_foundGroupList = [operation.groups sortedArrayUsingDescriptors:@[sortDescriptor]];
         dispatch_async(dispatch_get_main_queue(), ^{
-            self->loadingIndicatorView.hidden = YES;
+            self->activityView.hidden = YES;
             [self.tableView reloadData];
         });
     };

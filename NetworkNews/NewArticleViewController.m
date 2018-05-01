@@ -16,6 +16,7 @@
 #import "NetworkNews.h"
 #import "NSString+NewsAdditions.h"
 #import "EncodedWordEncoder.h"
+#import "ActivityView.h"
 
 #define EMPTY_STR @""
 
@@ -25,7 +26,7 @@
     UITextField *_subjectTextField;
     UIBarButtonItem *cancelButtonItem;
     UIBarButtonItem *sendButtonItem;
-    UIActivityIndicatorView *activityIndicatorView;
+    ActivityView *activityView;
     NSString *_groupName;
     NSString *_subject;
     NSString *_references;
@@ -204,10 +205,9 @@
     [_subjectTextField addConstraint:constraint];
 
     // Create an activity indicator
-    activityIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
-    activityIndicatorView.hidesWhenStopped = YES;
-    [self.view addSubview:activityIndicatorView];
-    activityIndicatorView.center = self.view.center;
+    activityView = [[ActivityView alloc] initWithFrame:CGRectMake(0, 0, 80, 80)];
+    activityView.hidden = YES;
+    [self.view addSubview:activityView];
     
     _groupNameLabel.text = _groupName;
     _subjectTextField.text = _subject;
@@ -245,10 +245,6 @@
            selector:@selector(keyboardWillHide:)
                name:UIKeyboardWillHideNotification
              object:nil];
-    [nc addObserver:self
-           selector:@selector(keyboardDidChangeFrame:)
-               name:UIKeyboardDidChangeFrameNotification
-             object:nil];
 
     if (_subjectTextField.text.length == 0)
         sendButtonItem.enabled = NO;
@@ -271,6 +267,12 @@
     [_operationQueue cancelAllOperations];
 }
 
+- (void)viewDidLayoutSubviews
+{
+    [super viewDidLayoutSubviews];
+    activityView.center = self.navigationController.view.center;
+}
+
 - (void)didReceiveMemoryWarning {
     // Releases the view if it doesn't have a superview.
     [super didReceiveMemoryWarning];
@@ -290,8 +292,7 @@
     return NO;
 }
 
-#pragma mark -
-#pragma mark Actions
+#pragma mark - Actions
 
 - (IBAction)cancelButtonPressed:(id)sender
 {
@@ -302,7 +303,7 @@
 {
     sendButtonItem.enabled = NO;
     [self.textView resignFirstResponder];
-    [activityIndicatorView startAnimating];
+    self->activityView.hidden = NO;
 
     EncodedWordEncoder *encoder = [[EncodedWordEncoder alloc] init];
 
@@ -351,7 +352,7 @@
                                                                                       data:articleData];
     operation.completionBlock = ^{
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self->activityIndicatorView stopAnimating];
+            self->activityView.hidden = YES;
         });
     };
     [_operationQueue addOperation:operation];
@@ -398,44 +399,6 @@
 
 - (void)keyboardDidShow:(NSNotification *)notification
 {
-//    UIViewController *parent = self.parentViewController;
-//    CGRect parentFrame = parent.view.frame;
-//
-//    if (keyboardShown)
-//        return;
-//
-//    NSDictionary *info = notification.userInfo;
-//
-//    // Get the size of the keyboard
-//    NSValue *value = info[UIKeyboardFrameEndUserInfoKey];
-//    CGSize keyboardSize = value.CGRectValue.size;
-//
-//    // Resize the text view
-//    CGRect frame = self.view.frame;
-//    frame.size.height -= keyboardSize.height;
-//    self.view.frame = frame;
-//
-//    keyboardShown = YES;
-}
-
-- (void)keyboardWillHide:(NSNotification *)notification
-{
-//    NSDictionary *info = notification.userInfo;
-//
-//    // Get the size of the keyboard
-//    NSValue *value = info[UIKeyboardFrameEndUserInfoKey];
-//    CGSize keyboardSize = value.CGRectValue.size;
-//
-//    // Reset the height of the scroll view to its original value
-//    CGRect frame = self.view.frame;
-//    frame.size.height += keyboardSize.height;
-//    self.view.frame = frame;
-//
-//    keyboardShown = NO;
-}
-
-- (void)keyboardDidChangeFrame:(NSNotification *)notification
-{
     UIViewController *parent = self.parentViewController;
     CGRect parentFrame = parent.view.frame;
 
@@ -447,6 +410,17 @@
     // Resize the root view
     CGRect frame = self.view.frame;
     frame.size.height = parentFrame.size.height - keyboardSize.height;
+    self.view.frame = frame;
+}
+
+- (void)keyboardWillHide:(NSNotification *)notification
+{
+    UIViewController *parent = self.parentViewController;
+    CGRect parentFrame = parent.view.frame;
+
+    // Resize the root view
+    CGRect frame = self.view.frame;
+    frame.size.height = parentFrame.size.height;
     self.view.frame = frame;
 }
 

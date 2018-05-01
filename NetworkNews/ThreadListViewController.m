@@ -18,7 +18,7 @@
 #import "NSString+NewsAdditions.h"
 #import "ThreadListTableViewCell.h"
 #import "LoadMoreTableViewCell.h"
-#import "LoadingIndicatorView.h"
+#import "ActivityView.h"
 #import "ThreadIterator.h"
 #import "NetworkNews.h"
 #import "NewsConnectionPool.h"
@@ -42,7 +42,7 @@
 >
 {
     NSFetchedResultsController *searchFetchedResultsController;
-    LoadingIndicatorView *loadingIndicatorView;
+    ActivityView *activityView;
     UILabel *_statusLabel;
     NSArray *threads;
     NSArray *fileThreads;
@@ -114,9 +114,9 @@
                        @".rar"];
 
     // Create a loading indicator
-    loadingIndicatorView = [[LoadingIndicatorView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
+    activityView = [[ActivityView alloc] initWithFrame:CGRectMake(0, 0, 80, 80)];
 //    loadingIndicatorView.hidden = YES;
-    [self.navigationController.view addSubview:loadingIndicatorView];
+    [self.navigationController.view addSubview:activityView];
 
     // Put status label into toolbar button item
     _statusLabel = [[UILabel alloc] initWithFrame:CGRectZero];
@@ -175,7 +175,7 @@
 - (void)viewDidLayoutSubviews
 {
     [super viewDidLayoutSubviews];
-    loadingIndicatorView.center = self.navigationController.view.center;
+    activityView.center = self.navigationController.view.center;
 }
 
 - (void)dealloc
@@ -521,7 +521,7 @@
         NSLog(@"(merging)");
         [self->_store.managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
         [self updateThreads];
-        self->loadingIndicatorView.hidden = YES;
+        self->activityView.hidden = YES;
     });
 
     //[_managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
