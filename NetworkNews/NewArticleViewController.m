@@ -19,8 +19,10 @@
 
 #define EMPTY_STR @""
 
-@interface NewArticleViewController () <UITextFieldDelegate, UITextViewDelegate>
+@interface NewArticleViewController () <UITextFieldDelegate>
 {
+    UILabel *_groupNameLabel;
+    UITextField *_subjectTextField;
     UIBarButtonItem *cancelButtonItem;
     UIBarButtonItem *sendButtonItem;
     UIActivityIndicatorView *activityIndicatorView;
@@ -32,8 +34,7 @@
     NSOperationQueue *_operationQueue;
 }
 
-@property(nonatomic, weak) IBOutlet UILabel *toLabel;
-@property(nonatomic, weak) IBOutlet UITextField *subjectTextField;
+@property(nonatomic, weak) IBOutlet UITextView *textView;
 
 @end
 
@@ -44,11 +45,6 @@
 {
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc removeObserver:self];
-}
-
-- (UITextView *)textView
-{
-    return (UITextView *)self.view;
 }
 
 - (void)setGroupName:(NSString *)groupName
@@ -93,35 +89,134 @@
                                     action:@selector(sendButtonPressed:)];
     self.navigationItem.rightBarButtonItem = sendButtonItem;
 
+    // Add additional fields and views to the text box
+    UILabel *toLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+//    toLabel.backgroundColor = UIColor.redColor;
+    toLabel.text = @"To:";
+    [self.textView addSubview:toLabel];
+    toLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    NSLayoutConstraint *constraint;
+    constraint = [NSLayoutConstraint constraintWithItem:toLabel
+                                              attribute:NSLayoutAttributeTop
+                                              relatedBy:NSLayoutRelationEqual
+                                                 toItem:self.textView
+                                              attribute:NSLayoutAttributeTop
+                                             multiplier:1.0
+                                               constant:8.0];
+    [self.textView addConstraint:constraint];
+    constraint = [NSLayoutConstraint constraintWithItem:toLabel
+                                              attribute:NSLayoutAttributeLeading
+                                              relatedBy:NSLayoutRelationEqual
+                                                 toItem:self.textView
+                                              attribute:NSLayoutAttributeLeading
+                                             multiplier:1.0
+                                               constant:4.0];
+    [self.textView addConstraint:constraint];
+//    constraint = [NSLayoutConstraint constraintWithItem:toLabel
+//                                              attribute:NSLayoutAttributeWidth
+//                                              relatedBy:NSLayoutRelationEqual
+//                                                 toItem:nil
+//                                              attribute:0
+//                                             multiplier:1.0
+//                                               constant:50.0];
+//    [toLabel addConstraint:constraint];
+
+    _groupNameLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+//    _groupNameLabel.backgroundColor = UIColor.blueColor;
+    [self.textView addSubview:_groupNameLabel];
+    _groupNameLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    constraint = [NSLayoutConstraint constraintWithItem:_groupNameLabel
+                                              attribute:NSLayoutAttributeLeading
+                                              relatedBy:NSLayoutRelationEqual
+                                                 toItem:toLabel
+                                              attribute:NSLayoutAttributeTrailing
+                                             multiplier:1.0
+                                               constant:8.0];
+    [self.textView addConstraint:constraint];
+    constraint = [NSLayoutConstraint constraintWithItem:_groupNameLabel
+                                              attribute:NSLayoutAttributeBaseline
+                                              relatedBy:NSLayoutRelationEqual
+                                                 toItem:toLabel
+                                              attribute:NSLayoutAttributeBaseline
+                                             multiplier:1.0
+                                               constant:0.0];
+    [self.textView addConstraint:constraint];
+
+    UILabel *fromLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+//    fromLabel.backgroundColor = UIColor.redColor;
+    fromLabel.text = @"From:";
+    [self.textView addSubview:fromLabel];
+    fromLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    constraint = [NSLayoutConstraint constraintWithItem:fromLabel
+                                              attribute:NSLayoutAttributeTop
+                                              relatedBy:NSLayoutRelationEqual
+                                                 toItem:toLabel
+                                              attribute:NSLayoutAttributeBottom
+                                             multiplier:1.0
+                                               constant:8.0];
+    [self.textView addConstraint:constraint];
+    constraint = [NSLayoutConstraint constraintWithItem:fromLabel
+                                              attribute:NSLayoutAttributeLeading
+                                              relatedBy:NSLayoutRelationEqual
+                                                 toItem:self.textView
+                                              attribute:NSLayoutAttributeLeading
+                                             multiplier:1.0
+                                               constant:4.0];
+    [self.textView addConstraint:constraint];
+
+    _subjectTextField = [[UITextField alloc] initWithFrame:CGRectZero];
+//    _subjectTextField.borderStyle = UITextBorderStyleLine;
+//    _subjectTextField.backgroundColor = UIColor.blueColor;
+    _subjectTextField.text = @"Subject";
+    [self.textView addSubview:_subjectTextField];
+    _subjectTextField.translatesAutoresizingMaskIntoConstraints = NO;
+    constraint = [NSLayoutConstraint constraintWithItem:_subjectTextField
+                                              attribute:NSLayoutAttributeLeading
+                                              relatedBy:NSLayoutRelationEqual
+                                                 toItem:fromLabel
+                                              attribute:NSLayoutAttributeTrailing
+                                             multiplier:1.0
+                                               constant:8.0];
+    [self.textView addConstraint:constraint];
+    constraint = [NSLayoutConstraint constraintWithItem:_subjectTextField
+                                              attribute:NSLayoutAttributeBaseline
+                                              relatedBy:NSLayoutRelationEqual
+                                                 toItem:fromLabel
+                                              attribute:NSLayoutAttributeBaseline
+                                             multiplier:1.0
+                                               constant:0.0];
+    [self.textView addConstraint:constraint];
+//    constraint = [NSLayoutConstraint constraintWithItem:_subjectTextField
+//                                              attribute:NSLayoutAttributeTrailing
+//                                              relatedBy:NSLayoutRelationEqual
+//                                                 toItem:self.textView
+//                                              attribute:NSLayoutAttributeTrailing
+//                                             multiplier:1.0
+//                                               constant:0.0];
+//    [self.textView addConstraint:constraint];
+    constraint = [NSLayoutConstraint constraintWithItem:_subjectTextField
+                                              attribute:NSLayoutAttributeWidth
+                                              relatedBy:NSLayoutRelationEqual
+                                                 toItem:nil
+                                              attribute:0
+                                             multiplier:1.0
+                                               constant:250.0];
+    [_subjectTextField addConstraint:constraint];
+
     // Create an activity indicator
     activityIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
     activityIndicatorView.hidesWhenStopped = YES;
     [self.view addSubview:activityIndicatorView];
     activityIndicatorView.center = self.view.center;
     
-    _toLabel.text = _groupName;
+    _groupNameLabel.text = _groupName;
     _subjectTextField.text = _subject;
 
-    [self textView].textContainerInset = UIEdgeInsetsMake(100, 0, 8, 0);
+    self.textView.textContainerInset = UIEdgeInsetsMake(70, 0, 8, 0);
 
     // Do we have body text to load?
     if (_messageBody)
-    {
-//        // Add the paragraph signs to the supplied body text.  The supplied text
-//        // is also likely to have CRLF pairs, so normalise this also.
-//        NSString *text = [_messageBody stringByReplacingOccurrencesOfString:CR_STR
-//                                                                 withString:EMPTY_STR];
-//        text = [text stringByReplacingOccurrencesOfString:LF_STR
-//                                               withString:PARAGRAPH_SIGN_LF_STR];
-//        [[self textView] setText:text];
-        [self textView].text = _messageBody;
-    }
-
-    if (self.textView.text.length == 0)
-    {
-//    textView.text = @"\n\n\nAndnowasinglelinewithoutwordbreaksandwehavetohandlethissituationalsoespeciallywhenitcomestolinks.  This is a whole load of test text so we can test the word wrapping function.  Lets add a whole lot more to test things out.\n\nThis is a new paragraph.\nAndnowasinglelinewithoutwordbreaksandwehavetohandlethissituationalsoespeciallywhenitcomestolinks.\n";
-        self.textView.text = @"Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nLorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nLorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
-    }
+        self.textView.text = _messageBody;
 
     // Append any default signature
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
@@ -129,7 +224,7 @@
     if (sigText && [sigText isEqualToString:EMPTY_STR] == NO)
     {
         NSString *signature = [NSString stringWithFormat:@"\n-- \n%@", sigText];
-        [self textView].text = [[self textView].text stringByAppendingString:signature];
+        self.textView.text = [self.textView.text stringByAppendingString:signature];
     }
 
     // Notifications we're interested in
@@ -147,9 +242,13 @@
                name:UIKeyboardDidShowNotification
              object:nil];
     [nc addObserver:self
-           selector:@selector(keyboardDidHide:)
-               name:UIKeyboardDidHideNotification
+           selector:@selector(keyboardWillHide:)
+               name:UIKeyboardWillHideNotification
              object:nil];
+//    [nc addObserver:self
+//           selector:@selector(keyboardDidChangeFrame:)
+//               name:UIKeyboardDidChangeFrameNotification
+//             object:nil];
 
     if (_subjectTextField.text.length == 0)
         sendButtonItem.enabled = NO;
@@ -179,154 +278,14 @@
     // Release any cached data, images, etc that aren't in use.
 }
 
-#pragma mark -
-#pragma mark UITextViewDelegate Methods
-
-//- (void)textViewDidChangeSelection:(UITextView *)aTextView
-//{
-//    NSRange range = aTextView.selectedRange;
-//    if (range.location == 0x7fffffff)
-//        return;
-//    
-//    if (restoringText)
-//    {
-//        restoringText = NO;
-//        _textView.selectedRange = restoredSelectedRange;
-//        return;
-//    }
-//
-//    // Make sure the selection does not start to the right of a paragraph sign
-//    if (range.location > 0
-//        && [aTextView.text characterAtIndex:range.location - 1] == PARAGRAPH_SIGN_CHAR)
-//    {
-//        // Adjust the range to the left
-//        --range.location;
-//        if (range.length > 0)
-//            ++range.length;
-//        
-//        aTextView.selectedRange = range;
-//    }
-//}
-//
-//- (BOOL)textView:(UITextView *)aTextView
-//shouldChangeTextInRange:(NSRange)range
-// replacementText:(NSString *)text
-//{
-//    // Refuse to allow the first three characters to be edited
-//    NSRange headerRange = NSMakeRange(0, 3);
-//    if (NSLocationInRange(range.location, headerRange))
-//        return NO;
-//    
-//    if ([text isEqualToString:LF_STR])
-//    {
-//        // Include a paragraph sign for hard line breaks
-//        NSMutableString *mutableText = [aTextView.text mutableCopy];
-//        [mutableText replaceCharactersInRange:range withString:PARAGRAPH_SIGN_LF_STR];
-//
-//        // Lock the scroller as when we set the text, the selection point is
-//        // moved to the end of the text.  We may need to bring it back, so we
-//        // want to prevent the scroll-to-end occuring.
-//        aTextView.scrollEnabled = NO;
-//        aTextView.text = mutableText;
-//        
-//        // If text has been inserted, we need to restore the selectedRange
-//        if (aTextView.selectedRange.location != range.location + 2)
-//            aTextView.selectedRange = NSMakeRange(range.location + 2, 0);
-//        
-//        // Now re-enable the scroller, and manually scroll to the selection point
-//        aTextView.scrollEnabled = YES;
-//        [aTextView scrollRangeToVisible:NSMakeRange(aTextView.selectedRange.location, 1)];
-//
-//        return NO;
-//    }
-//    else if ([text isEqualToString:EMPTY_STR])
-//    {
-//        // This is a deletion, so we must check if the first character in the
-//        // range is a new-line.  If so, we must also delete the corresponding
-//        // paragraph sign
-//        if ([aTextView.text characterAtIndex:range.location] == L'\n')
-//        {
-//            NSMutableString *mutableText = [aTextView.text mutableCopy];
-//            range.location -= 1;
-//            range.length += 1;
-//            [mutableText deleteCharactersInRange:range];
-//
-//            aTextView.scrollEnabled = NO;
-//            aTextView.text = mutableText;
-//
-//            // Do we need to restore the selectedRange?
-//            if (aTextView.selectedRange.location != range.location)
-//                aTextView.selectedRange = NSMakeRange(range.location, 0);
-//
-//            aTextView.scrollEnabled = YES;
-//            [aTextView scrollRangeToVisible:NSMakeRange(aTextView.selectedRange.location, 1)];
-//
-//            return NO;
-//        }
-//        else if ([aTextView.text characterAtIndex:range.location] == PARAGRAPH_SIGN_CHAR)
-//        {
-//            NSMutableString *mutableText = [aTextView.text mutableCopy];
-//            range.length += 1;
-//            [mutableText deleteCharactersInRange:range];
-//
-//            aTextView.scrollEnabled = NO;
-//            aTextView.text = mutableText;
-//
-//            // Do we need to restore the selectedRange?
-//            if (aTextView.selectedRange.location != range.location)
-//            {
-//                NSLog(@"YIPPEE!");
-//                aTextView.selectedRange = NSMakeRange(range.location, 0);
-//            }
-//
-//            aTextView.scrollEnabled = YES;
-//            [aTextView scrollRangeToVisible:NSMakeRange(aTextView.selectedRange.location, 1)];
-//
-//            return NO;
-//        }
-//    }
-//    else if (text.length > 1)
-//    {
-//        // Pasting text -- insert paragraph signs (if needed) into the supplied text
-//        // (This is also called when autocorrecting)
-//
-//        // If we're pasting text that we've copied from a NewArticleView, then
-//        // we'll need to strip out the paragraph signs first... before putting
-//        // them back in.
-//        NSString *replacementText = [text stringByReplacingOccurrencesOfString:PARAGRAPH_SIGN_STR
-//                                                                    withString:EMPTY_STR];
-//
-//        replacementText = [replacementText stringByReplacingOccurrencesOfString:LF_STR
-//                                                                     withString:PARAGRAPH_SIGN_LF_STR];
-//
-//        NSMutableString *mutableText = [aTextView.text mutableCopy];
-//        [mutableText replaceCharactersInRange:range withString:replacementText];
-//
-//        aTextView.scrollEnabled = NO;
-//        aTextView.text = mutableText;
-//
-//        // Do we need to restore the selectedRange?
-//        if (aTextView.selectedRange.location != range.location + replacementText.length)
-//            aTextView.selectedRange = NSMakeRange(range.location + replacementText.length, 0);
-//
-//        aTextView.scrollEnabled = YES;
-//        [aTextView scrollRangeToVisible:NSMakeRange(aTextView.selectedRange.location, 1)];
-//
-//        return NO;
-//    }
-//    
-//    return YES;
-//}
-
-#pragma mark -
-#pragma mark UITextFieldDelegate Methods
+#pragma mark - UITextFieldDelegate Methods
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
     // Make the text view the first responder and position the cursor at
     // the top
-    [[self textView] becomeFirstResponder];
-    [self textView].selectedRange = NSMakeRange(0, 0);
+    [self.textView becomeFirstResponder];
+    self.textView.selectedRange = NSMakeRange(0, 0);
     
     return NO;
 }
@@ -342,7 +301,7 @@
 - (IBAction)sendButtonPressed:(id)sender
 {
     sendButtonItem.enabled = NO;
-    [[self textView] resignFirstResponder];
+    [self.textView resignFirstResponder];
     [activityIndicatorView startAnimating];
 
     EncodedWordEncoder *encoder = [[EncodedWordEncoder alloc] init];
@@ -367,7 +326,7 @@
     
     NSString *organization = [userDefaults stringForKey:@"Organization"];
     
-    NSString *newsgroups = _toLabel.text;
+    NSString *newsgroups = _groupNameLabel.text;
     NSString *newSubject = [encoder encodeString:_subjectTextField.text];
     
     NSArray *headers = [NNArticleFormatter headerArrayWithDate:[NSDate date]
@@ -379,7 +338,7 @@
                                                     newsgroups:newsgroups
                                                        subject:newSubject];
     
-    NSString *articleText = [self textView].text;
+    NSString *articleText = self.textView.text;
     
     // Word-wrap the text at column 78
     articleText = [articleText stringByWrappingUnquotedWordsAtColumn:78];
@@ -456,7 +415,7 @@
     keyboardShown = YES;
 }
 
-- (void)keyboardDidHide:(NSNotification *)notification
+- (void)keyboardWillHide:(NSNotification *)notification
 {
     NSDictionary *info = notification.userInfo;
     
@@ -470,6 +429,25 @@
     self.view.frame = frame;
     
     keyboardShown = NO;
+}
+
+- (void)keyboardDidChangeFrame:(NSNotification *)notification
+{
+//    if (keyboardShown)
+//        return;
+
+    NSDictionary *info = notification.userInfo;
+
+    // Get the size of the keyboard
+    NSValue *value = info[UIKeyboardFrameEndUserInfoKey];
+    CGSize keyboardSize = value.CGRectValue.size;
+
+    // Resize the text view
+    CGRect frame = self.textView.frame;
+    frame.size.height = self.view.frame.size.height - keyboardSize.height;
+    self.view.frame = frame;
+
+    keyboardShown = YES;
 }
 
 @end

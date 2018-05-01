@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" colorMatched="YES" initialViewController="CnJ-Fz-JJk">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="CnJ-Fz-JJk">
     <device id="retina5_9" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -27,7 +28,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="toE-DR-4kg" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1324" y="-1664"/>
+            <point key="canvasLocation" x="2118.4000000000001" y="-1229.5566502463055"/>
         </scene>
         <!--Accounts-->
         <scene sceneID="qHJ-4N-DKK">
@@ -67,14 +68,14 @@
                     <navigationItem key="navigationItem" title="Accounts" id="Cy7-Pf-tW1">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="a74-c1-PH7">
                             <connections>
-                                <segue destination="43Y-mb-9su" kind="push" identifier="AddAccount" id="jlG-NH-NXo"/>
+                                <segue destination="43Y-mb-9su" kind="show" identifier="AddAccount" id="jlG-NH-NXo"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="6R0-8e-NTa" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1835" y="-1664"/>
+            <point key="canvasLocation" x="2936" y="-1229.5566502463055"/>
         </scene>
         <!--Groups-->
         <scene sceneID="KQX-ku-ObA">
@@ -102,7 +103,7 @@
                                     </subviews>
                                 </tableViewCellContentView>
                                 <connections>
-                                    <segue destination="nCd-TS-7j6" kind="push" identifier="SelectGroup" id="LV0-IJ-6KB"/>
+                                    <segue destination="nCd-TS-7j6" kind="show" identifier="SelectGroup" id="LV0-IJ-6KB"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -114,7 +115,7 @@
                     <toolbarItems>
                         <barButtonItem systemItem="action" id="mo3-fk-hu2">
                             <connections>
-                                <segue destination="Sf0-3L-tcM" kind="modal" identifier="SelectAccount" id="vHC-Ui-hJJ"/>
+                                <segue destination="Sf0-3L-tcM" kind="presentation" identifier="SelectAccount" id="vHC-Ui-hJJ"/>
                             </connections>
                         </barButtonItem>
                         <barButtonItem style="plain" systemItem="flexibleSpace" id="zkl-3S-D1e"/>
@@ -123,14 +124,14 @@
                         <barButtonItem key="backBarButtonItem" title="Groups" id="ZoD-PJ-ajM"/>
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="9ld-tK-Cak">
                             <connections>
-                                <segue destination="9qv-we-8PY" kind="modal" identifier="EditGroups" id="G6G-Bd-1zO"/>
+                                <segue destination="9qv-we-8PY" kind="presentation" identifier="EditGroups" id="G6G-Bd-1zO"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="wve-hH-s5a" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="931" y="-128"/>
+            <point key="canvasLocation" x="1489.6000000000001" y="-94.581280788177338"/>
         </scene>
         <!--Threads-->
         <scene sceneID="6QM-NR-cCe">
@@ -193,7 +194,7 @@
                                     <outlet property="previewLabel" destination="RV9-AJ-HHZ" id="4HX-dp-Tf8"/>
                                     <outlet property="readStatusImage" destination="Wfl-JD-PiV" id="H2Q-vs-e4d"/>
                                     <outlet property="titleLabel" destination="gy2-WW-f1d" id="xDm-lS-3WP"/>
-                                    <segue destination="QKf-Mr-mCo" kind="push" identifier="SelectThread" id="v4d-V3-QFC"/>
+                                    <segue destination="QKf-Mr-mCo" kind="show" identifier="SelectThread" id="v4d-V3-QFC"/>
                                 </connections>
                             </tableViewCell>
                             <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="ArticleCell" id="814-3S-x8V" customClass="ThreadListTableViewCell">
@@ -250,7 +251,7 @@
                                     <outlet property="previewLabel" destination="3JR-BF-Onh" id="MFg-k5-J41"/>
                                     <outlet property="readStatusImage" destination="PZ4-Rw-JyU" id="Aif-pW-Fe8"/>
                                     <outlet property="titleLabel" destination="fLo-HS-Kpj" id="3gX-XC-USc"/>
-                                    <segue destination="STc-Ql-pWw" kind="push" identifier="SelectArticle" id="qlP-Jf-LRj"/>
+                                    <segue destination="STc-Ql-pWw" kind="show" identifier="SelectArticle" id="qlP-Jf-LRj"/>
                                 </connections>
                             </tableViewCell>
                             <tableViewCell contentMode="scaleToFill" selectionStyle="blue" indentationWidth="10" reuseIdentifier="LoadMoreCell" id="69V-FN-eLt" customClass="LoadMoreTableViewCell">
@@ -290,7 +291,7 @@
                         <barButtonItem style="plain" systemItem="flexibleSpace" id="5Gj-HX-G9R"/>
                         <barButtonItem systemItem="compose" id="zjF-S7-n3C">
                             <connections>
-                                <segue destination="OSu-XW-ncU" kind="modal" identifier="NewArticle" id="Zfg-Gf-CDl"/>
+                                <segue destination="OSu-XW-ncU" kind="presentation" identifier="NewArticle" id="Zfg-Gf-CDl"/>
                             </connections>
                         </barButtonItem>
                     </toolbarItems>
@@ -311,7 +312,7 @@
                     </connections>
                 </searchDisplayController>
             </objects>
-            <point key="canvasLocation" x="1621.5" y="77"/>
+            <point key="canvasLocation" x="2594.4000000000001" y="56.896551724137929"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="L9S-N4-OAx">
@@ -327,69 +328,41 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="e7J-VQ-OK0" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1616" y="1535"/>
+            <point key="canvasLocation" x="2585.6000000000004" y="1134.2364532019703"/>
         </scene>
         <!--New Article View Controller-->
         <scene sceneID="bfI-We-IZA">
             <objects>
                 <viewController modalPresentationStyle="overCurrentContext" id="KYO-IE-ebS" customClass="NewArticleViewController" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="hL7-bf-pRD"/>
-                        <viewControllerLayoutGuide type="bottom" id="Vtp-me-fTw"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="Z8m-mn-L3X" customClass="UITextView">
+                    <view key="view" contentMode="scaleToFill" id="Z8m-mn-L3X">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="To:" lineBreakMode="tailTruncation" minimumFontSize="10" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cBY-5m-Api">
-                                <rect key="frame" x="16" y="8" width="20.666666666666671" height="17"/>
-                                <fontDescription key="fontDescription" name="Helvetica" family="Helvetica" pointSize="15"/>
-                                <color key="textColor" red="0.60000002379999995" green="0.60000002379999995" blue="0.60000002379999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="750" text="Newsgroup" lineBreakMode="tailTruncation" minimumFontSize="10" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZFS-wM-NCv">
-                                <rect key="frame" x="79" y="8" width="76" height="17"/>
-                                <fontDescription key="fontDescription" name="Helvetica" family="Helvetica" pointSize="15"/>
-                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Subject:" lineBreakMode="tailTruncation" minimumFontSize="10" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4Ga-nt-OKG">
-                                <rect key="frame" x="16" y="33" width="55" height="17.666666666666671"/>
-                                <fontDescription key="fontDescription" name="Helvetica" family="Helvetica" pointSize="15"/>
-                                <color key="textColor" red="0.60000002379999995" green="0.60000002379999995" blue="0.60000002379999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <textField autoresizesSubviews="NO" opaque="NO" clipsSubviews="YES" contentMode="left" contentHorizontalAlignment="left" contentVerticalAlignment="center" adjustsFontSizeToFit="NO" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="mSL-Va-itf">
-                                <rect key="frame" x="79" y="29" width="280" height="18"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="280" id="5FR-DP-nea"/>
-                                </constraints>
-                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <fontDescription key="fontDescription" name="Helvetica" family="Helvetica" pointSize="15"/>
-                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences" enablesReturnKeyAutomatically="YES"/>
-                            </textField>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="CsQ-x0-NmM">
+                                <rect key="frame" x="0.0" y="88" width="375" height="690"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="4Ga-nt-OKG" firstAttribute="top" secondItem="cBY-5m-Api" secondAttribute="bottom" constant="8" id="5SN-dT-4yB"/>
-                            <constraint firstItem="cBY-5m-Api" firstAttribute="leading" secondItem="Z8m-mn-L3X" secondAttribute="leadingMargin" id="AhA-6B-ekX"/>
-                            <constraint firstItem="4Ga-nt-OKG" firstAttribute="leading" secondItem="Z8m-mn-L3X" secondAttribute="leadingMargin" id="Fri-Yx-7yp"/>
-                            <constraint firstItem="ZFS-wM-NCv" firstAttribute="top" secondItem="Z8m-mn-L3X" secondAttribute="topMargin" constant="8" id="KWJ-Re-r6d"/>
-                            <constraint firstItem="mSL-Va-itf" firstAttribute="top" secondItem="ZFS-wM-NCv" secondAttribute="bottom" constant="4" id="MhL-mg-gqa"/>
-                            <constraint firstItem="mSL-Va-itf" firstAttribute="leading" secondItem="4Ga-nt-OKG" secondAttribute="trailing" constant="8" id="P5Y-Me-ZTg"/>
-                            <constraint firstItem="cBY-5m-Api" firstAttribute="top" secondItem="Z8m-mn-L3X" secondAttribute="topMargin" constant="8" id="dfX-C2-Lz5"/>
-                            <constraint firstItem="ZFS-wM-NCv" firstAttribute="leading" secondItem="cBY-5m-Api" secondAttribute="trailing" constant="42.670000000000002" id="oPu-O1-gTC"/>
+                            <constraint firstItem="CsQ-x0-NmM" firstAttribute="bottom" secondItem="HLx-cD-dRw" secondAttribute="bottom" id="00l-6B-Sau"/>
+                            <constraint firstItem="CsQ-x0-NmM" firstAttribute="leading" secondItem="HLx-cD-dRw" secondAttribute="leading" id="UeY-pz-WPQ"/>
+                            <constraint firstItem="CsQ-x0-NmM" firstAttribute="top" secondItem="HLx-cD-dRw" secondAttribute="top" id="Uez-Hs-ooc"/>
+                            <constraint firstItem="HLx-cD-dRw" firstAttribute="trailing" secondItem="CsQ-x0-NmM" secondAttribute="trailing" id="kWB-yb-IAz"/>
                         </constraints>
+                        <viewLayoutGuide key="safeArea" id="HLx-cD-dRw"/>
                     </view>
                     <navigationItem key="navigationItem" id="N0j-s1-KxX"/>
                     <connections>
-                        <outlet property="subjectTextField" destination="mSL-Va-itf" id="NGd-Di-rdK"/>
-                        <outlet property="toLabel" destination="ZFS-wM-NCv" id="KY9-TN-PgZ"/>
+                        <outlet property="textView" destination="CsQ-x0-NmM" id="Aet-Zn-DeN"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="W0u-hB-As7" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2084.5" y="1535"/>
+            <point key="canvasLocation" x="3335.1999999999998" y="1133.497536945813"/>
         </scene>
         <!--Thread-->
         <scene sceneID="rSx-7G-UG6">
@@ -424,7 +397,7 @@
                                     </subviews>
                                 </tableViewCellContentView>
                                 <connections>
-                                    <segue destination="STc-Ql-pWw" kind="push" identifier="SelectArticle" id="SO7-25-V3r"/>
+                                    <segue destination="STc-Ql-pWw" kind="show" identifier="SelectArticle" id="SO7-25-V3r"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -437,30 +410,27 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="CzE-zX-2OZ" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2085" y="543"/>
+            <point key="canvasLocation" x="3336" y="401.23152709359607"/>
         </scene>
         <!--Article-->
         <scene sceneID="mNe-hQ-lid">
             <objects>
                 <viewController title="Article" id="STc-Ql-pWw" customClass="ArticleViewController" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="k9e-jm-csg"/>
-                        <viewControllerLayoutGuide type="bottom" id="x3Q-CF-iSs"/>
-                    </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="U2Q-LD-4GJ">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <viewLayoutGuide key="safeArea" id="ZJl-HE-uBl"/>
                     </view>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" title="Article" largeTitleDisplayMode="never" id="ggy-8J-3Wj"/>
                     <connections>
-                        <segue destination="OSu-XW-ncU" kind="modal" identifier="NewArticle" id="3sH-cC-xc4"/>
+                        <segue destination="OSu-XW-ncU" kind="presentation" identifier="NewArticle" id="3sH-cC-xc4"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="JQM-Yc-cb7" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2626" y="77"/>
+            <point key="canvasLocation" x="4201.6000000000004" y="56.896551724137929"/>
         </scene>
         <!--Select Groups-->
         <scene sceneID="p3H-12-FeV">
@@ -533,7 +503,7 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="5LF-uP-7NQ" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <exit id="AXw-VI-OXW" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="2085" y="-797"/>
+            <point key="canvasLocation" x="3336" y="-588.91625615763542"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="zYU-Bj-k5G">
@@ -553,7 +523,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="0ev-Za-6SP" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="423" y="-128"/>
+            <point key="canvasLocation" x="676.80000000000007" y="-94.581280788177338"/>
         </scene>
         <!--Add Account-->
         <scene sceneID="3ti-kK-0yp">
@@ -583,7 +553,7 @@
                                     </constraints>
                                 </tableViewCellContentView>
                                 <connections>
-                                    <segue destination="9N4-MX-8RM" kind="modal" id="rRm-Pm-yog"/>
+                                    <segue destination="9N4-MX-8RM" kind="presentation" id="rRm-Pm-yog"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -596,7 +566,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="C1E-W4-jEn" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2352" y="-1664"/>
+            <point key="canvasLocation" x="3763.2000000000003" y="-1229.5566502463055"/>
         </scene>
         <!--Account Settings-->
         <scene sceneID="tjr-0b-E7D">
@@ -625,7 +595,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="1wW-Z7-P81" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3380" y="-1664"/>
+            <point key="canvasLocation" x="5408" y="-1229.5566502463055"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="8fa-Mr-AN2">
@@ -644,7 +614,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="aOP-Au-jCw" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1616" y="-797"/>
+            <point key="canvasLocation" x="2585.6000000000004" y="-588.91625615763542"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="sMN-TD-iQ5">
@@ -662,14 +632,14 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="EdF-65-Kst" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2893" y="-1664"/>
+            <point key="canvasLocation" x="4628.8000000000002" y="-1229.5566502463055"/>
         </scene>
     </scenes>
     <resources>
         <image name="Default" width="320" height="480"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="qlP-Jf-LRj"/>
-        <segue reference="Zfg-Gf-CDl"/>
+        <segue reference="SO7-25-V3r"/>
+        <segue reference="3sH-cC-xc4"/>
     </inferredMetricsTieBreakers>
 </document>

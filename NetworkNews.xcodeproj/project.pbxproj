@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		03148F3B1C47348400BAFED3 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 03148F3A1C47348400BAFED3 /* libz.tbd */; };
 		032B48B92090F9B000107B96 /* NSMutableAttributedStringTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 032B48B82090F9B000107B96 /* NSMutableAttributedStringTests.m */; };
+		032B48C12092493B00107B96 /* NetworkNewsUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 032B48C02092493B00107B96 /* NetworkNewsUITests.m */; };
+		032B48C82097882C00107B96 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 032B48CA2097882C00107B96 /* Main.storyboard */; };
 		03457BA1207BD2220047BAA8 /* LoadMoreTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 03457BA0207BD2220047BAA8 /* LoadMoreTableViewCell.m */; };
 		03457BA5207BE6E50047BAA8 /* EncodedWordEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 03457BA4207BE6E50047BAA8 /* EncodedWordEncoder.m */; };
 		03714C6920803470006AD9F8 /* LoadingIndicatorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 03714C6820803470006AD9F8 /* LoadingIndicatorView.m */; };
@@ -85,7 +87,6 @@
 		6398525816D0FBEA009303E2 /* LineIterator.m in Sources */ = {isa = PBXBuildFile; fileRef = 6398525716D0FBEA009303E2 /* LineIterator.m */; };
 		63A7205216F32B6B000AC69C /* FetchArticleOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 63A7205116F32B6B000AC69C /* FetchArticleOperation.m */; };
 		63C3011C1769707A00F8B6FE /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 63C3011B1769707A00F8B6FE /* Images.xcassets */; };
-		63C3011E176972B300F8B6FE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 63C3011D176972B300F8B6FE /* Main.storyboard */; };
 		63C69193178D6FDB0016776B /* NSMutableAttributedString+NewsAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C69192178D65450016776B /* NSMutableAttributedString+NewsAdditions.m */; };
 		63C69196178D70EB0016776B /* Preferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C69195178D70EB0016776B /* Preferences.m */; };
 		63E3A76C16E99BD300BD3D13 /* NewsConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 63E3A76B16E99BD300BD3D13 /* NewsConnection.m */; };
@@ -102,6 +103,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		032B48C32092493B00107B96 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 634191A916D0D6590069B528 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 634191B016D0D6590069B528;
+			remoteInfo = NetworkNews;
+		};
 		634191DC16D0D6590069B528 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 634191A916D0D6590069B528 /* Project object */;
@@ -114,6 +122,10 @@
 /* Begin PBXFileReference section */
 		03148F3A1C47348400BAFED3 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		032B48B82090F9B000107B96 /* NSMutableAttributedStringTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NSMutableAttributedStringTests.m; sourceTree = "<group>"; };
+		032B48BE2092493B00107B96 /* NetworkNewsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NetworkNewsUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		032B48C02092493B00107B96 /* NetworkNewsUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NetworkNewsUITests.m; sourceTree = "<group>"; };
+		032B48C22092493B00107B96 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		032B48C92097882C00107B96 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/Main.storyboard; sourceTree = "<group>"; };
 		03457B9F207BD2220047BAA8 /* LoadMoreTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LoadMoreTableViewCell.h; sourceTree = "<group>"; };
 		03457BA0207BD2220047BAA8 /* LoadMoreTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LoadMoreTableViewCell.m; sourceTree = "<group>"; };
 		03457BA3207BE6E50047BAA8 /* EncodedWordEncoder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EncodedWordEncoder.h; sourceTree = "<group>"; };
@@ -254,7 +266,6 @@
 		63A7205016F32B6B000AC69C /* FetchArticleOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FetchArticleOperation.h; sourceTree = "<group>"; };
 		63A7205116F32B6B000AC69C /* FetchArticleOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FetchArticleOperation.m; sourceTree = "<group>"; };
 		63C3011B1769707A00F8B6FE /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		63C3011D176972B300F8B6FE /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		63C69191178D65450016776B /* NSMutableAttributedString+NewsAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSMutableAttributedString+NewsAdditions.h"; sourceTree = "<group>"; };
 		63C69192178D65450016776B /* NSMutableAttributedString+NewsAdditions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSMutableAttributedString+NewsAdditions.m"; sourceTree = "<group>"; };
 		63C69194178D70EB0016776B /* Preferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Preferences.h; sourceTree = "<group>"; };
@@ -278,6 +289,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		032B48BB2092493B00107B96 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		634191AE16D0D6590069B528 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -307,6 +325,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		032B48BF2092493B00107B96 /* NetworkNewsUITests */ = {
+			isa = PBXGroup;
+			children = (
+				032B48C02092493B00107B96 /* NetworkNewsUITests.m */,
+				032B48C22092493B00107B96 /* Info.plist */,
+			);
+			path = NetworkNewsUITests;
+			sourceTree = "<group>";
+		};
 		03457BA2207BE6A20047BAA8 /* Encoders */ = {
 			isa = PBXGroup;
 			children = (
@@ -324,6 +351,7 @@
 				6341925716D0D8800069B528 /* todo.txt */,
 				634191BA16D0D6590069B528 /* NetworkNews */,
 				634191DE16D0D6590069B528 /* NetworkNewsTests */,
+				032B48BF2092493B00107B96 /* NetworkNewsUITests */,
 				634191B316D0D6590069B528 /* Frameworks */,
 				634191B216D0D6590069B528 /* Products */,
 			);
@@ -336,6 +364,7 @@
 			children = (
 				634191B116D0D6590069B528 /* NetworkNews.app */,
 				634191D716D0D6590069B528 /* NetworkNewsTests.xctest */,
+				032B48BE2092493B00107B96 /* NetworkNewsUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -476,7 +505,7 @@
 				6302EF0D178D8E7800BBC68E /* ExtendedLayoutManager.m */,
 				63C69194178D70EB0016776B /* Preferences.h */,
 				63C69195178D70EB0016776B /* Preferences.m */,
-				63C3011D176972B300F8B6FE /* Main.storyboard */,
+				032B48CA2097882C00107B96 /* Main.storyboard */,
 				634192EB16D0DAEE0069B528 /* Thread.h */,
 				634192EC16D0DAEE0069B528 /* Thread.m */,
 				634192B416D0DAEC0069B528 /* ConnectionVerifier.h */,
@@ -593,6 +622,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		032B48BD2092493B00107B96 /* NetworkNewsUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 032B48C52092493B00107B96 /* Build configuration list for PBXNativeTarget "NetworkNewsUITests" */;
+			buildPhases = (
+				032B48BA2092493B00107B96 /* Sources */,
+				032B48BB2092493B00107B96 /* Frameworks */,
+				032B48BC2092493B00107B96 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				032B48C42092493B00107B96 /* PBXTargetDependency */,
+			);
+			name = NetworkNewsUITests;
+			productName = NetworkNewsUITests;
+			productReference = 032B48BE2092493B00107B96 /* NetworkNewsUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		634191B016D0D6590069B528 /* NetworkNews */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 634191E916D0D6590069B528 /* Build configuration list for PBXNativeTarget "NetworkNews" */;
@@ -638,6 +685,12 @@
 				LastUpgradeCheck = 0930;
 				ORGANIZATIONNAME = "David Schweinsberg";
 				TargetAttributes = {
+					032B48BD2092493B00107B96 = {
+						CreatedOnToolsVersion = 9.3;
+						DevelopmentTeam = 9MWCHY26A8;
+						ProvisioningStyle = Automatic;
+						TestTargetID = 634191B016D0D6590069B528;
+					};
 					634191B016D0D6590069B528 = {
 						DevelopmentTeam = 9MWCHY26A8;
 					};
@@ -657,11 +710,19 @@
 			targets = (
 				634191B016D0D6590069B528 /* NetworkNews */,
 				634191D616D0D6590069B528 /* NetworkNewsTests */,
+				032B48BD2092493B00107B96 /* NetworkNewsUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		032B48BC2092493B00107B96 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		634191AF16D0D6590069B528 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -671,7 +732,7 @@
 				6341926D16D0D8800069B528 /* GroupInfoView.xib in Resources */,
 				6341926F16D0D8800069B528 /* AccountSettingsView.xib in Resources */,
 				03ECA37D206081C600A44D65 /* LaunchScreen.storyboard in Resources */,
-				63C3011E176972B300F8B6FE /* Main.storyboard in Resources */,
+				032B48C82097882C00107B96 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -685,6 +746,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		032B48BA2092493B00107B96 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				032B48C12092493B00107B96 /* NetworkNewsUITests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		634191AD16D0D6590069B528 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -776,6 +845,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		032B48C42092493B00107B96 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 634191B016D0D6590069B528 /* NetworkNews */;
+			targetProxy = 032B48C32092493B00107B96 /* PBXContainerItemProxy */;
+		};
 		634191DD16D0D6590069B528 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 634191B016D0D6590069B528 /* NetworkNews */;
@@ -784,6 +858,14 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		032B48CA2097882C00107B96 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				032B48C92097882C00107B96 /* en */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
 		634191BD16D0D6590069B528 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -811,6 +893,68 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		032B48C62092493B00107B96 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 9MWCHY26A8;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				INFOPLIST_FILE = NetworkNewsUITests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.typista.NetworkNewsUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = NetworkNews;
+			};
+			name = Debug;
+		};
+		032B48C72092493B00107B96 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 9MWCHY26A8;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				INFOPLIST_FILE = NetworkNewsUITests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = com.typista.NetworkNewsUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = NetworkNews;
+			};
+			name = Release;
+		};
 		634191E716D0D6590069B528 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -981,6 +1125,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		032B48C52092493B00107B96 /* Build configuration list for PBXNativeTarget "NetworkNewsUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				032B48C62092493B00107B96 /* Debug */,
+				032B48C72092493B00107B96 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		634191AC16D0D6590069B528 /* Build configuration list for PBXProject "NetworkNews" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

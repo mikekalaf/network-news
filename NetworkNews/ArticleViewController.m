@@ -90,17 +90,51 @@
     self.textView.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:self.textView];
 
-    NSDictionary *views = NSDictionaryOfVariableBindings(_textView);
-    NSArray *constraints = [NSLayoutConstraint constraintsWithVisualFormat:@"|[_textView]|"
-                                                                   options:0
-                                                                   metrics:nil
-                                                                     views:views];
-    [self.view addConstraints:constraints];
-    constraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_textView]|"
-                                                          options:0
-                                                          metrics:nil
-                                                            views:views];
-    [self.view addConstraints:constraints];
+//    NSDictionary *views = NSDictionaryOfVariableBindings(_textView);
+//    NSArray *constraints = [NSLayoutConstraint constraintsWithVisualFormat:@"|[_textView]|"
+//                                                                   options:0
+//                                                                   metrics:nil
+//                                                                     views:views];
+//    [self.view addConstraints:constraints];
+//    constraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_textView]|"
+//                                                          options:0
+//                                                          metrics:nil
+//                                                            views:views];
+//    [self.view addConstraints:constraints];
+
+    NSLayoutConstraint *constraint;
+    constraint = [NSLayoutConstraint constraintWithItem:_textView
+                                              attribute:NSLayoutAttributeTop
+                                              relatedBy:NSLayoutRelationEqual
+                                                 toItem:self.view.safeAreaLayoutGuide
+                                              attribute:NSLayoutAttributeTop
+                                             multiplier:1.0
+                                               constant:0.0];
+    [self.view addConstraint:constraint];
+    constraint = [NSLayoutConstraint constraintWithItem:_textView
+                                              attribute:NSLayoutAttributeBottom
+                                              relatedBy:NSLayoutRelationEqual
+                                                 toItem:self.view.safeAreaLayoutGuide
+                                              attribute:NSLayoutAttributeBottom
+                                             multiplier:1.0
+                                               constant:0.0];
+    [self.view addConstraint:constraint];
+    constraint = [NSLayoutConstraint constraintWithItem:_textView
+                                              attribute:NSLayoutAttributeLeading
+                                              relatedBy:NSLayoutRelationEqual
+                                                 toItem:self.view.safeAreaLayoutGuide
+                                              attribute:NSLayoutAttributeLeading
+                                             multiplier:1.0
+                                               constant:0.0];
+    [self.view addConstraint:constraint];
+    constraint = [NSLayoutConstraint constraintWithItem:_textView
+                                              attribute:NSLayoutAttributeTrailing
+                                              relatedBy:NSLayoutRelationEqual
+                                                 toItem:self.view.safeAreaLayoutGuide
+                                              attribute:NSLayoutAttributeTrailing
+                                             multiplier:1.0
+                                               constant:0.0];
+    [self.view addConstraint:constraint];
 
     // Set up the operation queue to download one part at a time
     _operationQueue = [[NSOperationQueue alloc] init];
