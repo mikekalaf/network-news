@@ -18,7 +18,6 @@
 #import "NSString+NewsAdditions.h"
 #import "ThreadListTableViewCell.h"
 #import "LoadMoreTableViewCell.h"
-#import "ActivityView.h"
 #import "ThreadIterator.h"
 #import "NetworkNews.h"
 #import "NewsConnectionPool.h"
@@ -42,14 +41,12 @@
 >
 {
     NSFetchedResultsController *searchFetchedResultsController;
-    ActivityView *activityView;
     UILabel *_statusLabel;
     NSArray *threads;
     NSArray *fileThreads;
     NSArray *messageThreads;
     ThreadIterator *threadIterator;
     GroupStore *_store;
-    BOOL silentlyFailConnection;
     NSString *searchText;
     NSUInteger searchScope;
     NSUInteger threadTypeDisplay;
@@ -61,6 +58,7 @@
     UIImage *readIconImage;
     NSArray *fileExtensions;
     NSOperationQueue *_operationQueue;
+    ArticleRange _availableArticles;
 }
 
 @property(nonatomic) IBOutlet UIBarButtonItem *statusBarButtonItem;
@@ -79,7 +77,7 @@
     _groupName = [aGroupName copy];
     _store = [[GroupStore alloc] initWithStoreName:_groupName
                                        inDirectory:_connectionPool.account.serviceName];
-    self.title = [_groupName shortGroupName];
+    self.title = _groupName.shortGroupName;
 }
 
 #pragma mark - View lifecycle
@@ -113,11 +111,6 @@
                        @".zip",
                        @".rar"];
 
-    // Create a loading indicator
-    activityView = [[ActivityView alloc] initWithFrame:CGRectMake(0, 0, 80, 80)];
-//    loadingIndicatorView.hidden = YES;
-    [self.navigationController.view addSubview:activityView];
-
     // Put status label into toolbar button item
     _statusLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     _statusLabel.font = [UIFont systemFontOfSize:11.0];
@@ -138,11 +131,8 @@
                name:NSManagedObjectContextDidSaveNotification
              object:nil];
 
-    [self updateThreads];
-
-    // Download the latest articles (this will also do a fetch request)
-    silentlyFailConnection = YES;
-    [self downloadArticlesWithMode:ArticleOverviewsLatest];
+    // Mark the available article range as invalid
+    _availableArticles.location = UINT64_MAX;
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -170,12 +160,6 @@
 	[super viewWillDisappear:animated];
     if (self.movingFromParentViewController)
         [_operationQueue cancelAllOperations];
-}
-
-- (void)viewDidLayoutSubviews
-{
-    [super viewDidLayoutSubviews];
-    activityView.center = self.navigationController.view.center;
 }
 
 - (void)dealloc
@@ -239,6 +223,14 @@
 
 - (NSInteger)tableView:(UITableView *)aTableView numberOfRowsInSection:(NSInteger)section
 {
+    // If the stored article range location is equal (or less than) the
+    // available article range, then don't show the load more cell
+    ArticleRange storedRange = _store.articleRange;
+    BOOL showLoadMore = YES;
+    if (_availableArticles.location != UINT64_MAX &&
+        storedRange.location <= _availableArticles.location)
+        showLoadMore = NO;
+
     // Return the number of rows in the section.
 //    if (aTableView == self.searchDisplayController.searchResultsTableView)
 //    {
@@ -249,18 +241,17 @@
 //    }
 //    else
     {
-        // If we're displaying no articles, hide the "Load more" cell also
-        NSUInteger count = [self activeThreads].count;
-        return count ? count + 1 : 0;
+        NSUInteger count = self.activeThreads.count;
+        return showLoadMore ? count + 1 : count;
     }
 }
 
 - (UITableViewCell *)tableView:(UITableView *)aTableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     // If this row is beyond the end of the list, show a "load more" cell
-    if (indexPath.row >= [self activeThreads].count)
+    if (indexPath.row >= self.activeThreads.count)
     {
-        [self downloadArticlesWithMode:ArticleOverviewsMore];
+        [self downloadArticlesWithMode:indexPath.row > 0 ? ArticleOverviewsMore : ArticleOverviewsLatest];
         LoadMoreTableViewCell *cell = [aTableView dequeueReusableCellWithIdentifier:@"LoadMoreCell"];
         [cell.activityIndicatorView startAnimating];
         return cell;
@@ -291,15 +282,6 @@
 
     authorLabel.text = [emailAddressFormatter stringForObjectValue:thread.initialAuthor];
     subjectLabel.text = thread.subject;
-    
-//    if (count > 1)
-//    {
-//        [[cell threadCountLabel] setText:[NSString stringWithFormat:@"%d", count]];
-//        [[cell threadCountLabel] setHidden:NO];
-//    }
-//    else
-//        [[cell threadCountLabel] setHidden:YES];
-
     dateLabel.text = [dateFormatter stringFromDate:thread.latestDate];
 
     if (count == 1 && thread.hasAllParts == NO)
@@ -520,8 +502,6 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         NSLog(@"(merging)");
         [self->_store.managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
-        [self updateThreads];
-        self->activityView.hidden = YES;
     });
 
     //[_managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
@@ -599,7 +579,6 @@
     [self.tableView reloadData];
 
     [self setStatusUpdatedDate:_store.lastUpdate];
-    silentlyFailConnection = NO;
 }
 
 - (NSArray *)activeThreads
@@ -767,8 +746,10 @@
                                                                                      maxArticleCount:maxCount];
     operation.completionBlock = ^{
         dispatch_async(dispatch_get_main_queue(), ^{
+            self->_availableArticles = operation.availableArticles;
             [self.refreshControl endRefreshing];
             [self toolbarEnabled:YES];
+            [self updateThreads];
         });
     };
     [_operationQueue addOperation:operation];

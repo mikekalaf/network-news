@@ -161,6 +161,7 @@ static BOOL PartNumber(NSString *subject,
                 [scanner scanLongLong:&high];
                 [scanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet]
                                         intoString:&name];
+                _availableArticles = [self rangeOfArticleNumberLow:low ArticleNumberHigh:high];
 
                 ArticleRange storedRange = _groupStore.articleRange;
 
@@ -174,7 +175,7 @@ static BOOL PartNumber(NSString *subject,
 
                     if (storedRange.length == 0)
                     {
-                        low = MAX(high - _maxArticleCount + 1, 0);
+                        low = MAX(high - (NSInteger)_maxArticleCount + 1, 0);
                     }
                     else
                     {
@@ -184,8 +185,17 @@ static BOOL PartNumber(NSString *subject,
                 }
                 else if (_mode == ArticleOverviewsMore)
                 {
-                    low = MAX(storedRange.location - _maxArticleCount, low);
-                    high = MAX(storedRange.location, low);
+                    // Have we already downloaded all the articles?
+                    if ((NSInteger)storedRange.location - (NSInteger)_maxArticleCount <= low)
+                    {
+                        NSLog(@"Already have earliest articles");
+                        low = high + 1;  // Force article range to have a length of zero
+                    }
+                    else
+                    {
+                        low = MAX((NSInteger)storedRange.location - (NSInteger)_maxArticleCount, low);
+                        high = MAX((NSInteger)storedRange.location, low);
+                    }
                 }
 
                 _articleRange = [self rangeOfArticleNumberLow:low ArticleNumberHigh:high];

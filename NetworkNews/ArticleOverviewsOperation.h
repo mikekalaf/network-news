@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "ArticleRange.h"
 
 @class NewsConnectionPool;
 @class GroupStore;
@@ -30,6 +31,7 @@ typedef NS_ENUM(unsigned int, ArticleOverviewsStatus) {
 @property (nonatomic, readonly) ArticleOverviewsMode mode;
 @property (nonatomic, readonly) NSUInteger maxArticleCount;
 @property (nonatomic, readonly) ArticleOverviewsStatus status;
+@property (nonatomic, readonly) ArticleRange availableArticles;
 
 - (instancetype)initWithConnectionPool:(NewsConnectionPool *)connectionPool
                   groupStore:(GroupStore *)groupStore
