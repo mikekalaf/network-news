@@ -1,4 +1,4 @@
-// 
+//
 //  GroupListing.m
 //  Network News
 //
@@ -8,46 +8,43 @@
 
 #import "GroupListing.h"
 
-@implementation GroupListing 
+@implementation GroupListing
 
 - (instancetype)initWithName:(NSString *)name
-    highestArticle:(long long)highestArticle
-     lowestArticle:(long long)lowestArticle
-     postingStatus:(char)postingStatus
-{
-    self = [super init];
-    if (self)
-    {
-        _name = name;
-        _highestArticle = highestArticle;
-        _lowestArticle = lowestArticle;
-        _postingStatus = postingStatus;
-    }
-    return self;
+              highestArticle:(long long)highestArticle
+               lowestArticle:(long long)lowestArticle
+               postingStatus:(char)postingStatus {
+  self = [super init];
+  if (self) {
+    _name = name;
+    _highestArticle = highestArticle;
+    _lowestArticle = lowestArticle;
+    _postingStatus = postingStatus;
+  }
+  return self;
 }
 
-- (instancetype)initWithCoder:(NSCoder *)aDecoder
-{
-    return [self initWithName:[aDecoder decodeObjectForKey:@"Name"]
-               highestArticle:[aDecoder decodeInt64ForKey:@"High"]
-                lowestArticle:[aDecoder decodeInt64ForKey:@"Low"]
-                postingStatus:0];
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
+  return [self initWithName:[aDecoder decodeObjectForKey:@"Name"]
+             highestArticle:[aDecoder decodeInt64ForKey:@"High"]
+              lowestArticle:[aDecoder decodeInt64ForKey:@"Low"]
+              postingStatus:0];
 }
 
-- (void)encodeWithCoder:(NSCoder *)aCoder
-{
-    [aCoder encodeObject:_name forKey:@"name"];
-    [aCoder encodeInt64:_highestArticle forKey:@"highestArticle"];
-    [aCoder encodeInt64:_lowestArticle forKey:@"lowestArticle"];
+- (void)encodeWithCoder:(NSCoder *)aCoder {
+  [aCoder encodeObject:_name forKey:@"name"];
+  [aCoder encodeInt64:_highestArticle forKey:@"highestArticle"];
+  [aCoder encodeInt64:_lowestArticle forKey:@"lowestArticle"];
 }
 
-- (long long)count
-{
-    return _highestArticle - _lowestArticle + 1;
+- (long long)count {
+  return _highestArticle - _lowestArticle + 1;
 }
 
-//- (NSRange)rangeOfLatestArticlesFromLowestArticleNumber:(long long)lowestArticleNumber
-//                                   highestArticleNumber:(long long)highestArticleNumber
+//- (NSRange)rangeOfLatestArticlesFromLowestArticleNumber:(long
+//long)lowestArticleNumber
+//                                   highestArticleNumber:(long
+//                                   long)highestArticleNumber
 //                                                inGroup:(GroupListing *)group
 //{
 //    //    long long lowestLoaded = group.lowestArticleNumber.longLongValue;
@@ -60,23 +57,27 @@
 //        else
 //            lowestNew = highestLoaded + 1;
 //
-//        NSLog(@"LATEST range: location = %lld, length = %lld", lowestNew, highestArticleNumber - lowestNew + 1);
+//        NSLog(@"LATEST range: location = %lld, length = %lld", lowestNew,
+//        highestArticleNumber - lowestNew + 1);
 //
 //        return NSMakeRange(lowestNew, highestArticleNumber - lowestNew + 1);
 //    }
 //    return NSMakeRange(highestArticleNumber, 0);
 //}
 //
-//- (NSRange)rangeOfMoreArticlesFromLowestArticleNumber:(long long)lowestArticleNumber
+//- (NSRange)rangeOfMoreArticlesFromLowestArticleNumber:(long
+//long)lowestArticleNumber
 //                                              inGroup:(GroupListing *)group
 //{
 //    long long lowestLoaded = group.lowestArticle;
 //    //    long long highestLoaded = group.highestArticleNumber.longLongValue;
 //    if (lowestArticleNumber < lowestLoaded)
 //    {
-//        NSLog(@"MORE range: location = %lld, length = %lld", lowestArticleNumber, lowestLoaded - lowestArticleNumber);
+//        NSLog(@"MORE range: location = %lld, length = %lld",
+//        lowestArticleNumber, lowestLoaded - lowestArticleNumber);
 //
-//        return NSMakeRange(lowestArticleNumber, lowestLoaded - lowestArticleNumber);
+//        return NSMakeRange(lowestArticleNumber, lowestLoaded -
+//        lowestArticleNumber);
 //    }
 //    return NSMakeRange(lowestArticleNumber, 0);
 //}

@@ -9,70 +9,62 @@
 #import "AppDelegate.h"
 #import "AccountsViewController.h"
 #import "ArticleViewController.h"
-#import "NewsAccount.h"
 #import "NSArray+NewsAdditions.h"
 #import "NetworkNews.h"
+#import "NewsAccount.h"
 #import "Preferences.h"
 
-@interface AppDelegate ()
-{
+@interface AppDelegate () {
 }
 
 @end
 
 @implementation AppDelegate
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
-{
-    [Preferences registerDefaults];
-    _accounts = [self accountsFromArchive];
-    return YES;
+- (BOOL)application:(UIApplication *)application
+    didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+  [Preferences registerDefaults];
+  _accounts = [self accountsFromArchive];
+  return YES;
 }
 
-- (void)applicationWillResignActive:(UIApplication *)application
-{
+- (void)applicationWillResignActive:(UIApplication *)application {
 }
 
-- (void)applicationDidEnterBackground:(UIApplication *)application
-{
+- (void)applicationDidEnterBackground:(UIApplication *)application {
 }
 
-- (void)applicationWillEnterForeground:(UIApplication *)application
-{
+- (void)applicationWillEnterForeground:(UIApplication *)application {
 }
 
-- (void)applicationDidBecomeActive:(UIApplication *)application
-{
+- (void)applicationDidBecomeActive:(UIApplication *)application {
 }
 
-- (void)applicationWillTerminate:(UIApplication *)application
-{
+- (void)applicationWillTerminate:(UIApplication *)application {
 }
 
-- (void)swipeLeft:(UIGestureRecognizer *)gestureRecognizer
-{
-    NSLog(@"swipeLeft:");
+- (void)swipeLeft:(UIGestureRecognizer *)gestureRecognizer {
+  NSLog(@"swipeLeft:");
 }
 
-- (void)swipeRight:(UIGestureRecognizer *)gestureRecognizer
-{
-    NSLog(@"swipeRight:");
+- (void)swipeRight:(UIGestureRecognizer *)gestureRecognizer {
+  NSLog(@"swipeRight:");
 }
 
-- (NSURL *)accountsFileURL
-{
-    NSFileManager *fileMananger = [[NSFileManager alloc] init];
-    NSArray *urls = [fileMananger URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask];
-    return [urls.lastObject URLByAppendingPathComponent:NetworkNewsAccountsFileName];
+- (NSURL *)accountsFileURL {
+  NSFileManager *fileMananger = [[NSFileManager alloc] init];
+  NSArray *urls = [fileMananger URLsForDirectory:NSDocumentDirectory
+                                       inDomains:NSUserDomainMask];
+  return
+      [urls.lastObject URLByAppendingPathComponent:NetworkNewsAccountsFileName];
 }
 
-- (NSMutableArray *)accountsFromArchive
-{
-    NSData *accountsData = [NSData dataWithContentsOfURL:[self accountsFileURL]];
-    if (accountsData)
-        return [NSKeyedUnarchiver unarchiveObjectWithData:accountsData];
-    else
-        return [NSMutableArray array];
+- (NSMutableArray *)accountsFromArchive {
+  NSData *accountsData = [NSData dataWithContentsOfURL:[self accountsFileURL]];
+  if (accountsData)
+    return [NSKeyedUnarchiver unarchiveObjectWithData:accountsData];
+  else
+    return [NSMutableArray array];
 }
 
 @end

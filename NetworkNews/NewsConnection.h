@@ -6,8 +6,8 @@
 //  Copyright (c) 2013 David Schweinsberg. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
 #import "ArticleRange.h"
+#import <Foundation/Foundation.h>
 
 extern NSString *const NewsConnectionBytesReceivedNotification;
 
@@ -17,7 +17,9 @@ extern NSString *const NewsConnectionBytesReceivedNotification;
 
 @property(nonatomic, readonly) NSString *welcome;
 
-- (instancetype)initWithHost:(NSString *)host port:(NSUInteger)port isSecure:(BOOL)secure NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithHost:(NSString *)host
+                        port:(NSUInteger)port
+                    isSecure:(BOOL)secure NS_DESIGNATED_INITIALIZER;
 - (instancetype)init __attribute__((unavailable));
 
 - (NSUInteger)loginWithUser:(NSString *)user password:(NSString *)password;

@@ -8,73 +8,62 @@
 
 #import "Attachment.h"
 #import "ContentType.h"
-#import "YEncDecoder.h"
-#import "UUDecoder.h"
 #import "NNBase64Decoder.h"
 #import "NSData+NewsAdditions.h"
+#import "UUDecoder.h"
+#import "YEncDecoder.h"
 
 @implementation Attachment
 
--   (instancetype)initWithBodyData:(NSData *)bodyData
-             contentType:(ContentType *)contentType
- contentTransferEncoding:(NSString *)contentTransferEncoding
-{
-    self = [super init];
-    if (self)
-    {
-        if ([contentType.mediaType hasPrefix:@"image"])
-        {
-            if ([contentTransferEncoding caseInsensitiveCompare:@"base64"] == NSOrderedSame)
-            {
-                NNBase64Decoder *decoder = [[NNBase64Decoder alloc] initWithData:bodyData];
-                _data = [decoder decode];
-                _fileName = contentType.name;
-                _rangeInArticleData = NSMakeRange(0, bodyData.length);
+- (instancetype)initWithBodyData:(NSData *)bodyData
+                     contentType:(ContentType *)contentType
+         contentTransferEncoding:(NSString *)contentTransferEncoding {
+  self = [super init];
+  if (self) {
+    if ([contentType.mediaType hasPrefix:@"image"]) {
+      if ([contentTransferEncoding caseInsensitiveCompare:@"base64"] ==
+          NSOrderedSame) {
+        NNBase64Decoder *decoder =
+            [[NNBase64Decoder alloc] initWithData:bodyData];
+        _data = [decoder decode];
+        _fileName = contentType.name;
+        _rangeInArticleData = NSMakeRange(0, bodyData.length);
 
-                NSLog(@"base64 Filename: %@", _fileName);
-            }
-        }
-        else if ([YEncDecoder containsYEncData:bodyData])
-        {
-            YEncDecoder *decoder = [[YEncDecoder alloc] initWithData:bodyData];
-            _data = [decoder decode];
-            if (_data)
-            {
-                _fileName = [decoder.fileName copy];
-                _rangeInArticleData = decoder.encodedRange;
+        NSLog(@"base64 Filename: %@", _fileName);
+      }
+    } else if ([YEncDecoder containsYEncData:bodyData]) {
+      YEncDecoder *decoder = [[YEncDecoder alloc] initWithData:bodyData];
+      _data = [decoder decode];
+      if (_data) {
+        _fileName = [decoder.fileName copy];
+        _rangeInArticleData = decoder.encodedRange;
 
-                NSLog(@"yEnc Filename: %@", _fileName);
+        NSLog(@"yEnc Filename: %@", _fileName);
 
-                // Check the checksum
-                if (decoder.CRC32)
-                {
-                    NSUInteger dataCRC32 = _data.CRC32;
-                    if (decoder.CRC32 != dataCRC32)
-                        NSLog(@"Reported CRC32: %lx, Calculated CRC32: %lx",
-                              (unsigned long)decoder.CRC32,
-                              (unsigned long)dataCRC32);
-                }
-            }
+        // Check the checksum
+        if (decoder.CRC32) {
+          NSUInteger dataCRC32 = _data.CRC32;
+          if (decoder.CRC32 != dataCRC32)
+            NSLog(@"Reported CRC32: %lx, Calculated CRC32: %lx",
+                  (unsigned long)decoder.CRC32, (unsigned long)dataCRC32);
         }
-        else if ([UUDecoder containsUUEncodedData:bodyData])
-        {
-            UUDecoder *decoder = [[UUDecoder alloc] initWithData:bodyData];
-            _data = [decoder decode];
-            if (_data)
-            {
-                _fileName = [decoder.fileName copy];
-                _rangeInArticleData = decoder.encodedRange;
-                
-                NSLog(@"uuencode Filename: %@", decoder.fileName);
-            }
-        }
+      }
+    } else if ([UUDecoder containsUUEncodedData:bodyData]) {
+      UUDecoder *decoder = [[UUDecoder alloc] initWithData:bodyData];
+      _data = [decoder decode];
+      if (_data) {
+        _fileName = [decoder.fileName copy];
+        _rangeInArticleData = decoder.encodedRange;
+
+        NSLog(@"uuencode Filename: %@", decoder.fileName);
+      }
     }
+  }
 
-    if (_data == nil)
-    {
-        return nil;
-    }
-    return self;
+  if (_data == nil) {
+    return nil;
+  }
+  return self;
 }
 
 @end

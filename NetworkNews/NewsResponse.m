@@ -10,20 +10,17 @@
 
 @implementation NewsResponse
 
-- (instancetype)initWithData:(NSData *)data statusCode:(NSInteger)statusCode
-{
-    self = [super init];
-    if (self)
-    {
-        _data = data;
-        _statusCode = statusCode;
-    }
-    return self;
+- (instancetype)initWithData:(NSData *)data statusCode:(NSInteger)statusCode {
+  self = [super init];
+  if (self) {
+    _data = data;
+    _statusCode = statusCode;
+  }
+  return self;
 }
 
-- (NSString *)string
-{
-    return [[NSString alloc] initWithData:_data encoding:NSUTF8StringEncoding];
+- (NSString *)string {
+  return [[NSString alloc] initWithData:_data encoding:NSUTF8StringEncoding];
 }
 
 @end

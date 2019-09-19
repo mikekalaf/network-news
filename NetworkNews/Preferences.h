@@ -8,10 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-
-@interface Preferences : NSObject
-{
-
+@interface Preferences : NSObject {
 }
 
 + (void)registerDefaults;

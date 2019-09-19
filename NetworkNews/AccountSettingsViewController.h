@@ -13,17 +13,22 @@
 
 @protocol AccountSettingsDelegate
 
-- (void)accountSettingsViewController:(AccountSettingsViewController *)controller
+- (void)accountSettingsViewController:
+            (AccountSettingsViewController *)controller
                       modifiedAccount:(NewsAccount *)account;
-- (void)accountSettingsViewControllerCancelled:(AccountSettingsViewController *)controller;
-- (BOOL)accountSettingsViewController:(AccountSettingsViewController *)controller verifyAccountName:(NSString *)accountName;
+- (void)accountSettingsViewControllerCancelled:
+    (AccountSettingsViewController *)controller;
+- (BOOL)accountSettingsViewController:
+            (AccountSettingsViewController *)controller
+                    verifyAccountName:(NSString *)accountName;
 
 @end
 
-@interface AccountSettingsViewController : UITableViewController
-    <UITextFieldDelegate, UIActionSheetDelegate, UIAlertViewDelegate>
+@interface AccountSettingsViewController
+    : UITableViewController <UITextFieldDelegate, UIActionSheetDelegate,
+                             UIAlertViewDelegate>
 
 @property(nonatomic) NewsAccount *account;
-@property(nonatomic, weak) id <AccountSettingsDelegate> delegate;
+@property(nonatomic, weak) id<AccountSettingsDelegate> delegate;
 
 @end

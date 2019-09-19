@@ -8,12 +8,11 @@
 
 #import <Foundation/Foundation.h>
 
-@interface LineIterator : NSObject
-{
-    NSData *data;
-    NSUInteger position;
-    BOOL partial;
-    NSUInteger lineNumber;
+@interface LineIterator : NSObject {
+  NSData *data;
+  NSUInteger position;
+  BOOL partial;
+  NSUInteger lineNumber;
 }
 
 @property(readonly) BOOL partial;
@@ -30,6 +29,6 @@
  complete) includes the terminating CRLF.  If there is no CRLF in the data, and
  thus in the string, then the line is flagged as "partial".
  */
-@property (NS_NONATOMIC_IOSONLY, readonly, copy) NSString *nextLine;
+@property(NS_NONATOMIC_IOSONLY, readonly, copy) NSString *nextLine;
 
 @end

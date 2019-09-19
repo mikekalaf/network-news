@@ -8,16 +8,16 @@
 
 #import <Foundation/Foundation.h>
 
-
 @interface NSString (NewsAdditions)
 
-@property (NS_NONATOMIC_IOSONLY, readonly, copy) NSString *shortGroupName;
+@property(NS_NONATOMIC_IOSONLY, readonly, copy) NSString *shortGroupName;
 
 - (NSArray *)rangesWrappingWordsAtColumn:(NSUInteger)location;
 - (NSString *)stringByWrappingUnquotedWordsAtColumn:(NSUInteger)location;
 
-@property (NS_NONATOMIC_IOSONLY, readonly, copy) NSString *messageIDFileName;
+@property(NS_NONATOMIC_IOSONLY, readonly, copy) NSString *messageIDFileName;
 
-- (NSString *)stringByReplacingOccurrencesOfNumbersWithString:(NSString *)replacement;
+- (NSString *)stringByReplacingOccurrencesOfNumbersWithString:
+    (NSString *)replacement;
 
 @end

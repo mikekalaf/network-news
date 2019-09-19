@@ -12,7 +12,7 @@
 
 @interface SearchGroupsViewController : UITableViewController
 
-@property (nonatomic) NewsConnectionPool *connectionPool;
-@property (nonatomic) NSMutableArray *checkedGroups;
+@property(nonatomic) NewsConnectionPool *connectionPool;
+@property(nonatomic) NSMutableArray *checkedGroups;
 
 @end

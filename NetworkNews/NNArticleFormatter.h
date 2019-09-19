@@ -8,7 +8,6 @@
 
 #import <Foundation/Foundation.h>
 
-
 @interface NNArticleFormatter : NSObject
 
 + (NSArray *)headerArrayWithDate:(NSDate *)date

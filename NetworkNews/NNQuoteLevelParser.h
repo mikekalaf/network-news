@@ -8,17 +8,15 @@
 
 #import <Foundation/Foundation.h>
 
-
-@interface NNQuoteLevelParser : NSObject
-{
-    NSData *data;
-    BOOL flowed;
+@interface NNQuoteLevelParser : NSObject {
+  NSData *data;
+  BOOL flowed;
 }
 
 @property(retain, readonly) NSArray *quoteLevels;
 
 - (instancetype)initWithData:(NSData *)aData
-            flowed:(BOOL)isFlowed NS_DESIGNATED_INITIALIZER;
+                      flowed:(BOOL)isFlowed NS_DESIGNATED_INITIALIZER;
 - (instancetype)init __attribute__((unavailable));
 
 @end

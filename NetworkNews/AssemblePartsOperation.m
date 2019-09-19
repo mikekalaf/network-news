@@ -10,17 +10,11 @@
 
 @implementation AssemblePartsOperation
 
-- (void)main
-{
-    @try
-    {
-    }
-    @catch (NSException *exception)
-    {
-    }
-    @finally
-    {
-    }
+- (void)main {
+  @try {
+  } @catch (NSException *exception) {
+  } @finally {
+  }
 }
 
 @end

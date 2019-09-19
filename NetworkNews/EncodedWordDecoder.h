@@ -8,9 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-
-@interface EncodedWordDecoder : NSObject
-{
+@interface EncodedWordDecoder : NSObject {
 }
 
 //- (NSString *)decodeData:(NSData *)data;

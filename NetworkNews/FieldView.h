@@ -8,10 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-
-@interface FieldView : UIView
-{
-
+@interface FieldView : UIView {
 }
 
 @end

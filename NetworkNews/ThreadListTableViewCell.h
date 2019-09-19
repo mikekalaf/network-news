@@ -8,9 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-
-@interface ThreadListTableViewCell : UITableViewCell
-{
+@interface ThreadListTableViewCell : UITableViewCell {
 }
 
 @property(nonatomic) IBOutlet UIImageView *readStatusImage;

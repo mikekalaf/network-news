@@ -12,12 +12,11 @@
 @protocol NewArticleDelegate;
 @class NewsConnectionPool;
 
-@interface NewArticleViewController : UIViewController
-{
+@interface NewArticleViewController : UIViewController {
 }
 
 @property(nonatomic) NewsConnectionPool *connectionPool;
-@property(nonatomic, weak) id <NewArticleDelegate> delegate;
+@property(nonatomic, weak) id<NewArticleDelegate> delegate;
 
 - (void)setGroupName:(NSString *)groupName;
 - (void)setSubject:(NSString *)subject;

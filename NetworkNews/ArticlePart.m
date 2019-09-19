@@ -1,4 +1,4 @@
-// 
+//
 //  ArticlePart.m
 //  Network News
 //
@@ -10,7 +10,7 @@
 
 #import "Article.h"
 
-@implementation ArticlePart 
+@implementation ArticlePart
 
 @dynamic date;
 @dynamic byteCount;

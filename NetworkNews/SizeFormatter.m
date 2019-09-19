@@ -13,28 +13,27 @@
 
 @implementation SizeFormatter
 
-- (NSString *)stringForObjectValue:(id)obj
-{
-    if ([obj isKindOfClass:[NSNumber class]])
-    {
-        NSNumber *number = obj;
-        NSUInteger value = number.integerValue;
-        if (value < ONE_KB)
-            return [NSString stringWithFormat:@"%lu B", (unsigned long)value];
-        else if (value < ONE_MB)
-            return [NSString stringWithFormat:@"%lu KB", (unsigned long)value / ONE_KB];
-        else
-            return [NSString stringWithFormat:@"%lu MB", (unsigned long)value / ONE_MB];
-    }
-    return nil;
+- (NSString *)stringForObjectValue:(id)obj {
+  if ([obj isKindOfClass:[NSNumber class]]) {
+    NSNumber *number = obj;
+    NSUInteger value = number.integerValue;
+    if (value < ONE_KB)
+      return [NSString stringWithFormat:@"%lu B", (unsigned long)value];
+    else if (value < ONE_MB)
+      return
+          [NSString stringWithFormat:@"%lu KB", (unsigned long)value / ONE_KB];
+    else
+      return
+          [NSString stringWithFormat:@"%lu MB", (unsigned long)value / ONE_MB];
+  }
+  return nil;
 }
 
 - (BOOL)getObjectValue:(id *)obj
              forString:(NSString *)string
-      errorDescription:(NSString **)errorString
-{
-    *obj = nil;
-    return YES;
+      errorDescription:(NSString **)errorString {
+  *obj = nil;
+  return YES;
 }
 
 @end

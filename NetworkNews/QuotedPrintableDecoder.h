@@ -8,9 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface QuotedPrintableDecoder : NSObject
-{
-
+@interface QuotedPrintableDecoder : NSObject {
 }
 
 + (BOOL)isQuotedPrintable:(NSArray *)headers;

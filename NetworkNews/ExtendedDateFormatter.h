@@ -8,10 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-
-@interface ExtendedDateFormatter : NSDateFormatter
-{
-
+@interface ExtendedDateFormatter : NSDateFormatter {
 }
 
 @end

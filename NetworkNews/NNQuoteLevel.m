@@ -8,7 +8,6 @@
 
 #import "NNQuoteLevel.h"
 
-
 @implementation NNQuoteLevel
 
 @synthesize level;
@@ -19,17 +18,15 @@
 - (instancetype)initWithLevel:(NSUInteger)aLevel
                         range:(NSRange)aRange
                        flowed:(BOOL)isFlowed
-             signatureDivider:(BOOL)isSignatureDivider
-{
-    self = [super init];
-    if (self)
-    {
-        level = aLevel;
-        range = aRange;
-        flowed = isFlowed;
-        signatureDivider = isSignatureDivider;
-    }
-    return self;
+             signatureDivider:(BOOL)isSignatureDivider {
+  self = [super init];
+  if (self) {
+    level = aLevel;
+    range = aRange;
+    flowed = isFlowed;
+    signatureDivider = isSignatureDivider;
+  }
+  return self;
 }
 
 @end

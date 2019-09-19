@@ -15,12 +15,14 @@ extern NSString *FetchArticleCompletedNotification;
 @interface FetchArticleOperation : NSOperation
 
 - (instancetype)initWithConnectionPool:(NewsConnectionPool *)connectionPool
-                   messageID:(NSString *)messageID
-                  partNumber:(NSUInteger)partNumber
-              totalPartCount:(NSUInteger)totalPartCount
-                    cacheURL:(NSURL *)cacheURL
-                  commonInfo:(NSMutableDictionary *)commonInfo
-                    progress:(void (^)(NSUInteger bytesReceived))progressBlock NS_DESIGNATED_INITIALIZER;
+                             messageID:(NSString *)messageID
+                            partNumber:(NSUInteger)partNumber
+                        totalPartCount:(NSUInteger)totalPartCount
+                              cacheURL:(NSURL *)cacheURL
+                            commonInfo:(NSMutableDictionary *)commonInfo
+                              progress:(void (^)(NSUInteger bytesReceived))
+                                           progressBlock
+    NS_DESIGNATED_INITIALIZER;
 - (instancetype)init __attribute__((unavailable));
 
 @end

@@ -12,7 +12,7 @@
 
 @interface FavouriteGroupsViewController : UITableViewController
 
-@property (nonatomic) NewsConnectionPool *connectionPool;
-@property (nonatomic, copy) NSMutableArray *groupNames;
+@property(nonatomic) NewsConnectionPool *connectionPool;
+@property(nonatomic, copy) NSMutableArray *groupNames;
 
 @end

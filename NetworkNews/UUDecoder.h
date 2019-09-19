@@ -8,14 +8,12 @@
 
 #import <Foundation/Foundation.h>
 
-
-@interface UUDecoder : NSObject
-{
-    NSData *data;
-    NSUInteger begin;
-    NSUInteger end;
-    NSString *fileName;
-    NSRange encodedRange;
+@interface UUDecoder : NSObject {
+  NSData *data;
+  NSUInteger begin;
+  NSUInteger end;
+  NSString *fileName;
+  NSRange encodedRange;
 }
 
 @property(readonly) NSRange encodedRange;
@@ -27,6 +25,6 @@
 - (instancetype)initWithData:(NSData *)encodedData NS_DESIGNATED_INITIALIZER;
 - (instancetype)init __attribute__((unavailable));
 
-@property (NS_NONATOMIC_IOSONLY, readonly, copy) NSData *decode;
+@property(NS_NONATOMIC_IOSONLY, readonly, copy) NSData *decode;
 
 @end

@@ -8,10 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
-
-@interface EditableTableViewCell : UITableViewCell
-{
-    UITextField *textField;
+@interface EditableTableViewCell : UITableViewCell {
+  UITextField *textField;
 }
 
 @property(nonatomic, retain) UITextField *textField;

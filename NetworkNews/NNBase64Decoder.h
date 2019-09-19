@@ -8,13 +8,12 @@
 
 #import <Foundation/Foundation.h>
 
-
 @interface NNBase64Decoder : NSObject
 
 - (instancetype)initWithData:(NSData *)encodedData NS_DESIGNATED_INITIALIZER;
 - (instancetype)init __attribute__((unavailable));
 
-@property (NS_NONATOMIC_IOSONLY, readonly, copy) NSData *decode;
+@property(NS_NONATOMIC_IOSONLY, readonly, copy) NSData *decode;
 
 + (NSString *)decodeString:(NSString *)string
           toStringEncoding:(NSStringEncoding)encoding;

@@ -8,10 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
-
-@interface ThreadTableViewCell : UITableViewCell
-{
-    UILabel *dateLabel;
+@interface ThreadTableViewCell : UITableViewCell {
+  UILabel *dateLabel;
 }
 
 @property(nonatomic, retain, readonly) UILabel *dateLabel;

@@ -16,11 +16,11 @@
 @property(nonatomic, readonly) char postingStatus;
 
 - (instancetype)initWithName:(NSString *)name
-    highestArticle:(long long)highestArticle
-     lowestArticle:(long long)lowestArticle
-     postingStatus:(char)postingStatus NS_DESIGNATED_INITIALIZER;
+              highestArticle:(long long)highestArticle
+               lowestArticle:(long long)lowestArticle
+               postingStatus:(char)postingStatus NS_DESIGNATED_INITIALIZER;
 - (instancetype)init __attribute__((unavailable));
 
-@property (NS_NONATOMIC_IOSONLY, readonly) long long count;
+@property(NS_NONATOMIC_IOSONLY, readonly) long long count;
 
 @end

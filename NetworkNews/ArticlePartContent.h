@@ -8,15 +8,13 @@
 
 #import <Foundation/Foundation.h>
 
-
-@interface ArticlePartContent : NSObject
-{
-    NSMutableData *data;
-    BOOL containsHead;
-    NSArray *headEntries;
-    NSRange headRange;
-    NSRange bodyRange;
-    NSData *bodyData;
+@interface ArticlePartContent : NSObject {
+  NSMutableData *data;
+  BOOL containsHead;
+  NSArray *headEntries;
+  NSRange headRange;
+  NSRange bodyRange;
+  NSData *bodyData;
 }
 
 @property(nonatomic, retain, readonly) NSMutableData *data;

@@ -16,12 +16,11 @@
 
 @end
 
-@interface GroupInfoViewController : UIViewController
-{
-    IBOutlet UILabel *groupNameLabel;
-    id <GroupInfoDelegate> delegate;
+@interface GroupInfoViewController : UIViewController {
+  IBOutlet UILabel *groupNameLabel;
+  id<GroupInfoDelegate> delegate;
 }
 
-@property(nonatomic, retain) id <GroupInfoDelegate> delegate;
+@property(nonatomic, retain) id<GroupInfoDelegate> delegate;
 
 @end

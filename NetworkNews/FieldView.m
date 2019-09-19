@@ -8,24 +8,19 @@
 
 #import "FieldView.h"
 
-
 @implementation FieldView
 
-
-- (instancetype)initWithFrame:(CGRect)frame
-{
-    if ((self = [super initWithFrame:frame]))
-    {
-        // Initialization code
-    }
-    return self;
+- (instancetype)initWithFrame:(CGRect)frame {
+  if ((self = [super initWithFrame:frame])) {
+    // Initialization code
+  }
+  return self;
 }
 
-- (void)drawRect:(CGRect)rect
-{
-    CGRect bottom = CGRectMake(0, rect.size.height - 1, rect.size.width, 1);
-    [[UIColor lightGrayColor] setFill];
-    UIRectFill(bottom);
+- (void)drawRect:(CGRect)rect {
+  CGRect bottom = CGRectMake(0, rect.size.height - 1, rect.size.width, 1);
+  [[UIColor lightGrayColor] setFill];
+  UIRectFill(bottom);
 }
 
 @end

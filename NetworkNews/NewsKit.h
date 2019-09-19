@@ -10,7 +10,7 @@
 #define APP_NAME_TOKEN @"NetworkNews"
 
 #if TARGET_OS_IPHONE == 1
-    #define OS_NAME @"iOS"
+#define OS_NAME @"iOS"
 #elif TARGET_OS_MAC == 1
-    #define OS_NAME @"OS X"
+#define OS_NAME @"OS X"
 #endif

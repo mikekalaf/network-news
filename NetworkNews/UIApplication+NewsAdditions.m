@@ -12,31 +12,26 @@ static NSInteger __count = 0;
 
 @implementation UIApplication (NewsAdditions)
 
-- (void)showNetworkActivityIndicator
-{
-    @synchronized ([UIApplication sharedApplication])
-    {
-        if (__count == 0)
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self setNetworkActivityIndicatorVisible:YES];
-            });
-        ++__count;
-    }
+- (void)showNetworkActivityIndicator {
+  @synchronized([UIApplication sharedApplication]) {
+    if (__count == 0)
+      dispatch_async(dispatch_get_main_queue(), ^{
+        [self setNetworkActivityIndicatorVisible:YES];
+      });
+    ++__count;
+  }
 }
 
-- (void)hideNetworkActivityIndicator
-{
-    @synchronized ([UIApplication sharedApplication])
-    {
-        --__count;
-        if (__count <= 0)
-        {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self setNetworkActivityIndicatorVisible:NO];
-            });
-            __count = 0;
-        }
+- (void)hideNetworkActivityIndicator {
+  @synchronized([UIApplication sharedApplication]) {
+    --__count;
+    if (__count <= 0) {
+      dispatch_async(dispatch_get_main_queue(), ^{
+        [self setNetworkActivityIndicatorVisible:NO];
+      });
+      __count = 0;
     }
+  }
 }
 
 @end

@@ -12,11 +12,11 @@
 
 @interface ThreadViewController : UITableViewController
 
-@property (nonatomic) NewsConnectionPool *connectionPool;
-@property (nonatomic) NSArray *articles;
-@property (nonatomic) NSString *threadTitle;
-@property (nonatomic) NSDate *threadDate;
-@property (nonatomic) NSString *groupName;
+@property(nonatomic) NewsConnectionPool *connectionPool;
+@property(nonatomic) NSArray *articles;
+@property(nonatomic) NSString *threadTitle;
+@property(nonatomic) NSDate *threadDate;
+@property(nonatomic) NSString *groupName;
 
 - (void)returningFromArticleIndex:(NSUInteger)fromArticleIndex;
 

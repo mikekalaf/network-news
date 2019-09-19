@@ -14,13 +14,14 @@
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
-@property (nonatomic) UIWindow *window;
-@property (nonatomic) UINavigationController *navigationController;
-@property (nonatomic) UISplitViewController *splitViewController;
-@property (nonatomic) ArticleViewController *articleViewController;
-@property (nonatomic) NSMutableArray *accounts;
+@property(nonatomic) UIWindow *window;
+@property(nonatomic) UINavigationController *navigationController;
+@property(nonatomic) UISplitViewController *splitViewController;
+@property(nonatomic) ArticleViewController *articleViewController;
+@property(nonatomic) NSMutableArray *accounts;
 
-@property (NS_NONATOMIC_IOSONLY, readonly, copy) NSURL *accountsFileURL;
-@property (NS_NONATOMIC_IOSONLY, readonly, copy) NSMutableArray *accountsFromArchive;
+@property(NS_NONATOMIC_IOSONLY, readonly, copy) NSURL *accountsFileURL;
+@property(NS_NONATOMIC_IOSONLY, readonly, copy)
+    NSMutableArray *accountsFromArchive;
 
 @end

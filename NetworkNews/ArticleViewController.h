@@ -6,9 +6,9 @@
 //  Copyright 2010 David Schweinsberg. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
-#import <MessageUI/MFMailComposeViewController.h>
 #import "NewArticleViewController.h"
+#import <MessageUI/MFMailComposeViewController.h>
+#import <UIKit/UIKit.h>
 
 @protocol ArticleSource;
 @class Article;
@@ -16,8 +16,8 @@
 
 @interface ArticleViewController : UIViewController
 
-@property (nonatomic) NewsConnectionPool *connectionPool;
-@property(nonatomic, weak) id <ArticleSource> articleSource;
+@property(nonatomic) NewsConnectionPool *connectionPool;
+@property(nonatomic, weak) id<ArticleSource> articleSource;
 @property(nonatomic) NSInteger articleIndex;
 @property(nonatomic, weak) NSString *groupName;
 
@@ -25,10 +25,9 @@
 
 @end
 
-
 @protocol ArticleSource
 
-@property (NS_NONATOMIC_IOSONLY, readonly) NSUInteger articleCount;
+@property(NS_NONATOMIC_IOSONLY, readonly) NSUInteger articleCount;
 - (Article *)articleAtIndex:(NSUInteger)index;
 
 @end

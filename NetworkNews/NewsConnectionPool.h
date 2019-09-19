@@ -13,9 +13,10 @@
 
 @interface NewsConnectionPool : NSObject
 
-@property (nonatomic, readonly) NewsAccount *account;
+@property(nonatomic, readonly) NewsAccount *account;
 
-- (instancetype)initWithAccount:(NewsAccount *)account NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithAccount:(NewsAccount *)account
+    NS_DESIGNATED_INITIALIZER;
 - (instancetype)init __attribute__((unavailable));
 
 - (NewsConnection *)dequeueConnection;

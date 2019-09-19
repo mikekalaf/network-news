@@ -13,60 +13,51 @@
 
 @synthesize data;
 
-- (instancetype)initWithHead:(BOOL)withHead
-{
-    self = [super init];
-    if (self)
-    {
-        containsHead = withHead;
-        data = [[NSMutableData alloc] initWithCapacity:1];
-    }
-    return self;
+- (instancetype)initWithHead:(BOOL)withHead {
+  self = [super init];
+  if (self) {
+    containsHead = withHead;
+    data = [[NSMutableData alloc] initWithCapacity:1];
+  }
+  return self;
 }
 
-- (void)collectHeadEntries
-{
-    if (containsHead && headEntries == nil)
-    {
-        // Initialise the head and body ranges
-        NNHeaderParser *hp = [[NNHeaderParser alloc] initWithData:data];
-        headEntries = hp.entries;
-        
-        headRange = NSMakeRange(0, hp.length);
-        bodyRange = NSMakeRange(hp.length, data.length - hp.length);
-    }
+- (void)collectHeadEntries {
+  if (containsHead && headEntries == nil) {
+    // Initialise the head and body ranges
+    NNHeaderParser *hp = [[NNHeaderParser alloc] initWithData:data];
+    headEntries = hp.entries;
+
+    headRange = NSMakeRange(0, hp.length);
+    bodyRange = NSMakeRange(hp.length, data.length - hp.length);
+  }
 }
 
-- (NSArray *)headEntries
-{
+- (NSArray *)headEntries {
+  [self collectHeadEntries];
+  return headEntries;
+}
+
+- (NSRange)headRange {
+  [self collectHeadEntries];
+  return headRange;
+}
+
+- (NSRange)bodyRange {
+  [self collectHeadEntries];
+  return bodyRange;
+}
+
+- (NSData *)bodyData {
+  if (containsHead && bodyData == nil) {
     [self collectHeadEntries];
-    return headEntries;
-}
+    bodyData = [data subdataWithRange:bodyRange];
+  }
 
-- (NSRange)headRange
-{
-    [self collectHeadEntries];
-    return headRange;
-}
-
-- (NSRange)bodyRange
-{
-    [self collectHeadEntries];
-    return bodyRange;
-}
-
-- (NSData *)bodyData
-{
-    if (containsHead && bodyData == nil)
-    {
-        [self collectHeadEntries];
-        bodyData = [data subdataWithRange:bodyRange];
-    }
-
-    if (bodyData)
-        return bodyData;
-    else
-        return data;
+  if (bodyData)
+    return bodyData;
+  else
+    return data;
 }
 
 @end

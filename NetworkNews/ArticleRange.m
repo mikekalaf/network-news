@@ -10,16 +10,14 @@
 
 @implementation NSValue (ArticleRange)
 
-+ (NSValue *)valueWithArticleRange:(ArticleRange)range
-{
-    return [NSValue valueWithBytes:&range objCType:@encode(ArticleRange)];
++ (NSValue *)valueWithArticleRange:(ArticleRange)range {
+  return [NSValue valueWithBytes:&range objCType:@encode(ArticleRange)];
 }
 
-- (ArticleRange)articleRangeValue
-{
-    ArticleRange range;
-    [self getValue:&range];
-    return range;
+- (ArticleRange)articleRangeValue {
+  ArticleRange range;
+  [self getValue:&range];
+  return range;
 }
 
 @end

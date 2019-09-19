@@ -20,8 +20,7 @@
  * We're keeping references as a string of message ids because it may be
  * referring to messages that are not present in our database.
  */
-@interface Article :  NSManagedObject  
-{
+@interface Article : NSManagedObject {
 }
 
 @property(nonatomic, retain) NSDate *date;
@@ -42,9 +41,7 @@
 
 + (NSDate *)dateWithString:(NSString *)dateString;
 
-
 @end
-
 
 @interface Article (CoreDataGeneratedAccessors)
 - (void)addPartsObject:(ArticlePart *)value;

@@ -10,6 +10,6 @@
 
 @interface WelcomeViewController : UITableViewController
 
-@property (nonatomic) NSMutableArray *accounts;
+@property(nonatomic) NSMutableArray *accounts;
 
 @end

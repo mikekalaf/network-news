@@ -14,8 +14,7 @@
  * Corresponds to an individual article on the news server, and thus has a
  * messageId identifying that article.
  */
-@interface ArticlePart : NSManagedObject
-{
+@interface ArticlePart : NSManagedObject {
 }
 
 @property(nonatomic, retain) NSDate *date;

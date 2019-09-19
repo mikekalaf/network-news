@@ -355,9 +355,9 @@
 				634191B316D0D6590069B528 /* Frameworks */,
 				634191B216D0D6590069B528 /* Products */,
 			);
-			indentWidth = 4;
+			indentWidth = 2;
 			sourceTree = "<group>";
-			tabWidth = 4;
+			tabWidth = 2;
 		};
 		634191B216D0D6590069B528 /* Products */ = {
 			isa = PBXGroup;
@@ -701,6 +701,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = 634191A816D0D6590069B528;

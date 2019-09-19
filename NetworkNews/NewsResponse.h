@@ -14,9 +14,10 @@
 @property(nonatomic, readonly) NSInteger statusCode;
 @property(nonatomic) NSDictionary *dictionary;
 
-- (instancetype)initWithData:(NSData *)data statusCode:(NSInteger)statusCode NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithData:(NSData *)data
+                  statusCode:(NSInteger)statusCode NS_DESIGNATED_INITIALIZER;
 - (instancetype)init __attribute__((unavailable));
 
-@property (NS_NONATOMIC_IOSONLY, readonly, copy) NSString *string;
+@property(NS_NONATOMIC_IOSONLY, readonly, copy) NSString *string;
 
 @end

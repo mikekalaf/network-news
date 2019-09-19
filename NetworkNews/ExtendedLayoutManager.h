@@ -10,9 +10,7 @@
 
 #define LEVEL_INDENT 10.0
 
-@interface ExtendedLayoutManager : NSLayoutManager
-{
-
+@interface ExtendedLayoutManager : NSLayoutManager {
 }
 
 @end

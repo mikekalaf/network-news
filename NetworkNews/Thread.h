@@ -8,26 +8,22 @@
 
 #import <Foundation/Foundation.h>
 
-typedef NS_ENUM(unsigned int, ThreadType)
-{
-    ThreadTypeMessage,
-    ThreadTypeFile
-};
+typedef NS_ENUM(unsigned int, ThreadType) { ThreadTypeMessage, ThreadTypeFile };
 
 @class Article;
 @class NNNewsrc;
 
 @interface Thread : NSObject //<NSCoding>
 {
-    NSString *subject;
-    NSString *initialAuthor;
-    NSDate *earliestDate;
-    NSDate *latestDate;
-    NSMutableArray *articles;
-    NSArray *sortedArticles;
-    BOOL sorted;
-    NSString *messageID;
-    ThreadType threadType;
+  NSString *subject;
+  NSString *initialAuthor;
+  NSDate *earliestDate;
+  NSDate *latestDate;
+  NSMutableArray *articles;
+  NSArray *sortedArticles;
+  BOOL sorted;
+  NSString *messageID;
+  ThreadType threadType;
 }
 
 @property(nonatomic, copy) NSString *subject;
