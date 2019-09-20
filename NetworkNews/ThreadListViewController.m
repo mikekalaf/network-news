@@ -104,8 +104,8 @@
   _statusLabel = [[UILabel alloc] initWithFrame:CGRectZero];
   _statusLabel.font = [UIFont systemFontOfSize:11.0];
   [_statusLabel setOpaque:NO];
-  _statusLabel.backgroundColor = [UIColor clearColor];
-  _statusLabel.textColor = [UIColor toolbarTextColor];
+  _statusLabel.backgroundColor = UIColor.clearColor;
+  _statusLabel.textColor = UIColor.toolbarTextColor;
   self.statusBarButtonItem.customView = _statusLabel;
 
   NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];

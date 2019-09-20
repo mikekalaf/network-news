@@ -18,7 +18,7 @@
     // Add a label display the date
     CGRect frame = CGRectMake(200, 4, 96, 16);
     dateLabel = [[UILabel alloc] initWithFrame:frame];
-    dateLabel.textColor = [UIColor blueColor];
+    dateLabel.textColor = UIColor.blueColor;
     dateLabel.font = [UIFont systemFontOfSize:[UIFont systemFontSize]];
     [self.contentView addSubview:dateLabel];
   }

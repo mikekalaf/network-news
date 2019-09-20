@@ -96,12 +96,12 @@
   long long articleCount = [listing count];
   cell.textLabel.text = groupName;
   if (articleCount > 0) {
-    cell.textLabel.textColor = [UIColor blackColor];
+    cell.textLabel.textColor = UIColor.labelColor;
     NSString *articleText = (articleCount > 1) ? @"Articles" : @"Article";
     cell.detailTextLabel.text =
         [NSString stringWithFormat:@"%lld %@", articleCount, articleText];
   } else {
-    cell.textLabel.textColor = [UIColor grayColor];
+    cell.textLabel.textColor = UIColor.grayColor;
     cell.detailTextLabel.text = @"Empty";
   }
 

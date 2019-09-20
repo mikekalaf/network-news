@@ -174,9 +174,9 @@ typedef NS_ENUM(unsigned int, AccountSettingsTag) {
     }
 
     if (isValid)
-      cell.textField.textColor = [UIColor blackColor];
+      cell.textField.textColor = UIColor.labelColor;
     else
-      cell.textField.textColor = [UIColor redColor];
+      cell.textField.textColor = UIColor.redColor;
 
     return cell;
   }
@@ -227,9 +227,9 @@ typedef NS_ENUM(unsigned int, AccountSettingsTag) {
     if ([view isKindOfClass:[UITextField class]]) {
       UITextField *textField = (UITextField *)view;
       if (enable)
-        textField.textColor = [UIColor blackColor];
+        textField.textColor = UIColor.labelColor;
       else
-        textField.textColor = [UIColor grayColor];
+        textField.textColor = UIColor.grayColor;
     }
   }
 }
@@ -356,9 +356,9 @@ typedef NS_ENUM(unsigned int, AccountSettingsTag) {
     _account.serviceName = textField.text;
     [self isServiceNameValid];
     if (_isServiceNameValid)
-      textField.textColor = [UIColor blackColor];
+      textField.textColor = UIColor.labelColor;
     else
-      textField.textColor = [UIColor redColor];
+      textField.textColor = UIColor.redColor;
   }
   //    else if (tag == AccountSettingsDescriptionTag)
   //    {

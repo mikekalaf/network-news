@@ -19,12 +19,12 @@
 
     _textLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     _textLabel.font = [UIFont boldSystemFontOfSize:[UIFont systemFontSize]];
-    _textLabel.textColor = UIColor.blackColor;
+    _textLabel.textColor = UIColor.labelColor;
     [self addSubview:_textLabel];
 
     _dateLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     _dateLabel.font = [UIFont systemFontOfSize:[UIFont systemFontSize]];
-    _dateLabel.textColor = UIColor.blackColor;
+    _dateLabel.textColor = UIColor.labelColor;
     [self addSubview:_dateLabel];
   }
   return self;
